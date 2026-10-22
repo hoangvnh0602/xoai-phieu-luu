@@ -464,13 +464,23 @@ textarea.code{width:100%;box-sizing:border-box;margin-top:8px;min-height:64px;bo
 /* Pet */
 .pet-scene{flex:1;min-height:0;width:100%;max-width:1040px;position:relative;border-radius:30px;overflow:hidden;background:linear-gradient(#DDF3FF,#F2FBFF 65%,#9EDB8C 65.2%,#7FCB6E);transition:filter .6s}
 .pet-scene.night{filter:brightness(.45) saturate(.7)}
-.dino-wrap{position:absolute;left:50%;bottom:6%;transform:translateX(-50%);height:78%;aspect-ratio:240/200;max-width:96%;display:grid;place-items:end center;cursor:pointer}
+.dino-wrap{position:absolute;left:50%;bottom:4%;transform:translateX(-50%);height:90%;aspect-ratio:1671/1958;max-width:96%;display:grid;place-items:end center;cursor:pointer}
 .dino-wrap svg{width:100%;height:100%;overflow:visible}
 .dino{transform-box:fill-box;transform-origin:50% 100%;animation:breathe 3s ease-in-out infinite}
 @keyframes breathe{50%{transform:scaleY(1.03)}}
 .dino.jump{animation:jump .7s ease}
 @keyframes jump{30%{transform:translateY(-22%) scaleY(1.05)}60%{transform:translateY(0) scaleY(.92)}}
-.dino.no #dHead{animation:headno .7s}
+.dino.no{animation:shakeNo .6s}
+@keyframes shakeNo{25%{transform:rotate(-3deg)}75%{transform:rotate(3deg)}}
+.d-an,.d-vui,.d-chao{opacity:0}
+.munch .d-base,.dino.jump .d-base,.hello .d-base{opacity:0}
+.munch .d-an{opacity:1;animation:chew .2s 5 alternate}
+@keyframes chew{to{transform:translateY(6px)}}
+.dino.jump .d-vui,.hello .d-chao{opacity:1}
+.munch .d-vui,.munch .d-chao{opacity:0}
+.comsvg{display:block}
+.egg-img{width:100%;height:100%;object-fit:contain;display:block;filter:drop-shadow(0 10px 0 rgba(29,54,70,.12))}
+.egg-big.broke{animation:none}
 @keyframes headno{25%{transform:rotate(-6deg)}75%{transform:rotate(6deg)}}
 #dHead{transform-box:fill-box;transform-origin:20% 90%;animation:headIdle 6s ease-in-out infinite}
 @keyframes headIdle{0%,100%{transform:rotate(0)}30%{transform:rotate(-4deg)}55%{transform:rotate(3deg)}}
@@ -497,7 +507,7 @@ textarea.code{width:100%;box-sizing:border-box;margin-top:8px;min-height:64px;bo
 .munch #dMouthC{display:none}
 @keyframes chomp{to{transform:scaleY(.2)}}
 #dMouthO{transform-box:fill-box;transform-origin:center}
-.egg-big{position:absolute;left:50%;bottom:8%;transform:translateX(-50%);height:66%;aspect-ratio:100/120;cursor:pointer;animation:wobble 2.2s ease-in-out infinite}
+.egg-big{position:absolute;left:50%;bottom:6%;transform:translateX(-50%);height:72%;aspect-ratio:700/684;cursor:pointer;animation:wobble 2.2s ease-in-out infinite;--wob:0deg}
 .egg-big svg{width:100%;height:100%}
 .egg-big.tap{animation:wobble2 .35s}
 @keyframes wobble{0%,80%,100%{transform:translateX(-50%) rotate(0)}85%{transform:translateX(-50%) rotate(-5deg)}92%{transform:translateX(-50%) rotate(5deg)}}
@@ -550,7 +560,7 @@ textarea.code{width:100%;box-sizing:border-box;margin-top:8px;min-height:64px;bo
 body.sleep{background:#22355C;color:#F2F5FF}
 body.sleep h1{color:#FFE28A}
 .moon{font-size:clamp(90px,15vw,160px);line-height:1}
-.sleep-dino{height:min(36vh,260px);aspect-ratio:240/200}
+.sleep-dino{height:min(40vh,300px);aspect-ratio:1}
 .sleep-dino svg{width:100%;height:100%}
 .panel{background:var(--card);color:var(--ink);border-radius:28px;padding:clamp(16px,3vh,28px);width:100%;max-width:640px;display:flex;flex-direction:column;gap:16px;text-align:left;max-height:100%;overflow:auto}
 .panel h2{font-family:var(--display);margin:0;font-size:26px}
@@ -609,7 +619,9 @@ const KEY='xoai_v2';
 function readLS(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}}
 function norm(d){d=Object.assign({stars:0,stickers:0,limit:20,day:'',used:0,bonus:0,stats:{},voice:'',rate:1,mute:false,music:true,hist:[]},d||{});if(d.earned==null)d.earned=d.stars;
   d.lvl=Object.assign({count:0,color:0,shape:0,code:0,memory:0,catch:0,band:0,hide:0,market:0,pattern:0,story:0},d.lvl||{});
-  d.pet=Object.assign({hatched:false,taps:0,xp:0,food:3,clean:3,fun:3,last:0,name:'Bé Cốm',color:'#5BC27A',stageSeen:0},d.pet||{});return d}
+  d.pet=Object.assign({hatched:false,taps:0,xp:0,food:3,clean:3,fun:3,last:0,name:'Bé Cốm',color:'#FF8CC0',stageSeen:0},d.pet||{});
+  if(!d.comArt){d.comArt=1;if(d.pet.color==='#5BC27A')d.pet.color='#FF8CC0';if(d.shop)d.shop.owned=(d.shop.owned||[]).map(x=>x==='skin-#5BC27A'?'skin-#FF8CC0':x)}
+  return d}
 let S=readLS(KEY);
 if(!S||!S.profiles||!S.profiles.length)S={profiles:[{id:'xoai',name:'Xoài',icon:'🦕'}],cur:'xoai',data:{xoai:readLS('xoai_v1')||{}}};
 S.data=S.data||{};S.profiles.forEach(p=>S.data[p.id]=norm(S.data[p.id]));
@@ -820,42 +832,50 @@ function memFaces(count){
     if(i<=sp.length||Math.random()<.7){used.add(key);out.push([dinoArt(s[0],col[1]),`${s[1]} màu ${col[0]}`,shade(col[1],.78)])}}
   return out}
 function stageOf(xp){return xp<15?1:xp<50?2:3}
+// ---------- Bé Cốm: illustrated art (img/*.webp), poses, recolored skins ----------
+const COM_POSES=['dung','vui','an','chao','ngu','lon1','lon2'];
+const COM_SRC=Object.assign(Object.fromEntries(COM_POSES.map(k=>[k,`img/com-${k}.webp`])),{trung:'img/trung.webp','trung-nut':'img/trung-nut.webp','trung-vo':'img/trung-vo.webp'},window.__IMG||{});
+const COM_BOX=[189,182,1671,1686];     // shared crop of every pose, in the 2048px art space
+const COM_VIEW=[189,-90,1671,1958];    // extra headroom so hats are never clipped
+const PINK='#FF8CC0';
+const skinCache={};
+function hexHsl(hex){const n=parseInt(hex.slice(1),16),r=(n>>16)/255,g=(n>>8&255)/255,b=(n&255)/255,mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2,d=mx-mn;
+  let h=0,s=0;if(d){s=d/(l>.5?2-mx-mn:mx+mn);h=mx===r?((g-b)/d)%6:mx===g?(b-r)/d+2:(r-g)/d+4;h*=60;if(h<0)h+=360}return[h,s,l]}
+function recolorSkin(pose,col){
+  const key=pose+col;if(skinCache[key])return;skinCache[key]='pending';
+  const im=new Image();im.onload=()=>{try{
+    const c=document.createElement('canvas');c.width=im.naturalWidth;c.height=im.naturalHeight;const x=c.getContext('2d');x.drawImage(im,0,0);
+    const d=x.getImageData(0,0,c.width,c.height),a=d.data,[th,ts,tl]=hexHsl(col);
+    for(let i=0;i<a.length;i+=4){if(!a[i+3])continue;const r=a[i]/255,g=a[i+1]/255,b=a[i+2]/255,mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2,dd=mx-mn;if(!dd)continue;
+      const s=dd/(l>.5?2-mx-mn:mx+mn);let h=mx===r?((g-b)/dd)%6:mx===g?(b-r)/dd+2:(r-g)/dd+4;h*=60;if(h<0)h+=360;
+      // only the pink skin and spots: cheeks, tongue, belly and outline keep their colors
+      if(!((h>=322||h<=1.5)&&s>.3&&l>.25&&l<.97))continue;
+      const nl=Math.min(1,Math.max(0,l+(tl-.82)*.55)),ns=Math.min(1,s*ts),q=nl<.5?nl*(1+ns):nl+ns-nl*ns,p=2*nl-q;
+      const hue=t=>{t=(t%1+1)%1;return t<1/6?p+(q-p)*6*t:t<.5?q:t<2/3?p+(q-p)*(2/3-t)*6:p};
+      a[i]=hue(th/360+1/3)*255;a[i+1]=hue(th/360)*255;a[i+2]=hue(th/360-1/3)*255}
+    x.putImageData(d,0,0);
+    const done=url=>{skinCache[key]=url;document.querySelectorAll(`image[data-k="${key}"]`).forEach(el=>el.setAttribute('href',url))};
+    if(c.toBlob)c.toBlob(b=>done(b?URL.createObjectURL(b):c.toDataURL()),'image/webp',.9);else done(c.toDataURL());
+  }catch(e){skinCache[key]=COM_SRC[pose]}};im.src=COM_SRC[pose]}
+function skinSrc(pose,col){if(!col||col===PINK)return COM_SRC[pose];const v=skinCache[pose+col];if(v&&v!=='pending')return v;recolorSkin(pose,col);return COM_SRC[pose]}
+function warmSkin(col){if(col&&col!==PINK)COM_POSES.forEach((k,i)=>setTimeout(()=>recolorSkin(k,col),60*i))}
+function comImg(pose,col,cls){const[x,y,w,h]=COM_BOX;return `<image class="${cls}" data-k="${pose+col}" href="${skinSrc(pose,col)}" x="${x}" y="${y}" width="${w}" height="${h}"/>`}
+// accessories are drawn in the old 240x200 pet space; place them onto the new head, eye and neck
+function accOn(p,part){const s=accSVG(p,part);if(!s)return'';
+  const T={head:[194,50,1460,520,8.6,.46],face:[199,43,1422,502,6.6,.55],neck:[150,100,1366,945,10,.4]}[part];
+  return `<g transform="translate(${T[2]} ${T[3]}) scale(${T[4]}) translate(${-T[0]} ${-T[1]})">${s.replace(/stroke-width="([\d.]+)"/g,(m,v)=>`stroke-width="${(v*T[5]).toFixed(2)}"`)}</g>`}
 function dino(p,sleeping=false){
-  const c=p.color,dk=shade(c,-.32),lt=shade(c,.6),hi=shade(c,.32),st=stageOf(p.xp),K='#1D3646',id='pg'+(++GID),F=`url(#${id})`;
-  const S=`stroke="${K}" stroke-width="4" stroke-linejoin="round"`;
-  const spikes=st>=2?`<g fill="${shade(c,-.15)}" ${S}>${[[76,96],[96,88],[116,87]].concat(st>=3?[[58,110]]:[]).map(([x,y])=>`<path d="M${x-10} ${y+8} Q${x-4} ${y-4} ${x} ${y-15} Q${x+4} ${y-4} ${x+10} ${y+8}Z"/>`).join('')}</g>`:'';
-  const toes=(x,y)=>`<g fill="#FFF6DF" stroke="${K}" stroke-width="2"><circle cx="${x-7}" cy="${y}" r="3.4"/><circle cx="${x}" cy="${y+1}" r="3.4"/><circle cx="${x+7}" cy="${y}" r="3.4"/></g>`;
-  const eye=sleeping?`<path d="M188 46 Q198 55 208 46" fill="none" stroke="${K}" stroke-width="4" stroke-linecap="round"/>`
-    :`<g class="d-eye"><ellipse cx="198" cy="43" rx="11" ry="12.5" fill="#fff" stroke="${K}" stroke-width="3"/><ellipse cx="200.5" cy="45" rx="7" ry="8.4" fill="${K}"/><circle cx="203.5" cy="40" r="3" fill="#fff"/><circle cx="198" cy="49.5" r="1.4" fill="#fff"/></g>`;
-  const dirtOp=clamp((3.8-p.clean)/2.8,0,1).toFixed(2);
-  const scale=[0,.72,.86,1][st];
-  return `<svg viewBox="0 0 240 200" style="overflow:visible"><defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${hi}"/><stop offset=".55" stop-color="${c}"/><stop offset="1" stop-color="${dk}"/></linearGradient></defs>
-  <ellipse cx="120" cy="194" rx="${(78*scale).toFixed(0)}" ry="6" fill="${K}" opacity=".14"/>
-  <g transform="translate(${(120*(1-scale)).toFixed(1)} ${(196*(1-scale)).toFixed(1)}) scale(${scale})"><g class="dino">
-  ${spikes}
-  <g class="d-tail"><path d="M72 128 Q24 148 4 112 Q34 131 78 110 Z" fill="${F}" ${S}/></g>
-  <ellipse cx="82" cy="164" rx="14" ry="20" fill="${dk}" ${S}/>
-  <ellipse cx="110" cy="125" rx="56" ry="42" fill="${F}" ${S}/>
-  <g fill="none" stroke="${dk}" stroke-width="5" stroke-linecap="round" opacity=".4"><path d="M80 98 q7 9 1 21"/><path d="M100 88 q7 10 1 23"/><path d="M122 89 q7 10 1 22"/></g>
-  <ellipse cx="116" cy="142" rx="38" ry="20" fill="${lt}"/>
-  <path d="M86 136 Q116 146 146 136 M90 150 Q116 159 142 150" fill="none" stroke="${hi}" stroke-width="3"/>
-  <ellipse cx="94" cy="104" rx="20" ry="7" fill="#fff" opacity=".3" transform="rotate(-18 94 104)"/>
-  <ellipse cx="96" cy="166" rx="14" ry="20" fill="${F}" ${S}/>${toes(96,182)}
-  <ellipse cx="140" cy="166" rx="14" ry="20" fill="${F}" ${S}/>${toes(140,182)}
-  <g id="dDirt" opacity="${dirtOp}"><ellipse cx="98" cy="118" rx="11" ry="7" fill="#8B5A2B"/><ellipse cx="128" cy="108" rx="7" ry="5" fill="#8B5A2B"/><ellipse cx="70" cy="140" rx="8" ry="6" fill="#8B5A2B"/><circle cx="104" cy="150" r="5" fill="#8B5A2B"/></g>
-  <g id="dHead">
-    <path d="M130 104 C140 72 158 54 176 48 L194 66 C174 72 162 92 160 118 Z" fill="${F}" ${S}/>
-    ${accSVG(p,'neck')}
-    <ellipse cx="194" cy="50" rx="38" ry="29" fill="${F}" ${S}/>
-    <ellipse cx="184" cy="32" rx="14" ry="5" fill="#fff" opacity=".35" transform="rotate(-12 184 32)"/>
-    <ellipse cx="212" cy="62" rx="7" ry="4.5" fill="#FF7FA8" opacity=".6"/>
-    <circle cx="226" cy="44" r="2.2" fill="${K}"/>
-    ${eye}
-    <path id="dMouthC" d="M206 66 Q215 73 225 62" fill="none" stroke="${K}" stroke-width="3.5" stroke-linecap="round"/>
-    <ellipse id="dMouthO" cx="216" cy="66" rx="7.5" ry="6.5" fill="#7A2335" stroke="${K}" stroke-width="2.5"/>
-    ${accSVG(p,'face')}${accSVG(p,'head')}
-  </g></g></g></svg>`;
-}
+  const st=stageOf(p.xp||0),col=p.color||PINK,K='#1D3646',scale=[0,.8,.9,1][st];
+  const base=sleeping?'ngu':st>=3?'lon2':st>=2?'lon1':'dung';
+  const dirtOp=clamp((3.8-(p.clean??5))/2.8,0,1).toFixed(2);
+  const dirt=`<g id="dDirt" opacity="${dirtOp}" fill="#8B5A2B"><ellipse cx="780" cy="1090" rx="78" ry="48"/><ellipse cx="1030" cy="1010" rx="46" ry="32"/><ellipse cx="640" cy="1270" rx="56" ry="40"/><ellipse cx="960" cy="1330" rx="34" ry="30"/><ellipse cx="1210" cy="1450" rx="40" ry="28"/><circle cx="880" cy="1200" r="18"/></g>`;
+  const ox=1024*(1-scale),oy=1840*(1-scale);
+  return `<svg viewBox="${COM_VIEW.join(' ')}" style="overflow:visible" class="comsvg"><ellipse cx="1010" cy="1846" rx="${(640*scale).toFixed(0)}" ry="34" fill="${K}" opacity=".13"/>
+  <g transform="translate(${ox.toFixed(1)} ${oy.toFixed(1)}) scale(${scale})"><g class="dino">
+    ${comImg(base,col,'d-img d-base')}${sleeping?'':comImg('an',col,'d-img d-an')+comImg('vui',col,'d-img d-vui')+comImg('chao',col,'d-img d-chao')}
+    ${dirt}${accOn(p,'neck')}${accOn(p,'face')}${accOn(p,'head')}
+  </g></g></svg>`}
+function petEgg(taps=0){return `<img class="egg-img" src="${COM_SRC[taps>=2?'trung-nut':'trung']}" alt="Trứng khủng long">`}
 const COLORS=[['đỏ','#F04438'],['vàng','#FFD23F'],['xanh lá','#38B26A'],['xanh dương','#2F7DF6'],['tím','#8E5CF6'],['cam','#FF8A3D'],['hồng','#FF8CC0']];
 const COUNTABLE=[['🦕','con khủng long cổ dài'],['🦖','con khủng long bạo chúa'],['🥚','quả trứng'],['🦴','khúc xương'],['🌴','cây dừa'],['🚀','tàu vũ trụ']];
 const STICKERS=[['🦕','Cổ Dài'],['🦖','Bạo Chúa'],['🥚','Trứng Thần'],['🌋','Núi Lửa'],['🐢','Rùa Cổ'],['🦎','Thằn Lằn'],['🐊','Cá Sấu'],['🦴','Xương Vàng'],['🌴','Cây Dừa'],['🚀','Tàu Vũ Trụ'],['🛸','Đĩa Bay'],['🌙','Mặt Trăng'],['🪐','Sao Thổ'],['☄️','Sao Chổi'],['🌈','Cầu Vồng'],['🏆','Cúp Vàng'],['🐉','Rồng Xanh'],['🦋','Bươm Bướm'],['🌻','Hoa Hướng Dương'],['👑','Vương Miện']];
@@ -895,7 +915,7 @@ function bumpStars(){const s=$('#starN');if(s)s.textContent=D.stars}
 const ICONS=['🦕','🦖','🐢','🦎','🐉','🐊','🦋','🐝','🐱','🐶','🐰','🦊','🐼','🐨','🦁','🐯','🐸','🐧','🚀','🤖','🌈','⭐','🌻','🍉','🧪','👨','👩','👴'];
 const clean=s=>s.replace(/[<>&"'`$\\]/g,'').trim();
 function goFull(){try{const el=document.documentElement;const f=el.requestFullscreen||el.webkitRequestFullscreen;if(f){const r=f.call(el);r&&r.catch&&r.catch(()=>{})}}catch(e){}}
-function enterProfile(id){useProfile(id);goFull();musicOn();if(overLimit())showSleep();else{showHome();say(`Chào ${KID()}! Hôm nay mình chơi gì nào?`)}}
+function enterProfile(id){useProfile(id);goFull();musicOn();warmSkin(D.pet.color);if(overLimit())showSleep();else{showHome();say(`Chào ${KID()}! Hôm nay mình chơi gì nào?`)}}
 function showStart(manage=false){
   screen='start';
   const cards=S.profiles.map(p=>`<button class="pcard" data-p="${p.id}"><span class="pic">${p.icon}</span><b>${p.name}</b>${p.pin?'<i class="pl" aria-label="Có mã">🔒</i>':''}${p.test?'<small>Người lớn</small>':''}${manage?'<i class="pe">✏️</i>':''}</button>`).join('');
@@ -978,7 +998,7 @@ function stArt(g){
     <text x="31" y="60" font-family="Baloo 2,system-ui" font-weight="800" font-size="30" fill="#fff" text-anchor="middle" transform="rotate(-12 31 51)">?</text>${nested(dinoArt('trex','#FF9F45'),47,28,42,38)}</svg>`;
   if(g==='catch')return `<svg viewBox="0 0 100 100"><g stroke="${K_}" stroke-width="3.5"><ellipse cx="36" cy="48" rx="13" ry="17" fill="#FF8CC0"/><ellipse cx="64" cy="46" rx="13" ry="17" fill="#4C9BF5"/><ellipse cx="50" cy="54" rx="13" ry="17" fill="#FFD23F"/>
     <path d="M10 58 Q50 100 90 58Z" fill="#B9773E"/><ellipse cx="50" cy="58" rx="40" ry="8" fill="#D99A57"/></g></svg>`;
-  if(g==='pet')return D.pet.hatched?dino(D.pet):egg(D.pet.color);
+  if(g==='pet')return D.pet.hatched?dino(D.pet):petEgg(D.pet.taps);
   if(g==='abc')return castleArt();
   if(g==='brain')return `<svg viewBox="0 0 100 100"><g stroke="#1D3646" stroke-width="4" stroke-linejoin="round"><path d="M50 12 C30 12 20 28 22 42 C24 54 34 58 36 70 L64 70 C66 58 76 54 78 42 C80 28 70 12 50 12Z" fill="#FFE066"/><rect x="37" y="70" width="26" height="9" rx="3" fill="#C9D6DF"/><rect x="40" y="79" width="20" height="8" rx="3" fill="#A9B8C3"/></g><path d="M42 50 Q50 40 58 50" stroke="#FF8A3D" stroke-width="4" fill="none" stroke-linecap="round"/><g stroke="#FFC83D" stroke-width="4" stroke-linecap="round"><path d="M12 30 L4 26"/><path d="M88 30 L96 26"/><path d="M50 4 L50 -2"/></g><path d="M66 74 Q84 66 88 82 Q74 90 66 80Z" fill="#38B26A" stroke="#1D3646" stroke-width="3"/></svg>`;
   if(g==='band')return `<svg viewBox="0 0 100 100">${nested(dinoArt('trike','#4C9BF5'),4,28,72,62)}<text x="70" y="40" font-size="30" fill="#1D3646">♪</text><text x="52" y="24" font-size="22" fill="#FF5C7A">♫</text></svg>`;
@@ -1327,7 +1347,7 @@ function showPet(){
   screen='pet';petDecay();const p=D.pet;P={sleeping:false,say:petHint(),rub:0};
   render(`${topBar(`<div class="pill">${p.hatched?'🦕 '+p.name:'🥚 Trứng bí ẩn'}</div>`)}${guide(P.say)}
     <div class="pet-scene" id="scene"><div class="skystars"></div><span class="moonx">🌙</span><span class="sunx">☀️</span>
-      <span class="grass" style="left:6%">🌿</span><span class="grass" style="left:22%;animation-delay:-1s">🌱</span><span class="grass" style="right:8%;animation-delay:-2s">🌿</span><span class="grass" style="right:26%;animation-delay:-.5s">🌼</span>${p.hatched?`<div class="dino-wrap" id="dw">${dino(p)}</div>`:`<div class="egg-big" id="eggb">${egg(p.color,p.taps)}</div>`}</div>
+      <span class="grass" style="left:6%">🌿</span><span class="grass" style="left:22%;animation-delay:-1s">🌱</span><span class="grass" style="right:8%;animation-delay:-2s">🌿</span><span class="grass" style="right:26%;animation-delay:-.5s">🌼</span>${p.hatched?`<div class="dino-wrap" id="dw">${dino(p)}</div>`:`<div class="egg-big" id="eggb">${petEgg(p.taps)}</div>`}</div>
     ${p.hatched?`<div class="meters" id="meters"></div>
     <div class="tray">${FOODS.map(f=>`<div class="drag" data-food="${f[1]}" aria-label="${f[1]}">${f[0]}</div>`).join('')}
       <div class="drag sep" id="sponge" aria-label="Bọt biển">🧽</div><button class="drag sep" id="moon" aria-label="Đi ngủ">🌙</button><button class="drag sep shopbtn" id="toShop" aria-label="Cửa hàng">🛍️</button></div>`:''}`);
@@ -1335,6 +1355,7 @@ function showPet(){
   say(P.say);
   if(!p.hatched){$('#eggb').onclick=tapEgg;return}
   drawMeters();wirePet();$('#toShop').onclick=()=>{tone('tap');showShop()};
+  {const sv=$('#dw svg');sv.classList.add('hello');later(()=>sv.classList.remove('hello'),1900)}
   const st=stageOf(p.xp);if(st>p.stageSeen){p.stageSeen=st;save();if(st>1)later(()=>{tone('ok');fx('🎉',50,30);say(`Oa! ${p.name} lớn lên rồi!`)},800)}
 }
 function drawMeters(){const p=D.pet,m=$('#meters');if(!m)return;
@@ -1342,13 +1363,14 @@ function drawMeters(){const p=D.pet,m=$('#meters');if(!m)return;
   const d=$('#dDirt');d&&d.setAttribute('opacity',clamp((3.8-p.clean)/2.8,0,1).toFixed(2))}
 function fx(e,xPct,yPct){const s=$('#scene');if(!s)return;const el=document.createElement('div');el.className='fx';el.textContent=e;el.style.left=xPct+'%';el.style.top=yPct+'%';s.appendChild(el);setTimeout(()=>el.remove(),1500)}
 function tapEgg(){const p=D.pet;const el=$('#eggb');tone('tap');el.classList.remove('tap');void el.offsetWidth;el.classList.add('tap');
-  p.taps=Math.min(5,p.taps+1);save();el.innerHTML=egg(p.color,p.taps);sparkEl(el,6+p.taps*3);
+  p.taps=Math.min(5,p.taps+1);save();el.innerHTML=petEgg(p.taps);el.style.setProperty('--wob',(p.taps*2.5)+'deg');sparkEl(el,6+p.taps*3);
   if(p.taps<5){say(['Một','Hai','Ba','Bốn'][p.taps-1]+'! Trứng sắp nở!');return}
-  el.onclick=null;el.classList.add('hatching');say('Trứng nở rồi!');tone('hatch');later(()=>tone('roar'),1300);
+  el.onclick=null;later(()=>{el.innerHTML=`<img class="egg-img" src="${COM_SRC['trung-vo']}" alt="">`;el.classList.add('broke')},700);el.classList.add('hatching');say('Trứng nở rồi!');tone('hatch');later(()=>tone('roar'),1300);
   later(()=>{const r=el.getBoundingClientRect();sparkAt(r.left+r.width/2,r.top+r.height/2,60,['#fff','#FFF3D6',p.color,'#FFC83D']);confetti(80)},850);
   later(()=>{p.hatched=true;p.last=Date.now();p.stageSeen=1;p.food=3;p.clean=4;p.fun=3;markTask('pet');save();
     showPet();later(()=>{fx('🎉',30,30);fx('✨',65,25);say(`Chào ${KID()}! Mình là ${p.name}. ${KID()} chăm sóc mình nhé!`)},500)},1050)}
-function headRect(){const h=$('#dHead');if(!h)return null;const r=h.getBoundingClientRect();return{l:r.left-50,t:r.top-50,r:r.right+50,b:r.bottom+50}}
+function comPt(x,y){const sv=$('#dw svg');if(!sv)return null;try{const m=sv.querySelector('.dino').getScreenCTM(),q=sv.createSVGPoint();q.x=x;q.y=y;const r=q.matrixTransform(m);return[r.x,r.y]}catch(e){const r=sv.getBoundingClientRect();return[r.left+(x-COM_VIEW[0])/COM_VIEW[2]*r.width,r.top+(y-COM_VIEW[1])/COM_VIEW[3]*r.height]}}
+function headRect(){const a=comPt(1080,150),b=comPt(1880,900);if(!a)return null;return{l:a[0]-40,t:a[1]-40,r:b[0]+60,b:b[1]+40}}
 function inRect(e,r){return r&&e.clientX>=r.l&&e.clientX<=r.r&&e.clientY>=r.t&&e.clientY<=r.b}
 function dragify(el,onMove,onDrop){
   el.addEventListener('pointerdown',e=>{if(P.sleeping)return;e.preventDefault();const gh=document.createElement('div');gh.className='ghost';gh.textContent=el.textContent;document.body.appendChild(gh);
@@ -1362,7 +1384,7 @@ function wirePet(){
   $$('[data-food]').forEach(el=>dragify(el,null,ev=>{
     if(!inRect(ev,headRect()))return;
     if(p.food>=4.6){dinoAnim('no',700);say(`${p.name} no rồi!`);return}
-    const m=$('#dMouthC').getBoundingClientRect();const f=document.createElement('div');f.className='foodfly';f.textContent=el.textContent;
+    const mp=comPt(1700,680)||[0,0],m={left:mp[0],top:mp[1],width:0,height:0};const f=document.createElement('div');f.className='foodfly';f.textContent=el.textContent;
     f.style.left=ev.clientX+'px';f.style.top=ev.clientY+'px';document.body.appendChild(f);setTimeout(()=>f.remove(),800);
     requestAnimationFrame(()=>requestAnimationFrame(()=>{f.style.left=(m.left+m.width/2)+'px';f.style.top=(m.top+m.height/2)+'px';f.style.transform='translate(-50%,-50%) scale(.2)'}));
     later(()=>{f.remove();const svg=$('#dw svg');svg.classList.add('munch','happyTail');later(()=>svg.classList.remove('munch','happyTail'),1200);tone('munch');
@@ -1936,8 +1958,8 @@ const STORIES=[
   {c:[['🔧','Bíp sửa tàu'],['🚀','tàu sẵn sàng'],['launch','tàu bay lên'],['🌕','tới mặt trăng']]},
   {c:[['egg0','quả trứng'],['egg4','trứng nứt ra'],['baby','khủng long con'],['big','khủng long lớn']]}];
 function storyArt(k){
-  const kid={color:(D.pet&&D.pet.color)||'#5BC27A',xp:20,clean:5};
-  const m={egg0:()=>egg('#FFE08A',0),egg4:()=>egg('#FFE08A',5),baby:()=>dinoArt('longneck','#5BC27A'),big:()=>dino({color:'#5BC27A',xp:60,clean:5}),
+  const kid={color:(D.pet&&D.pet.color)||PINK,xp:20,clean:5};
+  const m={egg0:()=>petEgg(0),egg4:()=>petEgg(4),baby:()=>dino({color:kid.color,xp:1,clean:5}),big:()=>dino({color:kid.color,xp:60,clean:5}),
     cocoon:()=>`<svg viewBox="0 0 100 100"><path d="M10 14 Q50 4 92 14" stroke="#8C5A2B" stroke-width="6" fill="none" stroke-linecap="round"/><path d="M50 11 L50 22" stroke="#8C5A2B" stroke-width="3"/><ellipse cx="50" cy="56" rx="16" ry="32" fill="#C9A26B" stroke="#1D3646" stroke-width="3.5"/><path d="M36 44 Q50 50 64 44 M35 58 Q50 64 65 58 M38 72 Q50 77 62 72" stroke="#8C5A2B" stroke-width="3" fill="none"/></svg>`,
     seed:()=>`<svg viewBox="0 0 100 100"><path d="M8 70 Q50 58 92 70 L92 96 L8 96Z" fill="#9C6B43"/><ellipse cx="50" cy="50" rx="12" ry="16" fill="#7A4A26" stroke="#1D3646" stroke-width="3" transform="rotate(20 50 50)"/><path d="M50 18 L50 32 M40 26 L50 34 L60 26" stroke="#1D3646" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
     dirty:()=>dino({...kid,clean:1}),bath:()=>dino({...kid,clean:3})+'<span class="ov">🫧</span>',clean:()=>dino(kid)+'<span class="ov">✨</span>',
@@ -2011,8 +2033,8 @@ const SHOP=[
   {id:'cap',slot:'head',name:'Mũ lưỡi trai',ico:'🧢',price:15},{id:'crown',slot:'head',name:'Vương miện',ico:'👑',price:30},
   {id:'glasses',slot:'face',name:'Kính tròn',ico:'👓',price:12},{id:'shades',slot:'face',name:'Kính râm',ico:'🕶️',price:20},
   {id:'bow',slot:'neck',name:'Nơ đỏ',ico:'🎀',price:8},{id:'scarf',slot:'neck',name:'Khăn quàng',ico:'🧣',price:15},
-  ...[['xanh lá','#5BC27A',0],['cam','#FF9F45',20],['xanh dương','#4C9BF5',20],['tím','#A07CF0',25],['hồng','#FF8CC0',25],['vàng','#F2C230',25]].map(([n,c,p])=>({id:'skin-'+c,slot:'skin',name:'Màu '+n,color:c,price:p}))];
-function shopData(){D.shop=D.shop||{owned:['skin-#5BC27A'],wear:{}};return D.shop}
+  ...[['hồng','#FF8CC0',0],['xanh lá','#5BC27A',20],['cam','#FF9F45',20],['xanh dương','#4C9BF5',20],['tím','#A07CF0',25],['vàng','#F2C230',25]].map(([n,c,p])=>({id:'skin-'+c,slot:'skin',name:'Màu '+n,color:c,price:p}))];
+function shopData(){D.shop=D.shop||{owned:['skin-#FF8CC0'],wear:{}};if(!D.shop.owned.includes('skin-#FF8CC0'))D.shop.owned.unshift('skin-#FF8CC0');return D.shop}
 function accSVG(p,part){const w=(p.wear||{})[part];const K='#1D3646';if(!w)return'';
   if(w==='party')return `<g><path d="M168 27 L206 21 L194 -16 Z" fill="#FF5C7A" stroke="${K}" stroke-width="3.5" stroke-linejoin="round"/><path d="M175 16 L201 12 M181 4 L198 1" stroke="#FFD23F" stroke-width="5" stroke-linecap="round"/><circle cx="194" cy="-17" r="7" fill="#FFD23F" stroke="${K}" stroke-width="3"/></g>`;
   if(w==='flower')return `<g transform="translate(176 22)">${[0,72,144,216,288].map(a=>`<ellipse cx="0" cy="-9" rx="6" ry="9" fill="#FF8CC0" stroke="${K}" stroke-width="2.5" transform="rotate(${a})"/>`).join('')}<circle r="6" fill="#FFD23F" stroke="${K}" stroke-width="2.5"/></g>`;
