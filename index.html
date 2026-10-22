@@ -880,7 +880,7 @@ const COLORS=[['đỏ','#F04438'],['vàng','#FFD23F'],['xanh lá','#38B26A'],['x
 const COUNTABLE=[['🦕','con khủng long cổ dài'],['🦖','con khủng long bạo chúa'],['🥚','quả trứng'],['🦴','khúc xương'],['🌴','cây dừa'],['🚀','tàu vũ trụ']];
 const STICKERS=[['🦕','Cổ Dài'],['🦖','Bạo Chúa'],['🥚','Trứng Thần'],['🌋','Núi Lửa'],['🐢','Rùa Cổ'],['🦎','Thằn Lằn'],['🐊','Cá Sấu'],['🦴','Xương Vàng'],['🌴','Cây Dừa'],['🚀','Tàu Vũ Trụ'],['🛸','Đĩa Bay'],['🌙','Mặt Trăng'],['🪐','Sao Thổ'],['☄️','Sao Chổi'],['🌈','Cầu Vồng'],['🏆','Cúp Vàng'],['🐉','Rồng Xanh'],['🦋','Bươm Bướm'],['🌻','Hoa Hướng Dương'],['👑','Vương Miện']];
 const PRAISE=()=>['Giỏi quá!','Đúng rồi!',`${KID()} siêu quá!`,'Tuyệt vời!','Chính xác!'];
-const GAMES={abc:'Chữ cái',hide:'Ai trốn mất',market:'Đi chợ',pattern:'Quy luật',story:'Thứ tự tranh',code:'Lập trình Bíp',memory:'Lật thẻ',catch:'Hứng trứng',band:'Ban nhạc',count:'Đếm (trò nhanh)',color:'Màu (trò nhanh)',shape:'Hình (trò nhanh)'};
+const GAMES={abc:'Chữ cái',hide:'Ai trốn mất',market:'Đi chợ',pattern:'Quy luật',story:'Thứ tự tranh',code:'Lập trình Bíp',memory:'Lật thẻ',catch:'Hứng trứng',band:'Ban nhạc'};
 
 // ================= timer =================
 let screen='start';
@@ -985,11 +985,10 @@ const STATIONS=[
   {g:'memory',name:'Hang Thẻ Bài',x:44,y:19,col:'#FFC6D3'},
   {g:'catch',name:'Tổ Trứng',x:76,y:27,col:'#FFE08A'},
   {g:'pet',name:'',x:79,y:68,col:'#CBE6FF'},
-  {g:'quick',name:'Bãi Trò Nhanh',x:49,y:60,col:'#E3D7FF'},
   {g:'book',name:'Rương Sticker',x:19,y:72,col:'#FFE0B3'},
   {g:'band',name:'Sân Khấu Nhạc',x:33,y:47,col:'#FFD1A8'},
   {g:'abc',name:'Lâu Đài Chữ',x:62,y:44,col:'#FFD6E8'},
-  {g:'brain',name:'Vườn Tư Duy',x:88,y:47,col:'#D7F5C9'}];
+  {g:'brain',name:'Vườn Tư Duy',x:49,y:60,col:'#D7F5C9'}];
 const K_='#1D3646';
 function nested(svg,x,y,w,h){return svg.replace(/<svg class="[^"]*" viewBox="0 0 120 100" aria-hidden="true">/,`<svg x="${x}" y="${y}" width="${w}" height="${h}" viewBox="0 0 120 100">`)}
 function stArt(g){
@@ -1002,7 +1001,6 @@ function stArt(g){
   if(g==='abc')return castleArt();
   if(g==='brain')return `<svg viewBox="0 0 100 100"><g stroke="#1D3646" stroke-width="4" stroke-linejoin="round"><path d="M50 12 C30 12 20 28 22 42 C24 54 34 58 36 70 L64 70 C66 58 76 54 78 42 C80 28 70 12 50 12Z" fill="#FFE066"/><rect x="37" y="70" width="26" height="9" rx="3" fill="#C9D6DF"/><rect x="40" y="79" width="20" height="8" rx="3" fill="#A9B8C3"/></g><path d="M42 50 Q50 40 58 50" stroke="#FF8A3D" stroke-width="4" fill="none" stroke-linecap="round"/><g stroke="#FFC83D" stroke-width="4" stroke-linecap="round"><path d="M12 30 L4 26"/><path d="M88 30 L96 26"/><path d="M50 4 L50 -2"/></g><path d="M66 74 Q84 66 88 82 Q74 90 66 80Z" fill="#38B26A" stroke="#1D3646" stroke-width="3"/></svg>`;
   if(g==='band')return `<svg viewBox="0 0 100 100">${nested(dinoArt('trike','#4C9BF5'),4,28,72,62)}<text x="70" y="40" font-size="30" fill="#1D3646">♪</text><text x="52" y="24" font-size="22" fill="#FF5C7A">♫</text></svg>`;
-  if(g==='quick')return `<svg viewBox="0 0 100 100"><g stroke="${K_}" stroke-width="4" stroke-linejoin="round"><circle cx="32" cy="62" r="20" fill="#F04438"/><path d="M58 22 L84 66 L32 66Z" fill="#2F7DF6"/><rect x="52" y="52" width="32" height="32" rx="5" fill="#FFD23F"/></g></svg>`;
   return `<svg viewBox="0 0 100 100"><g stroke="${K_}" stroke-width="4" stroke-linejoin="round"><rect x="14" y="44" width="72" height="42" rx="6" fill="#B9773E"/><path d="M14 46 Q14 18 50 18 Q86 18 86 46Z" fill="#D99A57"/>
     <rect x="14" y="40" width="72" height="9" fill="#FFC83D" stroke-width="3"/><rect x="44" y="46" width="12" height="16" rx="3" fill="#FFC83D" stroke-width="3"/></g><circle cx="22" cy="18" r="4" fill="#FFC83D"/><circle cx="80" cy="14" r="3" fill="#FFC83D"/></svg>`}
 function stBadge(g){const p=D.pet;
@@ -1010,7 +1008,6 @@ function stBadge(g){const p=D.pet;
   if(g==='memory')return [`${MEM_SIZES[Math.min(D.lvl.memory,MEM_SIZES.length-1)]} thẻ`];
   if(g==='catch')return [`Cấp ${D.lvl.catch+1}`];
   if(g==='pet')return !p.hatched?['Nở trứng!',1]:p.food<2.5?['Đói rồi!',1]:p.clean<2.5?['Cần tắm!',1]:p.fun<2.5?['Buồn chán',1]:['❤'];
-  if(g==='quick')return ['3 trò'];
   if(g==='band')return [`Cấp ${D.lvl.band+1}`];
   if(g==='abc')return [`${(D.abc&&D.abc.learned.length)||0}/29 chữ`];
   if(g==='brain')return ['4 trò'];
@@ -1028,7 +1025,6 @@ function mapSVG(){
   <g fill="#7FCB6E"><ellipse cx="300" cy="300" rx="80" ry="40"/><ellipse cx="560" cy="250" rx="70" ry="30"/><ellipse cx="880" cy="250" rx="50" ry="26"/></g>
   <path d="${TRAIL}" fill="none" stroke="#E7C98A" stroke-width="30" stroke-linecap="round" opacity=".7"/>
   <path class="trail" d="${TRAIL}" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round"/>
-  <path d="M760 169 Q840 200 880 290" fill="none" stroke="#E7C98A" stroke-width="26" stroke-linecap="round" opacity=".7"/><path class="trail" d="M760 169 Q840 200 880 290" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round"/>
   <path d="M490 375 Q560 350 620 275" fill="none" stroke="#E7C98A" stroke-width="26" stroke-linecap="round" opacity=".7"/><path class="trail" d="M490 375 Q560 350 620 275" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round"/>
   <path d="M170 187 Q215 280 330 294" fill="none" stroke="#E7C98A" stroke-width="26" stroke-linecap="round" opacity=".7"/><path class="trail" d="M170 187 Q215 280 330 294" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round"/>
   ${palm(95,320,.9)}${palm(330,560,.8,-1.5)}${palm(900,520,.9,-.7)}${palm(560,80,.6,-1)}
@@ -1040,7 +1036,7 @@ function mapSVG(){
   </svg>`}
 function showHome(){
   screen='home';
-  if(D.lastSt==null)D.lastSt=0;const dly=ensureDaily(),todo=dly.tasks.filter(t=>!t.done).map(t=>t.g);
+  if(D.lastSt==null||D.lastSt>=STATIONS.length)D.lastSt=0;const dly=ensureDaily(),todo=dly.tasks.filter(t=>!t.done).map(t=>t.g);
   const st=STATIONS.map((s,i)=>{const [b,alert]=stBadge(s.g);const nm=s.g==='pet'?(D.pet.hatched?'Nhà '+D.pet.name:'Trứng bí ẩn'):s.name;
     return `<button class="station${todo.includes(s.g)?' mtask':''}" data-st="${i}" style="left:${s.x}%;top:${s.y}%;--d:${(i*.09).toFixed(2)}s" aria-label="${nm}">
       <span class="st-ring" style="background:${s.col};animation-delay:${(-i*.5).toFixed(1)}s">${stArt(s.g)}</span><span class="st-name">${nm}</span><span class="st-badge${alert?' alert':''}">${b}</span></button>`}).join('');
@@ -1054,7 +1050,7 @@ function showHome(){
   let moving=false;
   $$('.station').forEach(b=>b.onclick=()=>{if(moving)return;const i=+b.dataset.st;const s=STATIONS[i];tone('tap');
     b.classList.remove('go');void b.offsetWidth;b.classList.add('go');
-    const open=()=>{moving=false;if(s.g==='quick')return quickSheet();if(s.g==='brain')return brainSheet();if(s.g==='book')return showBook();startGame(s.g)};
+    const open=()=>{moving=false;if(s.g==='brain')return brainSheet();if(s.g==='book')return showBook();startGame(s.g)};
     if(i===D.lastSt){moving=true;later(open,350);return}
     moving=true;D.lastSt=i;save();tone('whoosh');placeMB(i,true);later(open,950)});
   $('#lock').onclick=isTest()?()=>{parentBack='home';showParent()}:showGate;
@@ -1065,7 +1061,7 @@ function showHome(){
   $('#mus').onclick=()=>{D.music=!D.music;save();if(D.music)musicOn();else musicOff();$('#mus').textContent=D.music?'🎵':'🔇';tone('tap')};
   musicOn();
 }
-const SPOTS=[[30,42],[62,82],[36,88],[57,33],[10,58],[92,64],[88,82],[74,50],[45,88],[50,40]];
+const SPOTS=[[30,42],[62,82],[36,88],[57,33],[10,58],[92,64],[88,82],[74,50],[90,47],[50,40]];
 let MP=null;
 function wander(){const mp=$('#mp');if(!mp)return;let nxt;do{nxt=pickOne(SPOTS)}while(MP&&nxt[0]===MP[0]&&nxt[1]===MP[1]);
   mp.classList.toggle('flip',nxt[0]<MP[0]);const dist=Math.hypot(nxt[0]-MP[0],(nxt[1]-MP[1])*.62);const dur=clamp(dist*.11,1.4,4.5);
@@ -1076,17 +1072,7 @@ function sizeMap(){const h=$('.map-holder'),m=$('#map');if(!h||!m)return;const w
 function placeMB(i,anim){const mb=$('#mb');if(!mb)return;const s=STATIONS[i];if(!anim){mb.style.transition='none'}
   mb.style.left=(s.x-7)+'%';mb.style.top=(s.y-3)+'%';
   if(!anim){void mb.offsetWidth;mb.style.transition=''}else{mb.classList.add('walk');later(()=>mb.classList.remove('walk'),850)}}
-function quickSheet(){
-  const m=$('#map');if(!m)return;
-  m.insertAdjacentHTML('beforeend',`<div class="sheet-wrap" id="sw"><div class="sheet"><b class="sheet-t">Chọn trò nhanh</b>
-    <button data-q="count"><span>${dinoArt('longneck','#5BC27A')}</span>Đếm khủng long</button>
-    <button data-q="color"><span>${egg('#FF8CC0')}</span>Trứng màu sắc</button>
-    <button data-q="shape"><span>${shape('ngôi sao','#FFC83D')}</span>Hình khối</button></div></div>`);
-  say('Chọn trò nhanh nào!');
-  $('#sw').onclick=e=>{if(e.target.id==='sw'){tone('tap');$('#sw').remove()}};
-  $$('[data-q]').forEach(b=>b.onclick=()=>{tone('tap');startQuick(b.dataset.q)});
-}
-function startGame(k){({code:startCode,memory:startMemory,catch:startCatch,pet:showPet,band:startBand,abc:showAbc,hide:startHide,market:startMarket,pattern:startPattern,story:startStory}[k]||(()=>startQuick(k)))()}
+function startGame(k){({code:startCode,memory:startMemory,catch:startCatch,pet:showPet,band:startBand,abc:showAbc,hide:startHide,market:startMarket,pattern:startPattern,story:startStory}[k]||showHome)()}
 
 // ================= GAME: Lập trình Bíp =================
 const DIRS={u:[0,-1],d:[0,1],l:[-1,0],r:[1,0]};
@@ -1731,47 +1717,6 @@ function showAbcBoard(){
   $('#home').onclick=()=>{tone('tap');showAbc()};
   $$('.ltile').forEach(b=>b.onclick=()=>{const l=b.dataset.l;b.classList.remove('wig');void b.offsetWidth;b.classList.add('wig');tone('pop');
     setSay(`<span class="inlhw" style="color:${lcol(l)}">${hwSVG(l,{w:.5,pad:.2})}</span> · ${LTR[l][3]} ${wordHTML(l)}`);say(`${lsay(l)}. ${LTR[l][2]}`)});
-}
-
-// ================= Quick games (đếm, màu, hình) =================
-let G=null;
-function startQuick(kind){G={kind,q:0,total:5,stars:0,firstTry:true};nextQ()}
-function quickFrame(prompt,stage,choices){
-  screen='quick';
-  const dots=Array.from({length:G.total},(_,i)=>`<i class="${i<G.q?'on':''}"></i>`).join('');
-  render(`${topBar(`<div class="dots">${dots}</div>`)}${guide(prompt)}<div class="stage">${stage}</div><div class="choices">${choices}</div>`);
-  wireCommon(()=>G.say);say(G.say);
-}
-function nextQ(){if(G.q>=G.total)return showDone(G.kind,G.stars,`${KID()} giỏi quá!`);G.firstTry=true;({count:qCount,color:qColor,shape:qShape})[G.kind]()}
-function correct(btn){
-  tone('ok');say(pickOne(PRAISE()));stat(G.kind,true);if(G.firstTry)D.lvl[G.kind]++;
-  btn.classList.add('right');sparkEl(btn,22);bipReact('happy');flyStars(btn,1);G.q++;G.stars++;award(1);bumpStars();
-  const dot=$$('.dots i')[G.q-1];dot&&dot.classList.add('on');
-  $$('.choices button').forEach(b=>b.disabled=true);later(nextQ,1500);
-}
-function wrong(btn){tone('no');bipReact('sad');stat(G.kind,false);G.firstTry=false;btn.classList.remove('shake');void btn.offsetWidth;btn.classList.add('shake');later(()=>say('Chưa đúng rồi, thử lại nhé!'),250)}
-function qCount(){
-  const max=Math.min(10,3+Math.floor(D.lvl.count/4));const n=rand(1,max);const sp=pickOne(SPECIES),col=pickOne(DCOL);const emo=dinoArt(sp[0],col[1]),name='con '+sp[1];
-  const opts=new Set([n]);while(opts.size<3)opts.add(rand(Math.max(1,n-2),Math.min(10,n+2)));
-  G.say=`Có mấy ${name} nào?`;
-  quickFrame(`Có mấy <span class="inl2">${emo}</span> nào?`,Array.from({length:n},(_,i)=>`<button class="item" style="animation-delay:${i*.06}s" aria-label="${name}">${emo}</button>`).join(''),
-    shuffle([...opts]).map(o=>`<button class="num" data-v="${o}">${o}</button>`).join(''));
-  let c=0;$$('.item').forEach(it=>it.onclick=()=>{if(it.classList.contains('counted'))return;c++;it.classList.add('counted');it.insertAdjacentHTML('beforeend',`<span class="n">${c}</span>`);tone('tap');say(String(c))});
-  $$('.num').forEach(b=>b.onclick=()=>{+b.dataset.v===n?correct(b):wrong(b)});
-}
-function qColor(){
-  const set=shuffle(COLORS).slice(0,D.lvl.color<6?3:4);const target=pickOne(set);
-  G.say=`Tìm quả trứng màu ${target[0]} nào!`;
-  quickFrame(`Tìm trứng màu <u>${target[0]}</u>!`,'',set.map(c=>`<button class="pick" data-v="${c[0]}" aria-label="Trứng màu ${c[0]}">${egg(c[1])}</button>`).join(''));
-  $$('.pick').forEach(b=>b.onclick=()=>{if(b.dataset.v===target[0]){b.innerHTML=`<span class="baby">${pickOne(['🦕','🦖','🐣'])}</span>`;correct(b)}else wrong(b)});
-}
-function qShape(){
-  const names=Object.keys(SHAPES);const pool=D.lvl.shape<5?names.slice(0,4):names;
-  const set=shuffle(pool).slice(0,3);const target=pickOne(set);const cols=shuffle(COLORS).slice(0,3);
-  G.say=`Bíp cần ${target}.`;
-  quickFrame(`Bíp cần <u>${target}</u>!`,'<div class="item" style="width:auto;padding:0 20px;background:none;font-size:clamp(60px,9vw,96px)">🚀🔧</div>',
-    set.map((s,i)=>`<button class="pick" data-v="${s}" aria-label="${s}">${shape(s,cols[i][1])}</button>`).join(''));
-  $$('.pick').forEach(b=>b.onclick=()=>{b.dataset.v===target?correct(b):wrong(b)});
 }
 
 // ================= done / stickers / sleep =================
