@@ -454,10 +454,12 @@ textarea.code{width:100%;box-sizing:border-box;margin-top:8px;min-height:64px;bo
 /* Code game */
 .code-wrap{flex:1;min-height:0;width:100%;max-width:1040px;display:flex;gap:clamp(12px,2vw,24px);align-items:stretch}
 .board-holder{flex:1;min-width:0;min-height:0;display:grid;place-items:center}
-.board{position:relative;display:grid;border-radius:8px;overflow:visible;box-shadow:0 0 0 8px #fff,0 14px 0 8px rgba(29,54,70,.16);--cell:80px;background:#C6EBB2}
+.board{position:relative;display:grid;border-radius:8px;overflow:visible;border:4px solid #8CC970;box-sizing:content-box;box-shadow:0 0 0 8px #fff,0 14px 0 8px rgba(29,54,70,.16);--cell:80px;background:#C6EBB2}
 .cell{display:grid;place-items:center;font-size:calc(var(--cell)*.58);line-height:1;transition:background .3s;position:relative;animation:cellIn .45s cubic-bezier(.3,1.5,.5,1) backwards}
 @keyframes cellIn{from{transform:scale(0) rotate(-20deg);opacity:0}}
-.cell:nth-child(odd){background:#D9F3C9}.cell:nth-child(even){background:#C6EBB2}
+.cell.c0{background:#E2F6D6}.cell.c1{background:#B9E3A2}
+.cell{min-width:0;min-height:0;overflow:visible;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.75)}
+.cell.scell::after{content:"";position:absolute;inset:16%;border-radius:50%;background:rgba(255,255,255,.6);border:3px dashed #8FA6B5}
 .cell.hint{background:#FFF1A8 !important;box-shadow:inset 0 0 0 4px #FFC83D;animation:hintPulse .6s ease-in-out infinite alternate}
 @keyframes hintPulse{to{background:#FFE36A}}
 .cell .rock{display:inline-block;filter:drop-shadow(0 4px 0 rgba(29,54,70,.25))}
@@ -1157,12 +1159,12 @@ function codeLevel(){
   Object.assign(C,{L,direct:!!(def&&def.d),prog:[],pos:[...L.b],running:false,fails:0});
   C.say=C.direct?'Bấm mũi tên để đưa Bíp tới tàu vũ trụ!':'Xếp mũi tên, rồi bấm Chạy!';
   const cells=[];for(let y=0;y<L.h;y++)for(let x=0;x<L.w;x++){const k=x+','+y;
-    const g=x===L.g[0]&&y===L.g[1];cells.push(`<div class="cell${g?' gcell':''}" data-k="${k}" style="animation-delay:${((x+y)*.05).toFixed(2)}s">${L.rocks.has(k)?'<span class="rock">🪨</span>':g?'<span class="goal"><span class="rk">🚀</span></span>':''}</div>`)}
+    const g=x===L.g[0]&&y===L.g[1],st=x===L.b[0]&&y===L.b[1];cells.push(`<div class="cell c${(x+y)%2}${g?' gcell':''}${st?' scell':''}" data-k="${k}" style="animation-delay:${((x+y)*.05).toFixed(2)}s">${L.rocks.has(k)?'<span class="rock">🪨</span>':g?'<span class="goal"><span class="rk">🚀</span></span>':''}</div>`)}
   const dpad=['u','l','r','d'].map(k=>`<button style="grid-area:${k};background:${ACOL[k]}" data-a="${k}" aria-label="${AWORD[k]}">${arrow(k)}</button>`).join('');
   render(`${topBar(`<div class="pill">Màn ${D.lvl.code+1}</div>`)}
     ${guide(C.say)}
     <div class="code-wrap">
-      <div class="board-holder"><div class="board" id="board" style="grid-template-columns:repeat(${L.w},1fr)">${cells.join('')}<div class="tok" id="tok">${bip('x')}</div></div></div>
+      <div class="board-holder"><div class="board" id="board" style="grid-template-columns:repeat(${L.w},1fr);grid-template-rows:repeat(${L.h},1fr)">${cells.join('')}<div class="tok" id="tok">${bip('x')}</div></div></div>
       <div class="controls">
         ${C.direct?'':'<div class="strip" id="strip"></div>'}
         <div class="dpad">${dpad}</div>
@@ -1177,7 +1179,7 @@ function codeLevel(){
   say(D.lvl.code===0?'Giúp Bíp về tàu vũ trụ nào! Bấm mũi tên để Bíp đi.':C.say);
 }
 function sizeBoard(){const hold=$('.board-holder'),b=$('#board');if(!hold||!b)return;
-  const cs=Math.floor(Math.min(hold.clientWidth/C.L.w,hold.clientHeight/C.L.h,140));
+  const cs=Math.max(24,Math.floor(Math.min((hold.clientWidth-24)/C.L.w,(hold.clientHeight-24)/C.L.h,140)));
   b.style.width=cs*C.L.w+'px';b.style.height=cs*C.L.h+'px';b.style.setProperty('--cell',cs+'px');placeTok(false)}
 function placeTok(anim=true){const t=$('#tok');if(!t)return;
   if(!anim){t.style.transition='none';}
