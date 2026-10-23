@@ -406,6 +406,9 @@ textarea.code{width:100%;box-sizing:border-box;margin-top:8px;min-height:64px;bo
 .rw-sub{color:#fff;font-family:var(--display);font-weight:800;font-size:clamp(20px,3vw,28px);min-height:1.3em;animation:pulse 1.2s ease-in-out infinite}
 .rw-chest{width:min(52vmin,320px);animation:chestDrop .6s cubic-bezier(.3,1.5,.5,1) backwards,float 2.4s ease-in-out .7s infinite}
 .rw-chest svg{width:100%;height:auto;overflow:visible;filter:drop-shadow(0 14px 0 rgba(0,0,0,.25))}
+.chest2{position:relative;display:block;width:100%;aspect-ratio:520/453;filter:drop-shadow(0 14px 0 rgba(0,0,0,.25))}
+.chest2 img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;transition:opacity .15s,transform .35s cubic-bezier(.3,1.7,.5,1)}
+.chest2 .c-open{opacity:0;transform:scale(.92)}.rw-chest.open .c-closed{opacity:0}.rw-chest.open .c-open{opacity:1;transform:scale(1.06)}
 @keyframes chestDrop{from{transform:translateY(-70vh) rotate(-12deg)}}
 .chest .lid{transform-box:fill-box;transform-origin:10% 100%;transition:transform .5s cubic-bezier(.3,1.7,.5,1)}
 .chest .glowin{opacity:0;transition:opacity .4s}
@@ -492,9 +495,10 @@ textarea.code{width:100%;box-sizing:border-box;margin-top:8px;min-height:64px;bo
 .cell .rock{display:inline-block;filter:drop-shadow(0 4px 0 rgba(29,54,70,.25))}
 .cell.gcell::before{content:"";position:absolute;inset:8%;border-radius:50%;border:4px dashed #FFB800;animation:spin 7s linear infinite}
 .goal{display:inline-block;position:relative;animation:float 2.4s ease-in-out infinite;filter:drop-shadow(0 0 10px rgba(255,200,61,.9))}
-.goal .rk{display:inline-block;transform:rotate(-45deg)}
+.goal .rk{display:inline-block}
+.cell .oi{width:1.05em;height:1.05em;object-fit:contain;display:block}.goal .oi{width:1.25em;height:1.25em}.cell .rock .oi{width:1.2em;height:1.2em}
 .goal.launch{animation:launch 1.7s cubic-bezier(.6,0,.9,.6) .35s forwards}
-.goal.launch::after{content:"🔥";position:absolute;left:50%;top:78%;transform:translateX(-50%) rotate(180deg);font-size:.65em;animation:flame .12s infinite alternate}
+.goal.launch::after{content:"🔥";position:absolute;left:50%;top:92%;transform:translateX(-50%) rotate(180deg);font-size:.65em;animation:flame .12s infinite alternate}
 @keyframes flame{to{transform:translateX(-50%) rotate(180deg) scale(1.3,1.6)}}
 @keyframes launch{0%{transform:translateY(0)}20%{transform:translateY(8px) rotate(-3deg)}28%{transform:translateY(4px) rotate(3deg)}100%{transform:translateY(-120vh)}}
 .tok{position:absolute;display:grid;place-items:center;transition:left .4s cubic-bezier(.4,1.4,.6,1),top .4s cubic-bezier(.4,1.4,.6,1),opacity .3s,transform .3s;z-index:2;pointer-events:none}
@@ -1097,6 +1101,8 @@ const STATIONS=[
   {g:'brain',name:'Vườn Tư Duy',x:50.4,y:50.1,col:'#D7F5C9'}];
 // illustrated buildings for the stations (img/st-*.webp) and the island itself (img/map.webp)
 const ST_IMG=Object.fromEntries(['code','memory','catch','book','band','abc','brain'].map(k=>[k,(window.__IMG&&window.__IMG['st-'+k])||`img/st-${k}.webp`]));
+const OBJ_IMG=Object.fromEntries(['rock','star','rocket','nest','chest','chest-open'].map(k=>[k,(window.__IMG&&window.__IMG['o-'+k])||`img/o-${k}.webp`]));
+const objImg=(k,c='oi')=>`<img class="${c}" src="${OBJ_IMG[k]}" alt="" draggable="false">`;
 const MAP_IMG=(window.__IMG&&window.__IMG.map)||'img/map.webp';
 const K_='#1D3646';
 function nested(svg,x,y,w,h){return svg.replace(/<svg class="[^"]*" viewBox="0 0 120 100" aria-hidden="true">/,`<svg x="${x}" y="${y}" width="${w}" height="${h}" viewBox="0 0 120 100">`)}
@@ -1238,7 +1244,7 @@ function codeLevel(){
   Object.assign(C,{L,direct:!!(def&&def.d),prog:[],pos:[...L.b],running:false,fails:0,got:[],max:L.stars.length?14:10});
   C.say=C.direct?'Bấm mũi tên để đưa Bíp tới tàu vũ trụ!':L.stars.length?`Nhặt ${L.stars.length>1?'hết '+L.stars.length+' ngôi sao':'ngôi sao'} rồi về tàu nhé!`:'Xếp mũi tên, rồi bấm Chạy!';
   const cells=[];for(let y=0;y<L.h;y++)for(let x=0;x<L.w;x++){const k=x+','+y;
-    const g=x===L.g[0]&&y===L.g[1],st=x===L.b[0]&&y===L.b[1];cells.push(`<div class="cell c${(x+y)%2}${g?' gcell':''}${st?' scell':''}" data-k="${k}" style="animation-delay:${((x+y)*.05).toFixed(2)}s">${L.rocks.has(k)?'<span class="rock">🪨</span>':L.stars.includes(k)?'<span class="cstar">⭐</span>':g?'<span class="goal"><span class="rk">🚀</span></span>':''}</div>`)}
+    const g=x===L.g[0]&&y===L.g[1],st=x===L.b[0]&&y===L.b[1];cells.push(`<div class="cell c${(x+y)%2}${g?' gcell':''}${st?' scell':''}" data-k="${k}" style="animation-delay:${((x+y)*.05).toFixed(2)}s">${L.rocks.has(k)?`<span class="rock">${objImg('rock')}</span>`:L.stars.includes(k)?`<span class="cstar">${objImg('star')}</span>`:g?`<span class="goal"><span class="rk">${objImg('rocket')}</span></span>`:''}</div>`)}
   const dpad=['u','l','r','d'].map(k=>`<button style="grid-area:${k};background:${ACOL[k]}" data-a="${k}" aria-label="${AWORD[k]}">${arrow(k)}</button>`).join('');
   render(`${topBar(`<div class="pill">Màn ${D.lvl.code+1}</div>`)}
     ${guide(C.say)}
@@ -1360,7 +1366,8 @@ function memWin(){award(3);if(M.miss<=M.n/2)D.lvl.memory++;else if(M.miss>M.n*1.
 const CATCH_FEATS={1:'Cẩn thận, có đá rơi đó!',2:'Mới! Trứng vàng lấp lánh, hứng được thêm sao!',3:'Mới! Trứng biết bay lượn lắc lư!',4:'Mới! Thằn lằn bay thả trứng từ trên trời!',5:'Mới! Trứng cầu vồng, màu nào cũng hứng được!',6:'Mới! Màu trứng đổi nhanh hơn, nhớ nghe Bíp nhé!',8:'Thử thách! Trứng rơi nhanh hơn nữa!'};
 function catchCfg(lv){return{colors:lv<2?2:lv<4?3:4,goal:lv<6?8:9,every:lv<6?4:3,speed:.16+Math.min(lv,12)*.02,
   rock:lv<1?.06:Math.min(.1+lv*.025,.26),gold:lv>=2?.07:0,sway:lv>=3?Math.min(.3+(lv-3)*.1,.7):0,ptero:lv>=4,rainbow:lv>=5?.05:0,gap:Math.max(.55,1.15-lv*.06)}}
-let K=null,pteroImg=null;
+let K=null,pteroImg=null;const cImg={};
+function catchImg(k){if(!cImg[k]){cImg[k]=new Image();cImg[k].src=OBJ_IMG[k]}const i=cImg[k];return i.complete&&i.naturalWidth?i:null}
 // speaking a number on every catch used to cancel the voice mid-word and restyle the whole page; this one never interrupts and never touches the page
 function sayLite(t){if(D.mute)return;setTimeout(()=>{try{if(speechSynthesis.speaking||speechSynthesis.pending)return;const u=new SpeechSynthesisUtterance(t);u.lang='vi-VN';if(viVoice)u.voice=viVoice;u.rate=D.rate||1;lastSay=Date.now();speechSynthesis.speak(u)}catch(e){}},0)}
 function restartAnim(el,cls){if(!el)return;el.classList.remove(cls);requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add(cls)))}
@@ -1371,7 +1378,7 @@ function startCatch(){
   const lv=D.lvl.catch,cf=catchCfg(lv);const pal=shuffle(COLORS.filter(c=>c[0]!=='hồng')).slice(0,cf.colors);
   K={lv,cf,pal,target:pickOne(pal),got:0,goal:cf.goal,items:[],parts:[],texts:[],bx:.5,tx:.5,stun:0,shake:0,spawn:1.2,msg:'',msgT:0,done:false,wrong:0,bonus:0,t:0,
      ptero:cf.ptero?{x:-.15,dir:1,flap:0,drop:1.5}:null};
-  try{audio()}catch(e){}
+  try{audio()}catch(e){}catchImg('nest');catchImg('rock');
   if(cf.ptero&&!pteroImg){pteroImg=new Image();pteroImg.src=COM_SRC['kl-ptero']}
   K.say=`Hứng trứng màu ${K.target[0]} nhé!`;
   render(`${topBar(`<div class="pill">Cấp ${lv+1}</div><div class="kprog" id="kp">${'<i></i>'.repeat(K.goal)}</div>`)}
@@ -1458,7 +1465,8 @@ function drawEgg(ctx,x,y,r,c,rot,kind){ctx.save();ctx.translate(x,y);ctx.rotate(
   ctx.fill();ctx.lineWidth=3;ctx.strokeStyle='#1D3646';ctx.stroke();
   ctx.fillStyle='rgba(255,255,255,.55)';ctx.beginPath();ctx.arc(-r*.3,-r*.3,r*.16,0,7);ctx.fill();ctx.beginPath();ctx.arc(r*.25,r*.25,r*.2,0,7);ctx.fill();ctx.restore()}
 function drawGlint(ctx,x,y,s,a){ctx.save();ctx.translate(x,y);ctx.rotate(a);ctx.fillStyle='#fff';ctx.beginPath();for(let i=0;i<8;i++){const rr=i%2?s*.28:s;ctx.lineTo(Math.cos(i*Math.PI/4)*rr,Math.sin(i*Math.PI/4)*rr)}ctx.closePath();ctx.fill();ctx.restore()}
-function drawRock(ctx,x,y,r,rot){ctx.save();ctx.translate(x,y);ctx.rotate(rot);ctx.beginPath();const pts=[[1,.1],[.6,.85],[-.3,.95],[-.95,.3],[-.8,-.6],[-.1,-.95],[.7,-.7]];
+function drawRock(ctx,x,y,r,rot){const im=catchImg('rock');if(im){ctx.save();ctx.translate(x,y);ctx.rotate(rot);const w=r*2.3,h=w*im.naturalHeight/im.naturalWidth;ctx.drawImage(im,-w/2,-h/2,w,h);ctx.restore();return}
+  ctx.save();ctx.translate(x,y);ctx.rotate(rot);ctx.beginPath();const pts=[[1,.1],[.6,.85],[-.3,.95],[-.95,.3],[-.8,-.6],[-.1,-.95],[.7,-.7]];
   pts.forEach(([a,b],i)=>i?ctx.lineTo(a*r,b*r):ctx.moveTo(a*r,b*r));ctx.closePath();ctx.fillStyle='#8A949B';ctx.fill();ctx.lineWidth=3;ctx.strokeStyle='#1D3646';ctx.stroke();
   ctx.fillStyle='#A9B2B8';ctx.beginPath();ctx.arc(-r*.25,-r*.25,r*.22,0,7);ctx.fill();ctx.restore()}
 function drawCloud(ctx,x,y,s){ctx.fillStyle='rgba(255,255,255,.75)';ctx.beginPath();ctx.arc(x,y,22*s,0,7);ctx.arc(x+26*s,y-10*s,28*s,0,7);ctx.arc(x+56*s,y,22*s,0,7);ctx.rect(x,y-4*s,56*s,26*s);ctx.fill()}
@@ -1481,11 +1489,15 @@ function draw(ctx,W,H){
   let bx=K.bx*W;if(K.shake>0)bx+=Math.sin(K.shake*60)*8;
   const sq=K.squash>0?Math.sin(K.squash/.25*Math.PI)*.18:0;const tilt=clamp((K.vel||0)*.15,-.25,.25);
   ctx.save();ctx.translate(bx,top+bh*.6);ctx.rotate(tilt);ctx.scale(1+sq,1-sq);ctx.translate(-bx,-(top+bh*.6));
-  for(let i=0;i<Math.min(K.got,5);i++){drawEgg(ctx,bx-bw*.28+i*bw*.14,top+bh*.12,ER*.6,'#FFF3D6',Math.sin(K.t*3+i)*.3)}
-  ctx.beginPath();ctx.ellipse(bx,top+bh*.25,bw/2,bh*.75,0,0,Math.PI);ctx.fillStyle='#B9773E';ctx.fill();ctx.lineWidth=4;ctx.strokeStyle='#1D3646';ctx.stroke();
+  const nim=catchImg('nest');
+  // picture nest: back of the nest, the caught eggs sitting in the hollow, then the front rim drawn again over them
+  if(nim){const w=bw*1.25,h=w*nim.naturalHeight/nim.naturalWidth,y0=top-h*.18,nw=nim.naturalWidth,nh=nim.naturalHeight,cut=.5;ctx.drawImage(nim,bx-w/2,y0,w,h);
+    const ne=Math.min(K.got,5);for(let i=0;i<ne;i++)drawEgg(ctx,bx+(i-(ne-1)/2)*w*.12,y0+h*.4,ER*.62,'#FFF3D6',Math.sin(K.t*3+i)*.3);
+    ctx.drawImage(nim,0,nh*cut,nw,nh*(1-cut),bx-w/2,y0+h*cut,w,h*(1-cut))}
+  else{for(let i=0;i<Math.min(K.got,5);i++){drawEgg(ctx,bx-bw*.28+i*bw*.14,top+bh*.12,ER*.6,'#FFF3D6',Math.sin(K.t*3+i)*.3)}  ctx.beginPath();ctx.ellipse(bx,top+bh*.25,bw/2,bh*.75,0,0,Math.PI);ctx.fillStyle='#B9773E';ctx.fill();ctx.lineWidth=4;ctx.strokeStyle='#1D3646';ctx.stroke();
   ctx.strokeStyle='#8C5326';ctx.lineWidth=3;for(let i=1;i<4;i++){ctx.beginPath();ctx.ellipse(bx,top+bh*.25,bw/2*(1-i*.18),bh*.75*(1-i*.2),0,.15,Math.PI-.15);ctx.stroke()}
   ctx.beginPath();ctx.ellipse(bx,top+bh*.25,bw/2,bh*.18,0,0,Math.PI*2);ctx.fillStyle='#D99A57';ctx.fill();ctx.lineWidth=4;ctx.strokeStyle='#1D3646';ctx.stroke();
-  ctx.strokeStyle='#C98A4A';ctx.lineWidth=3;for(let i=-3;i<=3;i++){ctx.beginPath();ctx.moveTo(bx+i*bw*.12-6,top+bh*.2);ctx.lineTo(bx+i*bw*.12+6,top+bh*.32);ctx.stroke()}
+  ctx.strokeStyle='#C98A4A';ctx.lineWidth=3;for(let i=-3;i<=3;i++){ctx.beginPath();ctx.moveTo(bx+i*bw*.12-6,top+bh*.2);ctx.lineTo(bx+i*bw*.12+6,top+bh*.32);ctx.stroke()}}
   ctx.restore();
   if(K.stun>0){ctx.font=`${ER*1.2}px system-ui`;ctx.textAlign='center';ctx.fillText('💫',bx+Math.sin(K.t*10)*10,top-ER*.4)}
   for(const p of K.parts){ctx.globalAlpha=Math.max(0,p.life/.8);ctx.fillStyle=p.c;ctx.beginPath();ctx.arc(p.x,p.y,p.r||6,0,7);ctx.fill()}ctx.globalAlpha=1;
@@ -2407,17 +2419,7 @@ Object.assign(SFX,{
   coin:t=>{bell(1319,t,.09,.25);bell(1976,t+.06,.08,.35)}});
 
 // ================= reward chest screen =================
-function chestSVG(){return `<svg class="chest" viewBox="0 0 220 200" aria-hidden="true">
-  <defs><linearGradient id="cw" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E0A060"/><stop offset="1" stop-color="#A9653A"/></linearGradient>
-    <radialGradient id="cg" cx=".5" cy=".6" r=".6"><stop offset="0" stop-color="#FFF6C8"/><stop offset=".6" stop-color="#FFD84D"/><stop offset="1" stop-color="#FFB800" stop-opacity="0"/></radialGradient></defs>
-  <ellipse class="glowin" cx="110" cy="96" rx="80" ry="46" fill="url(#cg)"/>
-  <g class="body"><rect x="22" y="92" width="176" height="92" rx="14" fill="url(#cw)" stroke="#1D3646" stroke-width="6"/>
-    <rect x="22" y="110" width="176" height="14" fill="#FFC83D" stroke="#1D3646" stroke-width="5"/>
-    <rect x="60" y="92" width="16" height="92" fill="#FFC83D" stroke="#1D3646" stroke-width="5"/><rect x="144" y="92" width="16" height="92" fill="#FFC83D" stroke="#1D3646" stroke-width="5"/>
-    <rect x="95" y="104" width="30" height="34" rx="6" fill="#FFE066" stroke="#1D3646" stroke-width="5"/><circle cx="110" cy="119" r="5" fill="#1D3646"/></g>
-  <g class="lid"><path d="M22 96 Q22 30 110 30 Q198 30 198 96 Z" fill="url(#cw)" stroke="#1D3646" stroke-width="6" stroke-linejoin="round"/>
-    <path d="M60 96 Q60 38 68 34 L84 32 Q76 40 76 96 Z M144 96 Q144 40 136 32 L152 34 Q160 38 160 96 Z" fill="#FFC83D" stroke="#1D3646" stroke-width="5" stroke-linejoin="round"/>
-    <ellipse cx="84" cy="50" rx="26" ry="8" fill="#fff" opacity=".35" transform="rotate(-12 84 50)"/></g></svg>`}
+function chestSVG(){return `<span class="chest chest2">${objImg('chest','c-closed')}${objImg('chest-open','c-open')}</span>`}
 function pickGift(){if(!D.pet.hatched)return null;const sd=shopData();const c=SHOP.filter(it=>it.slot!=='skin'&&!sd.owned.includes(it.id)&&it.price<=20);return c.length?pickOne(c):null}
 function rewardScreen(opt){
   hush();const ov=document.createElement('div');ov.className='reward';ov.id='rw';
