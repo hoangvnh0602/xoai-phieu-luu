@@ -269,6 +269,7 @@ svg .b-armL{transform-origin:100% 50%}svg .b-armR{transform-origin:0% 50%}
 .slot2.back{animation:hopIn .6s cubic-bezier(.3,1.7,.5,1)}
 @keyframes hopIn{from{transform:translateY(60%) scale(.4);opacity:0}}
 .slot2.blink{animation:blinkHi 1.2s}
+.slot2.tapme{cursor:pointer;animation:float 2.4s ease-in-out infinite}
 @keyframes blinkHi{0%,40%,80%{background:rgba(255,224,138,.9)}20%,60%,100%{background:transparent}}
 .bushes{position:absolute;left:-4%;right:-4%;bottom:0;height:93%;z-index:3;transform:translateY(112%);transition:transform .5s cubic-bezier(.4,1.35,.5,1);pointer-events:none}
 .meadow.cover .bushes{transform:translateY(0)}
@@ -291,6 +292,8 @@ svg .b-armL{transform-origin:100% 50%}svg .b-armR{transform-origin:0% 50%}
 .mk-stall{flex:1;min-height:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(clamp(74px,11vw,110px),1fr));gap:10px;align-content:center;padding:12px;background:linear-gradient(#FFF,#FFF3D9)}
 .mkitem{aspect-ratio:1;max-width:100%;border-radius:22px;background:#fff;box-shadow:0 5px 0 rgba(29,54,70,.15);font-size:clamp(40px,7vw,64px);animation:popIn .4s backwards;transition:transform .3s,opacity .3s}
 .mkitem.taken{transform:translateY(60px) scale(.3);opacity:0;pointer-events:none}
+.mkitem.bump{animation:pickBump .35s ease}@keyframes pickBump{50%{transform:scale(.82)}}
+.mkq{display:flex;gap:2px;font-size:.78em}
 .mkitem.nope{animation:shake .45s}
 .mk-basket{position:absolute;right:2%;bottom:-2%;display:flex;align-items:center;gap:6px;background:#fff;border-radius:999px;padding:6px 16px;box-shadow:0 6px 0 rgba(29,54,70,.15);z-index:3}
 .mk-basket .bk{font-size:clamp(36px,6vw,52px)}
@@ -303,6 +306,7 @@ svg .b-armL{transform-origin:100% 50%}svg .b-armR{transform-origin:0% 50%}
 .pt-cell{aspect-ratio:1;max-width:100%;border-radius:18px;background:#fff;box-shadow:0 5px 0 rgba(29,54,70,.12);display:grid;place-items:center;padding:8%;box-sizing:border-box;animation:popIn .4s backwards}
 .pt-cell svg{width:100%;height:100%}
 .pt-cell.hole{border:4px dashed #9FB3C2;background:rgba(255,255,255,.5);box-shadow:none}
+.pt-cell.hole.cur{border-color:var(--berry);background:#FFF0F4}
 .pt-cell .q{font-family:var(--display);font-weight:800;font-size:clamp(30px,5vw,56px);color:#9FB3C2;animation:pulse 1s infinite}
 .pt-cell.beat{animation:beat .35s}
 @keyframes beat{40%{transform:translateY(-16%) scale(1.08)}}
@@ -462,6 +466,8 @@ textarea.code{width:100%;box-sizing:border-box;margin-top:8px;min-height:64px;bo
 .cell.scell::after{content:"";position:absolute;inset:16%;border-radius:50%;background:rgba(255,255,255,.6);border:3px dashed #8FA6B5}
 .cell.hint{background:#FFF1A8 !important;box-shadow:inset 0 0 0 4px #FFC83D;animation:hintPulse .6s ease-in-out infinite alternate}
 @keyframes hintPulse{to{background:#FFE36A}}
+.cell .cstar{display:inline-block;font-size:.8em;animation:float 2s ease-in-out infinite;filter:drop-shadow(0 0 8px rgba(255,200,61,.95));transition:transform .35s,opacity .35s}
+.cell .cstar.got{transform:scale(1.8) translateY(-30%);opacity:0}
 .cell .rock{display:inline-block;filter:drop-shadow(0 4px 0 rgba(29,54,70,.25))}
 .cell.gcell::before{content:"";position:absolute;inset:8%;border-radius:50%;border:4px dashed #FFB800;animation:spin 7s linear infinite}
 .goal{display:inline-block;position:relative;animation:float 2.4s ease-in-out infinite;filter:drop-shadow(0 0 10px rgba(255,200,61,.9))}
@@ -523,6 +529,10 @@ textarea.code{width:100%;box-sizing:border-box;margin-top:8px;min-height:64px;bo
 /* Catch */
 .catch-holder{flex:1;min-height:0;width:100%;max-width:1040px;position:relative;border-radius:26px;overflow:hidden;background:linear-gradient(rgba(255,255,255,.35),rgba(255,255,255,0) 70%);touch-action:none}
 .catch-holder canvas{display:block;touch-action:none}
+body.still .deco *,body.still .deco *::before,body.still .deco *::after{animation-play-state:paused!important}
+.unlock{position:absolute;left:50%;top:42%;transform:translateX(-50%);z-index:40;display:flex;align-items:center;gap:12px;max-width:min(88vw,720px);padding:16px 26px;border-radius:26px;background:linear-gradient(#FFF6C9,#FFE07A);border:4px solid var(--ink);box-shadow:0 8px 0 rgba(29,54,70,.25);font:800 clamp(20px,3.2vw,30px)/1.2 var(--display);color:var(--ink);pointer-events:none;animation:unlockIn 4.2s ease both}
+.unlock b{font-size:1.5em}
+@keyframes unlockIn{0%{opacity:0;transform:translate(-50%,-30px) scale(.6)}8%{opacity:1;transform:translate(-50%,0) scale(1.08)}12%{transform:translate(-50%,0) scale(1)}88%{opacity:1}100%{opacity:0;transform:translate(-50%,-10px) scale(.96)}}
 .kprog{display:flex;gap:6px}
 .kprog i{width:22px;height:28px;border-radius:50% 50% 46% 46%/60% 60% 40% 40%;background:rgba(255,255,255,.75);border:3px solid rgba(29,54,70,.2)}
 .kprog i.on{border-color:var(--ink)}
@@ -634,6 +644,7 @@ body.sleep h1{color:#FFE28A}
 .chip{background:var(--sky2);border-radius:999px;padding:10px 18px;font-weight:800;font-size:18px}
 .chip.sel{background:var(--ink);color:#fff}
 table{border-collapse:collapse;width:100%;font-size:18px;font-variant-numeric:tabular-nums}
+.lvt td.lvd{font-size:15px;color:var(--soft)}.lvt .chip{min-width:44px}
 td,th{padding:8px 6px;border-bottom:1px solid #DDE8EE;text-align:left}
 td:not(:first-child),th:not(:first-child){text-align:right}
 .keypad{display:grid;grid-template-columns:repeat(3,72px);gap:10px}
@@ -827,7 +838,7 @@ function bip(cls='bip'){return `<svg class="${cls}" viewBox="0 0 120 150" aria-l
 <g class="b-pupil"><circle cx="45" cy="64" r="6" fill="#1D3646"/><circle cx="81" cy="64" r="6" fill="#1D3646"/><circle cx="47" cy="61" r="2" fill="#fff"/><circle cx="83" cy="61" r="2" fill="#fff"/></g></g>
 <circle cx="28" cy="84" r="5" fill="#FF5C7A" opacity=".45"/><circle cx="92" cy="84" r="5" fill="#FF5C7A" opacity=".45"/>
 <path class="b-mouth" d="M48 84 Q60 94 72 84" fill="#7A2335" stroke="#1D3646" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></g></svg>`}
-function bipReact(kind){const b=$('.guide .bip');if(!b)return;b.classList.remove('happy','sad');void b.getBoundingClientRect();b.classList.add(kind);later(()=>b.classList.remove(kind),900)}
+function bipReact(kind){const b=$('.guide .bip');if(!b)return;b.classList.remove('happy','sad');clearTimeout(b._rt);requestAnimationFrame(()=>requestAnimationFrame(()=>{b.classList.add(kind);b._rt=setTimeout(()=>b.classList.remove(kind),900)}))}
 function egg(c,cracks=0){const cr=[
   'M30 50 L40 58 L34 66 L44 72','M66 40 L58 50 L68 56 L60 64','M50 92 L56 82 L48 76 L58 68','M22 78 L34 80 L30 90','M74 78 L66 84 L76 92'
  ].slice(0,cracks).map(d=>`<path d="${d}" fill="none" stroke="#1D3646" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>`).join('');
@@ -849,6 +860,10 @@ function memFaces(count){
   const sp=shuffle(SPECIES),out=[],used=new Set();let i=0;
   while(out.length<count&&i<200){const s=sp[i%sp.length],col=pickOne(DCOL),key=s[0]+col[0];i++;if(used.has(key))continue;
     if(i<=sp.length||Math.random()<.7){used.add(key);out.push([dinoArt(s[0],col[1]),`${s[1]} màu ${col[0]}`,shade(col[1],.78)])}}
+  return out}
+// "look-alike" decks: only two kinds of dinosaur and the same card colour, so a pair must match in both shape and colour
+function twinFaces(count){const sp=shuffle(SPECIES).slice(0,2),cols=shuffle(DCOL),out=[];
+  for(let i=0;out.length<count&&i<12;i++){const s=sp[i%2],c=cols[Math.floor(i/2)%cols.length];out.push([dinoArt(s[0],c[1]),`${s[1]} màu ${c[0]}`,'#EAF4FF'])}
   return out}
 function stageOf(xp){return xp<15?1:xp<50?2:3}
 // ---------- Bé Cốm: illustrated art (img/*.webp), poses, recolored skins ----------
@@ -949,7 +964,10 @@ function render(html,cls=''){
   $('#app').innerHTML=`<div class="screen">${html}</div>`;
 }
 function award(n){D.stars+=n;D.earned=(D.earned||0)+n;if(D.pet.hatched)D.pet.xp+=n;save()}
-function stat(kind,ok){const s=D.stats[kind]||(D.stats[kind]={ok:0,no:0});ok?s.ok++:s.no++;save()}
+// answers are counted many times a minute; writing the whole save on each one made fast games stutter, so it waits a moment and writes once
+let saveT=0;function saveSoon(){clearTimeout(saveT);saveT=setTimeout(save,1500)}
+addEventListener('pagehide',()=>save());document.addEventListener('visibilitychange',()=>{if(document.hidden)save()});
+function stat(kind,ok){const s=D.stats[kind]||(D.stats[kind]={ok:0,no:0});ok?s.ok++:s.no++;saveSoon()}
 function topBar(mid=''){return `<div class="top"><button class="icon-btn" id="home" aria-label="Về nhà">🏠</button>${mid}<div class="pill">⭐ <span id="starN">${D.stars}</span></div></div>`}
 function guide(text){return `<div class="guide">${bip()}<div class="bubble"><span id="say">${text}</span><button class="icon-btn" id="again" aria-label="Nghe lại">🔊</button></div></div>`}
 function wireCommon(getSay){
@@ -1053,7 +1071,7 @@ function stArt(g){
     <rect x="14" y="40" width="72" height="9" fill="#FFC83D" stroke-width="3"/><rect x="44" y="46" width="12" height="16" rx="3" fill="#FFC83D" stroke-width="3"/></g><circle cx="22" cy="18" r="4" fill="#FFC83D"/><circle cx="80" cy="14" r="3" fill="#FFC83D"/></svg>`}
 function stBadge(g){const p=D.pet;
   if(g==='code')return [`Màn ${D.lvl.code+1}`];
-  if(g==='memory')return [`${MEM_SIZES[Math.min(D.lvl.memory,MEM_SIZES.length-1)]} thẻ`];
+  if(g==='memory')return [D.lvl.memory>=5?`${D.lvl.memory>=6?16:12} thẻ khó`:`${MEM_SIZES[Math.min(D.lvl.memory,MEM_SIZES.length-1)]} thẻ`];
   if(g==='catch')return [`Cấp ${D.lvl.catch+1}`];
   if(g==='pet')return !p.hatched?['Nở trứng!',1]:p.food<2.5?['Đói rồi!',1]:p.clean<2.5?['Cần tắm!',1]:p.fun<2.5?['Buồn chán',1]:['❤'];
   if(g==='band')return [`Cấp ${D.lvl.band+1}`];
@@ -1140,26 +1158,41 @@ const CODE_LEVELS=[
   {m:["...R.","B.R.G","....."]},
   {m:["B.R..","..R.R","....G"]},
   {m:["G....","RR.R.","....B"]},
+  // from here: stars to pick up on the way (Bíp must collect every star before the rocket takes off)
+  {m:["B.S.","....","...G"],news:'Mới! Nhặt ngôi sao rồi mới về tàu nhé!'},
+  {m:["B...","..S.","G..."]},
+  {m:["B.R.S","..R..","....G"]},
+  {m:["S...B",".RR..","G...."]},
+  {m:["B.S..","RR.R.","S...G"],news:'Hai ngôi sao! Nhặt hết cả hai nhé!'},
+  {m:["G.R.S","..R..","B...."]},
+  {m:["B..R..","S.R.S.","....RG"],news:'Bàn cờ to hơn rồi! Đếm ô thật kỹ nhé!'},
 ];
-function parseLevel(m){const h=m.length,w=m[0].length;let b,g;const rocks=new Set();
-  m.forEach((row,y)=>[...row].forEach((ch,x)=>{if(ch==='B')b=[x,y];if(ch==='G')g=[x,y];if(ch==='R')rocks.add(x+','+y)}));return{w,h,b,g,rocks}}
-function bfsPath(L){const start=L.b.join(','),prev={[start]:null},q=[L.b];
-  while(q.length){const [x,y]=q.shift();if(x===L.g[0]&&y===L.g[1]){const path=[];let k=x+','+y;while(k){path.unshift(k);k=prev[k]}return path}
-    for(const [dx,dy] of Object.values(DIRS)){const nx=x+dx,ny=y+dy,k=nx+','+ny;if(nx<0||ny<0||nx>=L.w||ny>=L.h||L.rocks.has(k)||k in prev)continue;prev[k]=x+','+y;q.push([nx,ny])}}
+function parseLevel(m){const h=m.length,w=m[0].length;let b,g;const rocks=new Set(),stars=[];
+  m.forEach((row,y)=>[...row].forEach((ch,x)=>{if(ch==='B')b=[x,y];if(ch==='G')g=[x,y];if(ch==='R')rocks.add(x+','+y);if(ch==='S')stars.push(x+','+y)}));return{w,h,b,g,rocks,stars}}
+// shortest route from L.b that picks up every star not yet in `have`, then reaches the rocket
+function bfsPath(L,have=[]){const st=L.stars||[],full=(1<<st.length)-1;let m0=0;st.forEach((k,i)=>{if(have.includes(k)||k===L.b.join(','))m0|=1<<i});
+  const key=(k,m)=>k+'|'+m,s0=key(L.b.join(','),m0),prev={[s0]:null},q=[[L.b[0],L.b[1],m0]];
+  while(q.length){const [x,y,m]=q.shift();if(x===L.g[0]&&y===L.g[1]&&m===full){const path=[];let k=key(x+','+y,m);while(k){path.unshift(k.split('|')[0]);k=prev[k]}return path}
+    for(const [dx,dy] of Object.values(DIRS)){const nx=x+dx,ny=y+dy,k=nx+','+ny;if(nx<0||ny<0||nx>=L.w||ny>=L.h||L.rocks.has(k))continue;
+      const i=st.indexOf(k),nm=i>=0?m|(1<<i):m,kk=key(k,nm);if(kk in prev)continue;prev[kk]=key(x+','+y,m);q.push([nx,ny,nm])}}
   return null}
-function genLevel(){for(let t=0;t<300;t++){const w=5,h=4;const L={w,h,rocks:new Set(),b:[rand(0,w-1),rand(0,h-1)],g:[rand(0,w-1),rand(0,h-1)]};
-  const nr=rand(3,6);while(L.rocks.size<nr){const k=rand(0,w-1)+','+rand(0,h-1);if(k!==L.b.join(',')&&k!==L.g.join(','))L.rocks.add(k)}
-  const p=bfsPath(L);if(p&&p.length>=5&&p.length<=9)return L}
+// after the hand-made levels: fresh boards that slowly grow (more rocks, a second star, a wider board)
+function genLevel(lv){const extra=Math.max(0,lv-CODE_LEVELS.length);
+  for(let t=0;t<600;t++){const w=extra>=4?6:5,h=4,ns=extra>=2?2:1;const L={w,h,rocks:new Set(),stars:[],b:[rand(0,w-1),rand(0,h-1)],g:[rand(0,w-1),rand(0,h-1)]};
+  const used=k=>k===L.b.join(',')||k===L.g.join(',')||L.rocks.has(k)||L.stars.includes(k);
+  const nr=rand(3,5+Math.min(extra,3));while(L.rocks.size<nr){const k=rand(0,w-1)+','+rand(0,h-1);if(!used(k))L.rocks.add(k)}
+  while(L.stars.length<ns){const k=rand(0,w-1)+','+rand(0,h-1);if(!used(k))L.stars.push(k)}
+  const p=bfsPath(L);if(p&&p.length>=6&&p.length<=Math.min(13,9+extra))return L}
   return parseLevel(CODE_LEVELS[CODE_LEVELS.length-1].m)}
 let C=null;
 function startCode(){C={played:0,stars:0};codeLevel()}
 function codeLevel(){
   screen='code';
-  const def=CODE_LEVELS[D.lvl.code];const L=def?parseLevel(def.m):genLevel();
-  Object.assign(C,{L,direct:!!(def&&def.d),prog:[],pos:[...L.b],running:false,fails:0});
-  C.say=C.direct?'Bấm mũi tên để đưa Bíp tới tàu vũ trụ!':'Xếp mũi tên, rồi bấm Chạy!';
+  const def=CODE_LEVELS[D.lvl.code];const L=def?parseLevel(def.m):genLevel(D.lvl.code);
+  Object.assign(C,{L,direct:!!(def&&def.d),prog:[],pos:[...L.b],running:false,fails:0,got:[],max:L.stars.length?14:10});
+  C.say=C.direct?'Bấm mũi tên để đưa Bíp tới tàu vũ trụ!':L.stars.length?`Nhặt ${L.stars.length>1?'hết '+L.stars.length+' ngôi sao':'ngôi sao'} rồi về tàu nhé!`:'Xếp mũi tên, rồi bấm Chạy!';
   const cells=[];for(let y=0;y<L.h;y++)for(let x=0;x<L.w;x++){const k=x+','+y;
-    const g=x===L.g[0]&&y===L.g[1],st=x===L.b[0]&&y===L.b[1];cells.push(`<div class="cell c${(x+y)%2}${g?' gcell':''}${st?' scell':''}" data-k="${k}" style="animation-delay:${((x+y)*.05).toFixed(2)}s">${L.rocks.has(k)?'<span class="rock">🪨</span>':g?'<span class="goal"><span class="rk">🚀</span></span>':''}</div>`)}
+    const g=x===L.g[0]&&y===L.g[1],st=x===L.b[0]&&y===L.b[1];cells.push(`<div class="cell c${(x+y)%2}${g?' gcell':''}${st?' scell':''}" data-k="${k}" style="animation-delay:${((x+y)*.05).toFixed(2)}s">${L.rocks.has(k)?'<span class="rock">🪨</span>':L.stars.includes(k)?'<span class="cstar">⭐</span>':g?'<span class="goal"><span class="rk">🚀</span></span>':''}</div>`)}
   const dpad=['u','l','r','d'].map(k=>`<button style="grid-area:${k};background:${ACOL[k]}" data-a="${k}" aria-label="${AWORD[k]}">${arrow(k)}</button>`).join('');
   render(`${topBar(`<div class="pill">Màn ${D.lvl.code+1}</div>`)}
     ${guide(C.say)}
@@ -1176,8 +1209,13 @@ function codeLevel(){
   $('#hint').onclick=showHint;
   if(!C.direct){$('#clear').onclick=()=>{if(C.running)return;C.prog=[];drawStrip();tone('tap')};$('#run').onclick=runProg;drawStrip()}
   sizeBoard();onResize(sizeBoard);
-  say(D.lvl.code===0?'Giúp Bíp về tàu vũ trụ nào! Bấm mũi tên để Bíp đi.':C.say);
+  if(def&&def.news&&unlockToast('code'+D.lvl.code,def.news)){say(def.news);later(()=>say(C.say),3000)}
+  else say(D.lvl.code===0?'Giúp Bíp về tàu vũ trụ nào! Bấm mũi tên để Bíp đi.':C.say);
 }
+function pickStar(){const k=C.pos.join(',');if(!C.L.stars.includes(k)||C.got.includes(k))return;C.got.push(k);
+  const el=$(`.cell[data-k="${k}"] .cstar`);if(el){el.classList.add('got');sparkEl(el,14)}tone('coin');
+  const left=C.L.stars.length-C.got.length;say(left?`Còn ${left} ngôi sao!`:'Đủ sao rồi! Về tàu thôi!')}
+function resetStars(){C.got=[];$$('.cstar.got').forEach(e=>e.classList.remove('got'))}
 function sizeBoard(){const hold=$('.board-holder'),b=$('#board');if(!hold||!b)return;
   const cs=Math.max(24,Math.floor(Math.min((hold.clientWidth-24)/C.L.w,(hold.clientHeight-24)/C.L.h,140)));
   b.style.width=cs*C.L.w+'px';b.style.height=cs*C.L.h+'px';b.style.setProperty('--cell',cs+'px');placeTok(false)}
@@ -1186,11 +1224,12 @@ function placeTok(anim=true){const t=$('#tok');if(!t)return;
   t.style.left=(C.pos[0]*100/C.L.w)+'%';t.style.top=(C.pos[1]*100/C.L.h)+'%';t.style.width=(100/C.L.w)+'%';t.style.height=(100/C.L.h)+'%';
   if(!anim){void t.offsetWidth;t.style.transition=''}}
 function drawStrip(){const s=$('#strip');if(!s)return;
-  s.innerHTML=C.prog.map((k,i)=>`<button class="slot" data-i="${i}" style="background:${ACOL[k]}" aria-label="Bỏ mũi tên ${AWORD[k]}">${arrow(k)}</button>`).join('')+(C.prog.length<10?'<span class="slot empty">+</span>':'');
+  s.innerHTML=C.prog.map((k,i)=>`<button class="slot" data-i="${i}" style="background:${ACOL[k]}" aria-label="Bỏ mũi tên ${AWORD[k]}">${arrow(k)}</button>`).join('')+(C.prog.length<C.max?'<span class="slot empty">+</span>':'');
   $$('.slot[data-i]').forEach(b=>b.onclick=()=>{if(C.running)return;C.prog.splice(+b.dataset.i,1);drawStrip();tone('tap')})}
 function markSlot(i){$$('.slot[data-i]').forEach((s,j)=>s.classList.toggle('cur',j===i))}
 const blocked=(x,y)=>x<0||y<0||x>=C.L.w||y>=C.L.h||C.L.rocks.has(x+','+y);
 const atGoal=()=>C.pos[0]===C.L.g[0]&&C.pos[1]===C.L.g[1];
+const allStars=()=>C.got.length>=C.L.stars.length;
 function boardFx(e,x,y){const b=$('#board');if(!b)return;const el=document.createElement('div');el.className='fx';el.textContent=e;el.style.left=((x+.25)*100/C.L.w)+'%';el.style.top=((y-.1)*100/C.L.h)+'%';b.appendChild(el);setTimeout(()=>el.remove(),1500)}
 function puff([x,y]){const b=$('#board');if(!b)return;const cw=100/C.L.w,ch=100/C.L.h;
   for(let i=0;i<3;i++){const p=document.createElement('div');p.className='puff';const s=cw*(.22+Math.random()*.12);
@@ -1201,25 +1240,25 @@ function press(k){
   if(C.running)return;tone('tap');say(AWORD[k]);
   const btn=$(`.dpad [data-a="${k}"]`);btn&&(btn.animate&&btn.animate([{transform:'scale(1)'},{transform:'scale(.85)'},{transform:'scale(1)'}],{duration:220}));
   if(C.direct){const nx=C.pos[0]+DIRS[k][0],ny=C.pos[1]+DIRS[k][1];if(blocked(nx,ny)){bonk();return}stepTo(nx,ny);if(atGoal()){C.running=true;later(codeWin,350)}return}
-  if(C.prog.length>=10){say('Đủ mười mũi tên rồi');return}
+  if(C.prog.length>=C.max){say('Đủ mũi tên rồi, bấm Chạy nhé!');return}
   C.prog.push(k);drawStrip();const last=$$('.slot[data-i]').pop();last&&last.animate&&last.animate([{transform:'scale(0) rotate(-90deg)'},{transform:'scale(1.2)'},{transform:'scale(1)'}],{duration:300,easing:'ease-out'});
 }
 async function runProg(){
   if(C.running)return;if(!C.prog.length){say('Xếp mũi tên trước nhé!');return}
-  const g=gen;C.running=true;C.pos=[...C.L.b];placeTok(false);await wait(200);
+  const g=gen;C.running=true;C.pos=[...C.L.b];resetStars();placeTok(false);await wait(200);
   for(let i=0;i<C.prog.length;i++){
     if(g!==gen)return;markSlot(i);
     const nx=C.pos[0]+DIRS[C.prog[i]][0],ny=C.pos[1]+DIRS[C.prog[i]][1];
     if(blocked(nx,ny)){const out=nx<0||ny<0||nx>=C.L.w||ny>=C.L.h;bonk();say(out?'Ối, ra ngoài rồi!':'Ối, đụng đá rồi!');C.fails++;
       await wait(1400);if(g!==gen)return;resetRun();say(C.fails>=2?'Bấm bóng đèn để xem gợi ý nhé!':'Sửa lại mũi tên nhé!');return}
-    stepTo(nx,ny);tone('step');await wait(480);
+    stepTo(nx,ny);tone('step');pickStar();await wait(480);
     if(g!==gen)return;
-    if(atGoal()){markSlot(-1);codeWin();return}
+    if(atGoal()&&allStars()){markSlot(-1);codeWin();return}
   }
-  await wait(300);if(g!==gen)return;C.fails++;stat('code',false);say('Bíp chưa tới tàu. Thêm mũi tên nữa nhé!');await wait(1500);if(g!==gen)return;resetRun();
+  await wait(300);if(g!==gen)return;C.fails++;stat('code',false);say(atGoal()?'Còn sao chưa nhặt kìa! Sửa mũi tên nhé!':'Bíp chưa tới tàu. Thêm mũi tên nữa nhé!');await wait(1500);if(g!==gen)return;resetRun();
 }
-function resetRun(){C.running=false;C.pos=[...C.L.b];placeTok();markSlot(-1)}
-function showHint(){if(C.running)return;const p=bfsPath({...C.L,b:C.pos});if(!p)return;tone('pop');say('Đi theo đường màu vàng nhé!');
+function resetRun(){C.running=false;C.pos=[...C.L.b];resetStars();placeTok();markSlot(-1)}
+function showHint(){if(C.running)return;const p=bfsPath({...C.L,b:C.pos},C.got);if(!p)return;tone('pop');say('Đi theo đường màu vàng nhé!');
   p.forEach(k=>{const c=$(`.cell[data-k="${k}"]`);c&&c.classList.add('hint')});later(()=>$$('.cell.hint').forEach(c=>c.classList.remove('hint')),2600)}
 function codeWin(){
   C.running=true;tone('ok');say(pickOne(PRAISE())+' Bíp về tàu rồi!');stat('code',true);bipReact('happy');
@@ -1235,11 +1274,11 @@ const MEM_SIZES=[4,6,8,12,16];
 let M=null;
 function startMemory(){
   screen='memory';
-  const n=MEM_SIZES[Math.min(D.lvl.memory,MEM_SIZES.length-1)];
-  const faces=memFaces(n/2);const deck=shuffle([...faces,...faces]);
+  const lv=D.lvl.memory,twin=lv>=5;const n=twin?(lv>=6?16:12):MEM_SIZES[Math.min(lv,MEM_SIZES.length-1)];
+  const faces=twin?twinFaces(n/2):memFaces(n/2);const deck=shuffle([...faces,...faces]);
   const [cols,rows]=({4:[2,2],6:[3,2],8:[4,2],12:[4,3],16:[4,4]})[n];
   M={deck,open:[],found:0,lock:true,n,miss:0,cols,rows,say:'Lật hai thẻ giống nhau nhé!'};
-  render(`${topBar(`<div class="pill">${n} thẻ</div>`)}${guide(M.say)}
+  render(`${topBar(`<div class="pill">${n} thẻ${twin?' ✨':''}</div>`)}${guide(M.say)}
     <div class="mem-holder"><div class="mem" id="mem" style="grid-template-columns:repeat(${cols},1fr)">
     ${deck.map((f,i)=>`<button class="card" data-i="${i}" aria-label="Thẻ ${i+1}" style="animation-delay:${(i*.07).toFixed(2)}s"><span class="side back">?</span><span class="side front" style="background:${f[2]}">${f[0]}</span></button>`).join('')}
     </div></div>`);
@@ -1247,7 +1286,9 @@ function startMemory(){
   sizeMem();onResize(sizeMem);
   const cards=$$('.card');
   cards.forEach(c=>c.onclick=()=>flip(c,cards));
-  if(D.lvl.memory<2){cards.forEach(c=>c.classList.add('up'));say('Nhìn kỹ các thẻ nhé!');
+  const news=lv===5?'Mới! Các bạn khủng long trông giống nhau hơn. Nhìn kỹ cả hình và màu nhé!':lv===3?'Mới! Nhiều thẻ hơn rồi đó!':'';
+  if(news&&unlockToast('memory'+lv,news)){M.lock=true;say(news);later(()=>{M.lock=false;say(M.say)},3600)}
+  else if(D.lvl.memory<2){cards.forEach(c=>c.classList.add('up'));say('Nhìn kỹ các thẻ nhé!');
     later(()=>{cards.forEach(c=>c.classList.remove('up'));M.lock=false;later(()=>say(M.say),500)},n<=6?3000:4000)}
   else{M.lock=false;say(M.say)}
 }
@@ -1266,91 +1307,131 @@ function flip(c,cards){
     later(()=>{stat('memory',false);ca.classList.remove('up','nope');cb.classList.remove('up','nope');M.open=[];M.lock=false},1250);
   }
 }
-function memWin(){award(3);if(M.miss<=M.n/2)D.lvl.memory++;save();showDone('memory',3,'Trí nhớ siêu quá!')}
+function memWin(){award(3);if(M.miss<=M.n/2)D.lvl.memory++;else if(M.miss>M.n*1.2&&D.lvl.memory>0)D.lvl.memory--;save();showDone('memory',3,'Trí nhớ siêu quá!')}
 
 // ================= GAME: Hứng trứng =================
-let K=null;
+// Level ladder (D.lvl.catch). Each level adds at most one new twist, announced once, so a 4-year-old always meets one new thing at a time.
+const CATCH_FEATS={1:'Cẩn thận, có đá rơi đó!',2:'Mới! Trứng vàng lấp lánh, hứng được thêm sao!',3:'Mới! Trứng biết bay lượn lắc lư!',4:'Mới! Thằn lằn bay thả trứng từ trên trời!',5:'Mới! Trứng cầu vồng, màu nào cũng hứng được!',6:'Mới! Màu trứng đổi nhanh hơn, nhớ nghe Bíp nhé!',8:'Thử thách! Trứng rơi nhanh hơn nữa!'};
+function catchCfg(lv){return{colors:lv<2?2:lv<4?3:4,goal:lv<6?8:9,every:lv<6?4:3,speed:.16+Math.min(lv,12)*.02,
+  rock:lv<1?.06:Math.min(.1+lv*.025,.26),gold:lv>=2?.07:0,sway:lv>=3?Math.min(.3+(lv-3)*.1,.7):0,ptero:lv>=4,rainbow:lv>=5?.05:0,gap:Math.max(.55,1.15-lv*.06)}}
+let K=null,pteroImg=null;
+// speaking a number on every catch used to cancel the voice mid-word and restyle the whole page; this one never interrupts and never touches the page
+function sayLite(t){if(D.mute)return;setTimeout(()=>{try{if(speechSynthesis.speaking||speechSynthesis.pending)return;const u=new SpeechSynthesisUtterance(t);u.lang='vi-VN';if(viVoice)u.voice=viVoice;u.rate=D.rate||1;lastSay=Date.now();speechSynthesis.speak(u)}catch(e){}},0)}
+function restartAnim(el,cls){if(!el)return;el.classList.remove(cls);requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add(cls)))}
+function unlockToast(key,text){D.seen=D.seen||{};if(!text||D.seen[key])return false;D.seen[key]=1;save();
+  const t=document.createElement('div');t.className='unlock';t.innerHTML=`<b>✨</b><span>${text}</span>`;$('#app .screen').appendChild(t);later(()=>t.remove(),4200);tone('chime');return true}
 function startCatch(){
   screen='catch';
-  const lv=D.lvl.catch;const pal=shuffle(COLORS).slice(0,lv<2?2:lv<4?3:4);
-  K={pal,target:pickOne(pal),got:0,goal:8,items:[],parts:[],bx:.5,tx:.5,stun:0,shake:0,spawn:.6,msg:'',msgT:0,done:false,
-     speed:.17+Math.min(lv,8)*.022,rockRate:lv<1?.08:Math.min(.12+lv*.03,.28)};
+  const lv=D.lvl.catch,cf=catchCfg(lv);const pal=shuffle(COLORS.filter(c=>c[0]!=='hồng')).slice(0,cf.colors);
+  K={lv,cf,pal,target:pickOne(pal),got:0,goal:cf.goal,items:[],parts:[],texts:[],bx:.5,tx:.5,stun:0,shake:0,spawn:1.2,msg:'',msgT:0,done:false,wrong:0,bonus:0,t:0,
+     ptero:cf.ptero?{x:-.15,dir:1,flap:0,drop:1.5}:null};
+  try{audio()}catch(e){}
+  if(cf.ptero&&!pteroImg){pteroImg=new Image();pteroImg.src=COM_SRC['kl-ptero']}
   K.say=`Hứng trứng màu ${K.target[0]} nhé!`;
-  render(`${topBar(`<div class="kprog" id="kp">${'<i></i>'.repeat(K.goal)}</div>`)}
+  render(`${topBar(`<div class="pill">Cấp ${lv+1}</div><div class="kprog" id="kp">${'<i></i>'.repeat(K.goal)}</div>`)}
     ${guide(`Hứng trứng <svg class="inl" viewBox="0 0 100 120" id="tEgg"><ellipse cx="50" cy="66" rx="40" ry="50" fill="${K.target[1]}" stroke="#1D3646" stroke-width="8"/></svg> màu <span id="tName">${K.target[0]}</span>!`)}
     <div class="catch-holder" id="kh"><canvas id="cv"></canvas></div>`);
   wireCommon(()=>K.say);
-  say(K.say+' Kéo cái tổ qua lại nha!');
-  const cv=$('#cv'),ctx=cv.getContext('2d');let W=0,H=0;
-  function fit(){const r=$('#kh').getBoundingClientRect();const dpr=Math.min(2,window.devicePixelRatio||1);W=r.width;H=r.height;cv.width=W*dpr;cv.height=H*dpr;cv.style.width=W+'px';cv.style.height=H+'px';ctx.setTransform(dpr,0,0,dpr,0,0)}
-  fit();onResize(fit);
-  const setT=e=>{const r=cv.getBoundingClientRect();K.tx=clamp((e.clientX-r.left)/r.width,0,1)};
+  document.body.classList.add('still');onCleanup(()=>{document.body.classList.remove('still');save()});
+  const news=CATCH_FEATS[lv];
+  if(news&&unlockToast('catch'+lv,news)){say(news);later(()=>say(K.say+' Kéo cái tổ qua lại nha!'),3200);K.spawn=3.4}
+  else say(K.say+' Kéo cái tổ qua lại nha!');
+  const cv=$('#cv'),ctx=cv.getContext('2d');let W=0,H=0,rect=null;
+  // capped at 1.5x: on a retina iPad a 2x canvas is four times the pixels to repaint every frame, with no visible gain for big cartoon eggs
+  function fit(){const r=$('#kh').getBoundingClientRect();rect=r;const dpr=Math.min(1.5,window.devicePixelRatio||1);W=r.width;H=r.height;cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);cv.style.width=W+'px';cv.style.height=H+'px';ctx.setTransform(dpr,0,0,dpr,0,0)}
+  fit();onResize(()=>{fit()});
+  const setT=e=>{K.tx=clamp((e.clientX-rect.left)/rect.width,0,1)};
   let down=false;
-  cv.addEventListener('pointerdown',e=>{down=true;try{cv.setPointerCapture(e.pointerId)}catch(_){}setT(e)});
+  cv.addEventListener('pointerdown',e=>{down=true;try{cv.setPointerCapture(e.pointerId)}catch(_){}rect=cv.getBoundingClientRect();setT(e)});
   cv.addEventListener('pointermove',e=>{if(down||e.pointerType==='mouse')setT(e)});
   cv.addEventListener('pointerup',()=>down=false);cv.addEventListener('pointercancel',()=>down=false);
   let last=performance.now(),raf=0;
-  const frame=t=>{const dt=Math.min(.05,(t-last)/1000);last=t;update(dt,W,H);draw(ctx,W,H);raf=requestAnimationFrame(frame)};
+  // fixed small steps: if the tablet hiccups, eggs keep falling at the same speed instead of freezing then jumping
+  const frame=t=>{let dt=Math.min(.1,(t-last)/1000);last=t;while(dt>0){const s=Math.min(dt,1/60);update(s,W,H);dt-=s}draw(ctx,W,H);raf=requestAnimationFrame(frame)};
   raf=requestAnimationFrame(frame);onCleanup(()=>cancelAnimationFrame(raf));
 }
 function catchDims(W,H){const ER=Math.max(20,Math.min(W,H)*.05);const bw=Math.max(120,W*.2),bh=Math.max(46,H*.1);return{ER,bw,bh,top:H-bh-12}}
+function spawnEgg(W,H,ER){const cf=K.cf;let x=.08+Math.random()*.84,y=-ER*1.4;
+  if(K.ptero&&K.ptero.x>.06&&K.ptero.x<.94&&Math.random()<.6){x=K.ptero.x;y=H*.13}
+  const r=Math.random();let kind='egg',color;
+  if(r<cf.rock)kind='rock';else if(r<cf.rock+cf.gold)kind='gold';else if(r<cf.rock+cf.gold+cf.rainbow)kind='rainbow';
+  if(kind==='egg'){const others=K.pal.filter(c=>c!==K.target);color=Math.random()<.55||!others.length?K.target:pickOne(others)}
+  const sw=cf.sway&&kind!=='rock'&&Math.random()<.6?cf.sway:0;
+  K.items.push({x,x0:x,y,vy:H*cf.speed*(.85+Math.random()*.3)*(kind==='gold'?1.15:1),vx:0,kind,rock:kind==='rock',color,rot:0,spin:(Math.random()-.5)*2.4,
+    sw:sw*.09,sf:1.4+Math.random()*1.2,ph:Math.random()*6.3})}
 function update(dt,W,H){
-  const {ER,bw,top}=catchDims(W,H);K.t=(K.t||0)+dt;
+  const {ER,bw,top}=catchDims(W,H);K.t+=dt;
   if(!K.clouds)K.clouds=[0,1,2].map(i=>({x:Math.random(),y:.08+i*.13,s:.6+Math.random()*.6,v:.01+Math.random()*.015}));
   for(const c of K.clouds){c.x+=c.v*dt;if(c.x>1.2)c.x=-.2}
   const prev=K.bx;
   if(K.stun>0)K.stun-=dt;else K.bx+=(K.tx-K.bx)*Math.min(1,dt*12);
-  K.vel=(K.bx-prev)/Math.max(dt,.001);
+  K.vel=K.vel*.7+((K.bx-prev)/Math.max(dt,.001))*.3;
   K.shake=Math.max(0,K.shake-dt);K.msgT=Math.max(0,K.msgT-dt);K.squash=Math.max(0,(K.squash||0)-dt);
+  const P=K.ptero;if(P){P.x+=P.dir*dt*.16;P.flap+=dt;if(P.x>1.15){P.dir=-1}if(P.x<-.15){P.dir=1}}
   K.spawn-=dt;
-  if(K.spawn<=0&&!K.done){K.spawn=Math.max(.6,1.15-D.lvl.catch*.06)+Math.random()*.45;
-    const rock=Math.random()<K.rockRate;const others=K.pal.filter(c=>c!==K.target);
-    const color=rock?null:(Math.random()<.55||!others.length?K.target:pickOne(others));
-    K.items.push({x:.08+Math.random()*.84,y:-ER*1.4,vy:H*K.speed*(.85+Math.random()*.3),vx:0,rock,color,rot:0,spin:(Math.random()-.5)*2.4})}
+  if(K.spawn<=0&&!K.done){K.spawn=K.cf.gap+Math.random()*.45;spawnEgg(W,H,ER)}
   const bx=K.bx*W;
   for(const it of K.items){
     if(it.bounce){it.vy+=H*1.6*dt;it.x+=it.vx*dt;it.fade=Math.max(0,(it.fade??1)-dt*1.2)}
+    else if(it.sw){it.x=clamp(it.x0+Math.sin(K.t*it.sf+it.ph)*it.sw,.05,.95)}
     it.y+=it.vy*dt;it.rot+=it.spin*dt;
     if(!it.hit&&!it.bounce&&it.y+ER*.8>=top&&it.y<top+ER&&Math.abs(it.x*W-bx)<bw/2+ER*.2)catchItem(it,W,H)}
-  K.items=K.items.filter(it=>!it.hit&&it.y<H+ER*2&&(it.fade??1)>0);
-  for(const p of K.parts){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=600*dt;p.life-=dt}
-  K.parts=K.parts.filter(p=>p.life>0);
-  for(const t of K.texts||[]){t.y-=60*dt;t.life-=dt}
-  K.texts=(K.texts||[]).filter(t=>t.life>0);
+  let n=0;for(const it of K.items)if(!it.hit&&it.y<H+ER*2&&(it.fade??1)>0)K.items[n++]=it;K.items.length=n;
+  n=0;for(const p of K.parts){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=600*dt;p.life-=dt;if(p.life>0)K.parts[n++]=p}K.parts.length=n;
+  n=0;for(const t of K.texts){t.y-=60*dt;t.life-=dt;if(t.life>0)K.texts[n++]=t}K.texts.length=n;
 }
 function burst(x,y,c,n=16){for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,s=120+Math.random()*240;K.parts.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-220,life:.8,c,r:3+Math.random()*5})}}
-function floatText(txt,x,y,c='#1D3646'){(K.texts=K.texts||[]).push({txt,x,y,c,life:1})}
+function floatText(txt,x,y,c='#1D3646',big){K.texts.push({txt,x,y,c,life:1,big})}
+function catchMsg(m,t=1.1){K.msg=m;K.msgT=t}
 function catchItem(it,W,H){
   if(K.done)return;
-  if(it.rock){tone('bonk');K.stun=.8;K.shake=.5;K.combo=0;K.msg='Ui da! Đá đó!';K.msgT=1;
+  if(it.rock){tone('bonk');K.stun=.8;K.shake=.5;K.combo=0;K.wrong++;catchMsg('Ui da! Đá đó!',1);
     it.bounce=true;it.vy=-H*.55;it.vx=(Math.random()<.5?-1:1)*.4;it.spin=8;burst(it.x*W,it.y,'#8A949B',10);
-    const kh=$('#kh');if(kh){kh.classList.remove('shake');void kh.offsetWidth;kh.classList.add('shake')}bipReact('sad');return}
-  if(it.color!==K.target){tone('no');stat('catch',false);K.combo=0;K.msg='Không phải màu này!';K.msgT=1.1;
+    restartAnim($('#kh'),'shake');bipReact('sad');return}
+  if(it.kind==='gold'){it.hit=true;K.bonus++;tone('coin');burst(it.x*W,it.y,'#FFC83D',22);floatText('+1 ⭐',it.x*W,it.y-20,'#E0A100',true);catchMsg('Trứng vàng! Thêm sao!',1.2);sayLite('Trứng vàng!');return}
+  if(it.kind==='egg'&&it.color!==K.target){tone('no');stat('catch',false);K.combo=0;K.wrong++;catchMsg('Không phải màu này!');
     it.bounce=true;it.vy=-H*.5;it.vx=(it.x<K.bx?-1:1)*.35;it.spin=6;
-    if(Date.now()-lastSay>2500)say('Không phải màu '+it.color[0]);return}
-  it.hit=true;K.got++;K.combo=(K.combo||0)+1;K.squash=.25;stat('catch',true);tone('pop');burst(it.x*W,it.y,K.target[1]);
-  floatText('+1',it.x*W,it.y-20,K.target[1]);if(K.combo>=3)floatText(pickOne(['Siêu quá!','Tuyệt!','Giỏi ghê!']),it.x*W,it.y-60);
-  say(String(K.got));
-  const slot=$$('#kp i')[K.got-1];if(slot){slot.classList.add('on');slot.style.background=K.target[1]}
-  if(K.got===K.goal){K.done=true;bipReact('happy');later(()=>{tone('ok');say('Đủ tám quả trứng rồi! Giỏi quá!');confetti(100)},500);award(3);
-    D.lvl.catch++;save();later(()=>showDone('catch',3,'Hứng trứng giỏi quá!'),2400);return}
-  if(K.got===K.goal/2&&K.pal.length>1){const nt=pickOne(K.pal.filter(c=>c!==K.target));K.target=nt;K.say=`Giờ hứng trứng màu ${nt[0]} nhé!`;
+    if(Date.now()-lastSay>2500)sayLite('Không phải màu '+it.color[0]);return}
+  it.hit=true;K.got++;K.combo=(K.combo||0)+1;K.squash=.25;stat('catch',true);tone('pop');
+  const col=it.kind==='rainbow'?'#FF5C7A':K.target[1];burst(it.x*W,it.y,col,it.kind==='rainbow'?26:16);
+  floatText(String(K.got),it.x*W,it.y-20,col,true);if(K.combo>=3)floatText(pickOne(['Siêu quá!','Tuyệt!','Giỏi ghê!']),it.x*W,it.y-70);
+  sayLite(String(K.got));
+  const slot=$$('#kp i')[K.got-1];if(slot){slot.classList.add('on');slot.style.background=col}
+  if(K.got===K.goal){K.done=true;bipReact('happy');
+    // move up only when it went well; drop back a level after a rough round so it never becomes frustrating
+    const lv=D.lvl.catch;D.lvl.catch=K.wrong<=3?lv+1:K.wrong>=8&&lv>0?lv-1:lv;
+    const st=3+Math.min(2,K.bonus);later(()=>{tone('ok');say(`Đủ ${K.goal} quả trứng rồi! Giỏi quá!`);confetti(100)},500);award(st);save();
+    later(()=>showDone('catch',st,'Hứng trứng giỏi quá!'),2400);return}
+  if(K.got%K.cf.every===0&&K.pal.length>1){const nt=pickOne(K.pal.filter(c=>c!==K.target));K.target=nt;K.say=`Giờ hứng trứng màu ${nt[0]} nhé!`;
     const te=$('#tEgg ellipse');te&&te.setAttribute('fill',nt[1]);const tn=$('#tName');tn&&(tn.textContent=nt[0]);
-    const b=$('#tEgg')&&$('#tEgg').closest('.bubble');if(b){b.classList.remove('pop');void b.offsetWidth;b.classList.add('pop')}
-    later(()=>say(K.say),700)}
+    const b=$('#tEgg')&&$('#tEgg').closest('.bubble');restartAnim(b,'pop');catchMsg('Đổi màu!',1.2);
+    later(()=>say(K.say),600)}
 }
-function drawEgg(ctx,x,y,r,c,rot){ctx.save();ctx.translate(x,y);ctx.rotate(rot*.3);ctx.beginPath();ctx.ellipse(0,0,r*.8,r,0,0,Math.PI*2);ctx.fillStyle=c;ctx.fill();ctx.lineWidth=3;ctx.strokeStyle='#1D3646';ctx.stroke();
+function drawEgg(ctx,x,y,r,c,rot,kind){ctx.save();ctx.translate(x,y);ctx.rotate(rot*.3);ctx.beginPath();ctx.ellipse(0,0,r*.8,r,0,0,Math.PI*2);
+  if(kind==='rainbow'){const g=ctx.createLinearGradient(0,-r,0,r);['#F04438','#FF8A3D','#FFD23F','#38B26A','#2F7DF6','#8E5CF6'].forEach((s,i)=>{g.addColorStop(i/5,s)});ctx.fillStyle=g}else ctx.fillStyle=c;
+  ctx.fill();ctx.lineWidth=3;ctx.strokeStyle='#1D3646';ctx.stroke();
   ctx.fillStyle='rgba(255,255,255,.55)';ctx.beginPath();ctx.arc(-r*.3,-r*.3,r*.16,0,7);ctx.fill();ctx.beginPath();ctx.arc(r*.25,r*.25,r*.2,0,7);ctx.fill();ctx.restore()}
+function drawGlint(ctx,x,y,s,a){ctx.save();ctx.translate(x,y);ctx.rotate(a);ctx.fillStyle='#fff';ctx.beginPath();for(let i=0;i<8;i++){const rr=i%2?s*.28:s;ctx.lineTo(Math.cos(i*Math.PI/4)*rr,Math.sin(i*Math.PI/4)*rr)}ctx.closePath();ctx.fill();ctx.restore()}
 function drawRock(ctx,x,y,r,rot){ctx.save();ctx.translate(x,y);ctx.rotate(rot);ctx.beginPath();const pts=[[1,.1],[.6,.85],[-.3,.95],[-.95,.3],[-.8,-.6],[-.1,-.95],[.7,-.7]];
   pts.forEach(([a,b],i)=>i?ctx.lineTo(a*r,b*r):ctx.moveTo(a*r,b*r));ctx.closePath();ctx.fillStyle='#8A949B';ctx.fill();ctx.lineWidth=3;ctx.strokeStyle='#1D3646';ctx.stroke();
   ctx.fillStyle='#A9B2B8';ctx.beginPath();ctx.arc(-r*.25,-r*.25,r*.22,0,7);ctx.fill();ctx.restore()}
 function drawCloud(ctx,x,y,s){ctx.fillStyle='rgba(255,255,255,.75)';ctx.beginPath();ctx.arc(x,y,22*s,0,7);ctx.arc(x+26*s,y-10*s,28*s,0,7);ctx.arc(x+56*s,y,22*s,0,7);ctx.rect(x,y-4*s,56*s,26*s);ctx.fill()}
+function drawPtero(ctx,x,y,s,dir,flap){ctx.save();ctx.translate(x,y+Math.sin(flap*5)*s*.06);if(dir<0)ctx.scale(-1,1);
+  if(pteroImg&&pteroImg.complete&&pteroImg.naturalWidth){const w=s*1.6,h=w*pteroImg.naturalHeight/pteroImg.naturalWidth;ctx.drawImage(pteroImg,-w/2,-h/2,w,h)}
+  else{ctx.fillStyle='#2BB5A8';ctx.strokeStyle='#1D3646';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-s*.8,-s*.1);ctx.quadraticCurveTo(0,-s*(.5+Math.sin(flap*10)*.2),s*.8,-s*.1);ctx.lineTo(0,s*.2);ctx.closePath();ctx.fill();ctx.stroke()}
+  ctx.restore()}
 function draw(ctx,W,H){
   const {ER,bw,bh,top}=catchDims(W,H);ctx.clearRect(0,0,W,H);
   for(const c of K.clouds||[])drawCloud(ctx,c.x*W,c.y*H,c.s*Math.max(1,W/700));
+  if(K.ptero)drawPtero(ctx,K.ptero.x*W,H*.1,Math.max(70,ER*3.2),K.ptero.dir,K.ptero.flap);
   // shadows on the nest line help the child aim
   for(const it of K.items){if(it.bounce)continue;const k=clamp(it.y/top,0,1);ctx.fillStyle=`rgba(29,54,70,${(.08+k*.18).toFixed(2)})`;ctx.beginPath();ctx.ellipse(it.x*W,top+bh*.95,ER*(.4+k*.5),ER*.16,0,0,7);ctx.fill()}
-  for(const it of K.items){ctx.globalAlpha=it.fade??1;it.rock?drawRock(ctx,it.x*W,it.y,ER*.9,it.rot):drawEgg(ctx,it.x*W,it.y,ER,it.color[1],it.rot)}ctx.globalAlpha=1;
+  for(const it of K.items){ctx.globalAlpha=it.fade??1;const x=it.x*W;
+    if(it.rock)drawRock(ctx,x,it.y,ER*.9,it.rot);
+    else if(it.kind==='gold'){ctx.save();ctx.shadowColor='#FFE680';ctx.shadowBlur=18;drawEgg(ctx,x,it.y,ER*1.05,'#FFC83D',it.rot);ctx.restore();drawGlint(ctx,x+ER*.55,it.y-ER*.6,ER*.42,K.t*3);drawGlint(ctx,x-ER*.6,it.y+ER*.35,ER*.28,-K.t*2)}
+    else if(it.kind==='rainbow'){drawEgg(ctx,x,it.y,ER,null,it.rot,'rainbow');drawGlint(ctx,x+ER*.5,it.y-ER*.7,ER*.3,K.t*3)}
+    else drawEgg(ctx,x,it.y,ER,it.color[1],it.rot)}
+  ctx.globalAlpha=1;
   let bx=K.bx*W;if(K.shake>0)bx+=Math.sin(K.shake*60)*8;
   const sq=K.squash>0?Math.sin(K.squash/.25*Math.PI)*.18:0;const tilt=clamp((K.vel||0)*.15,-.25,.25);
   ctx.save();ctx.translate(bx,top+bh*.6);ctx.rotate(tilt);ctx.scale(1+sq,1-sq);ctx.translate(-bx,-(top+bh*.6));
@@ -1363,7 +1444,7 @@ function draw(ctx,W,H){
   if(K.stun>0){ctx.font=`${ER*1.2}px system-ui`;ctx.textAlign='center';ctx.fillText('💫',bx+Math.sin(K.t*10)*10,top-ER*.4)}
   for(const p of K.parts){ctx.globalAlpha=Math.max(0,p.life/.8);ctx.fillStyle=p.c;ctx.beginPath();ctx.arc(p.x,p.y,p.r||6,0,7);ctx.fill()}ctx.globalAlpha=1;
   ctx.textAlign='center';
-  for(const t of K.texts||[]){ctx.globalAlpha=Math.min(1,t.life*2);ctx.font=`800 ${Math.max(24,W*.04)}px "Baloo 2",system-ui`;ctx.lineWidth=6;ctx.strokeStyle='#fff';ctx.strokeText(t.txt,t.x,t.y);ctx.fillStyle=t.c;ctx.fillText(t.txt,t.x,t.y)}ctx.globalAlpha=1;
+  for(const t of K.texts){ctx.globalAlpha=Math.min(1,t.life*2);ctx.font=`800 ${Math.max(24,W*(t.big?.06:.04))}px "Baloo 2",system-ui`;ctx.lineWidth=6;ctx.strokeStyle='#fff';ctx.strokeText(t.txt,t.x,t.y);ctx.fillStyle=t.c;ctx.fillText(t.txt,t.x,t.y)}ctx.globalAlpha=1;
   if(K.msgT>0){ctx.font=`800 ${Math.max(22,W*.035)}px "Baloo 2",system-ui`;ctx.lineWidth=6;ctx.strokeStyle='#fff';ctx.strokeText(K.msg,W/2,H*.18);ctx.fillStyle='#1D3646';ctx.fillText(K.msg,W/2,H*.18)}
 }
 
@@ -1448,7 +1529,7 @@ let B=null;
 function startBand(){
   screen='band';musicOff();
   const lv=D.lvl.band,n=lv<2?3:lv<5?4:5,base=lv<2?2:lv<4?3:4;
-  B={n,round:0,rounds:3,seq:Array.from({length:base},()=>rand(0,n-1)),pos:0,mode:'wait',free:false,miss:0,say:'Nghe Bíp hát, rồi hát lại nhé!'};
+  B={n,lv,ear:lv>=6,round:0,rounds:3,seq:Array.from({length:base},()=>rand(0,n-1)),pos:0,mode:'wait',free:false,miss:0,say:'Nghe Bíp hát, rồi hát lại nhé!'};
   const dots=Array.from({length:B.rounds},()=>'<i></i>').join('');
   render(`${topBar(`<div class="dots" id="bdots">${dots}</div>`)}${guide(B.say)}
     <div class="band-stage"><div class="band-row">${BAND.slice(0,n).map(([k,c],i)=>`<button class="bpad" data-i="${i}" style="--c:${c};animation-delay:${(i*.1).toFixed(1)}s" aria-label="Khủng long ${BAND[i][3]}"><span class="light"></span>${dinoArt(k,c,{both:1})}<span class="podium"></span></button>`).join('')}</div></div>
@@ -1458,15 +1539,19 @@ function startBand(){
   $('#replay').onclick=()=>{if(B.free||B.mode==='listen')return;tone('tap');playSeq()};
   $('#free').onclick=()=>{B.free=!B.free;tone('tap');$('#free').textContent=B.free?'🎯 Chơi theo Bíp':'🎹 Chơi tự do';
     if(B.free){B.mode='free';B.say=`Chơi tự do! ${KID()} chạm khủng long để hát nhé.`;setSay(B.say);say(B.say)}else playSeq()};
-  later(playSeq,700);
+  const news={2:'Mới! Thêm một bạn khủng long vào ban nhạc!',5:'Mới! Cả năm bạn cùng hát, nhanh hơn nữa!',6:'Thử thách! Nghe bằng tai: các bạn không nhún nhảy nữa, nghe thật kỹ nhé!'}[lv];
+  if(news&&unlockToast('band'+lv,news)){say(news);later(playSeq,4200)}else later(playSeq,700);
 }
-function bandNote(i){try{audio();const f=BAND[i][2],t=ac.currentTime+.01;bell(f,t,.36,.9);osc('triangle',f/2,t,.4,.09,{a:.02})}catch(e){}
-  const pad=$$('.bpad')[i];if(!pad)return;pad.classList.remove('sing');void pad.offsetWidth;pad.classList.add('sing');clearTimeout(pad._t);pad._t=setTimeout(()=>pad.classList.remove('sing'),420);
+function bandNote(i,vis=true){try{audio();const f=BAND[i][2],t=ac.currentTime+.01;bell(f,t,.36,.9);osc('triangle',f/2,t,.4,.09,{a:.02})}catch(e){}
+  const pad=$$('.bpad')[i];if(!pad||!vis)return;pad.classList.remove('sing');void pad.offsetWidth;pad.classList.add('sing');clearTimeout(pad._t);pad._t=setTimeout(()=>pad.classList.remove('sing'),420);
   const n=document.createElement('span');n.className='note-fx';n.textContent=pickOne(['♪','♫','♬']);n.style.left=(35+Math.random()*30)+'%';pad.appendChild(n);setTimeout(()=>n.remove(),1200)}
 async function playSeq(){
   const g=gen;B.mode='listen';B.pos=0;$$('.bpad').forEach(p=>p.classList.add('dim'));
   B.say='Nghe Bíp hát nhé!';setSay(B.say);say(B.say);await wait(1300);
-  for(const i of B.seq){if(g!==gen||B.free)return;bandNote(i);await wait(Math.max(480,720-D.lvl.band*40))}
+  // ear mode: in the demo the dinos stay still, so the child remembers the tune by sound; after a slip the lights come back for that round
+  const vis=!B.ear||B.help;
+  if(!vis){B.say='Nghe thật kỹ nhé!';setSay(B.say)}
+  for(const i of B.seq){if(g!==gen||B.free)return;bandNote(i,vis);await wait(Math.max(420,720-D.lvl.band*40))}
   if(g!==gen||B.free)return;$$('.bpad').forEach(p=>p.classList.remove('dim'));
   B.mode='play';B.say=`Đến lượt ${KID()}! Hát lại ${B.seq.length} nốt nhé.`;setSay(B.say);say(`Đến lượt ${KID()}!`);
 }
@@ -1478,10 +1563,11 @@ function bandPress(i){
     if(B.pos<B.seq.length)return;
     B.mode='wait';stat('band',true);B.round++;const d=$$('#bdots i')[B.round-1];d&&d.classList.add('on');
     later(()=>{bipReact('happy');sparkEl($('.band-row'),30);say(pickOne(PRAISE()))},350);
-    if(B.round>=B.rounds){award(3);if(B.miss<=1)D.lvl.band++;save();later(async()=>{say('Cả ban nhạc cùng hát nào!');await wait(1300);confetti(110);await bandJingle(true);later(()=>showDone('band',3,'Ban nhạc tuyệt vời!'),400)},900);return}
+    B.help=false;
+    if(B.round>=B.rounds){award(3);if(B.miss<=1)D.lvl.band++;else if(B.miss>=4&&D.lvl.band>0)D.lvl.band--;save();later(async()=>{say('Cả ban nhạc cùng hát nào!');await wait(1300);confetti(110);await bandJingle(true);later(()=>showDone('band',3,'Ban nhạc tuyệt vời!'),400)},900);return}
     B.seq.push(rand(0,B.n-1));later(async()=>{await bandJingle(false);later(playSeq,500)},800);
   }else{
-    B.mode='wait';B.miss++;stat('band',false);later(()=>{tone('no');bipReact('sad');say('Gần đúng rồi! Nghe lại nhé.')},350);later(playSeq,2200);
+    B.mode='wait';B.miss++;B.help=true;stat('band',false);later(()=>{tone('no');bipReact('sad');say('Gần đúng rồi! Nghe lại nhé.')},350);later(playSeq,2200);
   }
 }
 
@@ -1813,31 +1899,49 @@ function castOf(n,lv){
 // ---------- 1. Ai trốn mất rồi? (trí nhớ hình ảnh) ----------
 let HD=null;
 function startHide(){HD={round:0,rounds:4,miss:0};hideRound()}
+// three kinds of round, unlocked in turn: who disappeared, who is new (a stranger sneaks in), and two hiding at once
+function hideMode(lv,r){const m=lv<4?['gone']:lv<8?['gone','new']:['gone','new','two'];return m[r%m.length]}
 function hideRound(){
-  screen='brain';const lv=D.lvl.hide||0,n=Math.min(6,3+Math.floor(lv/2));const cast=castOf(n,lv),gone=rand(0,n-1);
-  Object.assign(HD,{cast,gone,first:true,say:'Nhìn kỹ các bạn khủng long nhé!'});
+  screen='brain';const lv=D.lvl.hide||0,n=Math.min(6,3+Math.floor(lv/3)),mode=hideMode(lv,HD.round);
+  const all=castOf(n+1,lv),cast=all.slice(0,n),newbie=all[n];
+  const gone=mode==='two'?shuffle(cast.map((d,i)=>i)).slice(0,2):[rand(0,n-1)];
+  Object.assign(HD,{cast,gone,mode,newbie,found:[],first:true,tries:0,phase:'look',say:'Nhìn kỹ các bạn khủng long nhé!'});
   render(`${topBar(gdots(HD.rounds,HD.round))}${guide(HD.say)}
     <div class="meadow" id="md"><div class="sunbeam"></div><div class="lineup" style="--n:${n}">${cast.map((d,i)=>`<div class="slot2" data-i="${i}" style="animation-delay:${(i*.1).toFixed(1)}s">${dinoArt(d.k,d.c)}</div>`).join('')}</div>
       <div class="bushes"><svg class="hedge" viewBox="0 0 1000 400" preserveAspectRatio="none"><defs><linearGradient id="hg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7FD68E"/><stop offset=".35" stop-color="#4DBB6A"/><stop offset="1" stop-color="#2A8F53"/></linearGradient></defs><path d="M0 400 L0 45 Q70 -23 140 22 Q215 -23 290 40 Q360 -27 430 18 Q505 -27 580 38 Q650 -25 720 20 Q790 -25 860 40 Q930 -21 1000 24 L1000 400 Z" fill="url(#hg)" stroke="#1D3646" stroke-width="7" vector-effect="non-scaling-stroke"/><g fill="none" stroke="#2A8F53" stroke-width="4" stroke-linecap="round" vector-effect="non-scaling-stroke" opacity=".55"><path d="M90 170 q30 -25 60 0"/><path d="M330 150 q30 -25 60 0"/><path d="M560 190 q30 -25 60 0"/><path d="M800 160 q30 -25 60 0"/><path d="M200 280 q30 -25 60 0"/><path d="M680 290 q30 -25 60 0"/></g></svg>${[12,38,63,86].map((x,i)=>`<i style="left:${x}%;top:${20+(i%2)*16}%">${['🌸','🍃','🌼','🍃'][i]}</i>`).join('')}</div><div class="hide-count" id="hcnt"></div></div>
     <div class="choices hchoices" id="hc"></div>`);
-  wireCommon(()=>HD.say);say(HD.say);
-  const look=2400+n*550,g=gen;
+  wireCommon(()=>HD.say);
+  const news=mode==='new'?['hidenew','Mới! Có một bạn lạ lẻn vào. Tìm bạn mới nhé!']:mode==='two'?['hidetwo','Thử thách! Hai bạn cùng trốn một lúc!']:null;
+  const intro=news&&unlockToast(news[0],news[1]);say(intro?news[1]:HD.say);
+  const look=2400+n*550+(mode==='two'?800:0)+(intro?2500:0),g=gen;
   // a visible countdown helps a 4-year-old know when the leaves will come
   const steps=3;for(let s=0;s<steps;s++)later(()=>{const c=$('#hcnt');if(c){c.textContent=steps-s;c.classList.remove('tick');void c.offsetWidth;c.classList.add('tick');tone('step')}},look-steps*800+s*800);
   later(()=>{$('#hcnt').textContent='';say('Lá che lại rồi!');$('#md').classList.add('cover');tone('whoosh')},look);
-  later(()=>{const s=$$('.slot2')[gone];s.classList.add('empty');s.innerHTML='<span class="q">?</span>'},look+900);
-  later(()=>{$('#md').classList.remove('cover');tone('whoosh');HD.say='Bạn nào trốn mất rồi?';setSay(HD.say);say(HD.say);
-    const others=shuffle(cast.map((d,i)=>i).filter(i=>i!==gone)).slice(0,2),opts=shuffle([gone,...others]);
+  later(()=>{const sl=$$('.slot2');
+    if(mode==='new'){sl[gone[0]].innerHTML=dinoArt(newbie.k,newbie.c)}
+    else gone.forEach(i=>{sl[i].classList.add('empty');sl[i].innerHTML='<span class="q">?</span>'})},look+900);
+  later(()=>{$('#md').classList.remove('cover');tone('whoosh');HD.phase='pick';
+    if(mode==='new'){HD.say='Bạn nào mới đến? Chạm vào bạn mới nhé!';setSay(HD.say);say(HD.say);
+      $$('.slot2').forEach(s=>{s.classList.add('tapme');s.onclick=()=>hideTapNew(s,+s.dataset.i)});return}
+    HD.say=mode==='two'?'Hai bạn nào trốn mất rồi?':'Bạn nào trốn mất rồi?';setSay(HD.say);say(HD.say);
+    const others=shuffle(cast.map((d,i)=>i).filter(i=>!gone.includes(i))).slice(0,2),opts=shuffle([...gone,...others]);
     $('#hc').innerHTML=opts.map((i,k)=>`<button class="pick hpick" data-i="${i}" style="animation-delay:${(k*.1).toFixed(1)}s">${dinoArt(cast[i].k,cast[i].c)}</button>`).join('');
     $$('.hpick').forEach(b=>b.onclick=()=>hidePick(b,+b.dataset.i))},look+1800);
 }
-function hidePick(b,i){
-  if(i===HD.gone){$$('.hpick').forEach(x=>x.disabled=true);tone('ok');bipReact('happy');stat('hide',true);
+function hideMiss(){HD.miss++;HD.tries++;HD.first=false;stat('hide',false);tone('no');bipReact('sad')}
+function hideRoundWon(msg){tone('ok');bipReact('happy');stat('hide',true);say(msg);HD.phase='done';
+  // up a level on a clean round, back one after a round with two or more slips
+  const lv=D.lvl.hide||0;D.lvl.hide=HD.first?lv+1:HD.tries>=2&&lv>0?lv-1:lv;save();HD.round++;dotOn(HD.round);
+  if(HD.round>=HD.rounds){const st=starsFor(HD.miss);award(st);later(()=>showDone('hide',st,'Mắt tinh quá!'),2200)}else later(hideRound,2300)}
+function hideTapNew(s,i){if(HD.phase!=='pick')return;
+  if(i===HD.gone[0]){$$('.slot2').forEach(x=>{x.classList.remove('tapme');x.onclick=null});s.classList.add('back');sparkEl(s,22);hideRoundWon(`${pickOne(PRAISE())} Bạn ${HD.newbie.name} mới đến đó!`)}
+  else{hideMiss();s.classList.remove('blink');void s.offsetWidth;s.classList.add('blink');say(`Bạn ${HD.cast[i].name} có từ trước rồi mà!`)}}
+function hidePick(b,i){if(HD.phase!=='pick')return;
+  if(HD.gone.includes(i)&&!HD.found.includes(i)){HD.found.push(i);b.disabled=true;b.classList.add('right');
     const s=$$('.slot2')[i];s.classList.remove('empty');s.classList.add('back');s.innerHTML=dinoArt(HD.cast[i].k,HD.cast[i].c);sparkEl(s,22);
-    b.classList.add('right');say(`${pickOne(PRAISE())} Bạn ${HD.cast[i].name} trốn đó!`);
-    if(HD.first)D.lvl.hide=(D.lvl.hide||0)+1;save();HD.round++;dotOn(HD.round);
-    if(HD.round>=HD.rounds){const st=starsFor(HD.miss);award(st);later(()=>showDone('hide',st,'Mắt tinh quá!'),2200)}else later(hideRound,2300);
-  }else{HD.miss++;HD.first=false;stat('hide',false);tone('no');bipReact('sad');b.disabled=true;b.classList.add('nope');
+    if(HD.found.length<HD.gone.length){tone('pop');say(`Đúng rồi! Còn một bạn nữa!`);return}
+    $$('.hpick').forEach(x=>x.disabled=true);hideRoundWon(`${pickOne(PRAISE())} Bạn ${HD.cast[i].name} trốn đó!`);
+  }else{hideMiss();b.disabled=true;b.classList.add('nope');
     const s=$$('.slot2')[i];s.classList.remove('blink');void s.offsetWidth;s.classList.add('blink');say(`Bạn ${HD.cast[i].name} vẫn đứng đây mà!`)}
 }
 
@@ -1847,22 +1951,24 @@ let MK=null;
 const mkWho=()=>D.pet.hatched?D.pet.name:'Bíp';
 function startMarket(){MK={round:0,rounds:3,miss:0};marketRound()}
 function marketRound(){
-  screen='brain';const lv=D.lvl.market||0,len=lv<2?2:lv<5?3:4;const pool=shuffle(MARKET);
-  Object.assign(MK,{list:pool.slice(0,len),extra:pool.slice(len,len+Math.min(8,len*2+2)-len),got:[],first:true,replays:0,phase:'listen',say:`Nghe ${mkWho()} dặn nhé!`});
+  // from level 6 some items are wanted twice ("hai cà rốt"), so the child remembers the item and how many
+  screen='brain';const lv=D.lvl.market||0,qty=lv>=6,len=lv<2?2:lv<5?3:lv<9?(qty?3:4):4;const pool=shuffle(MARKET);
+  const list=pool.slice(0,len).map(([e,n],i)=>[e,n,qty&&(i===0||(lv>=9&&i===2)||Math.random()<.25)?2:1]);
+  Object.assign(MK,{slips:0,list:shuffle(list),extra:pool.slice(len,len+Math.min(8,len*2+2)-len),got:[],cnt:{},units:list.reduce((a,x)=>a+x[2],0),first:true,replays:0,phase:'listen',say:`Nghe ${mkWho()} dặn nhé!`});
   render(`${topBar(gdots(MK.rounds,MK.round))}${guide(MK.say)}
     <div class="mk-wrap"><div class="mk-req" id="mkq"><div class="mk-pet">${D.pet.hatched?dino(D.pet):bip('x')}</div><div class="mk-cloud" id="mkc"></div></div>
       <div class="mk-market" id="mkm" hidden><div class="awning"></div><div class="mk-stall" id="mks"></div></div>
-      <div class="mk-basket" id="mkb" hidden><span class="bk">🧺</span><span class="bi" id="mkbi">${MK.list.map(()=>'<i></i>').join('')}</span></div></div>
+      <div class="mk-basket" id="mkb" hidden><span class="bk">🧺</span><span class="bi" id="mkbi">${'<i></i>'.repeat(MK.units)}</span></div></div>
     <div class="row" style="justify-content:center"><button class="chipbtn" id="mkr" hidden>🔁 Nghe dặn lại (1 lần)</button></div>`);
   wireCommon(()=>MK.say);
   $('#mkr').onclick=()=>{if(MK.replays>=1||MK.phase!=='shop')return;MK.replays++;MK.first=false;tone('tap');$('#mkr').hidden=true;mkTell()};
-  mkTell();
+  if(qty&&unlockToast('marketqty','Mới! Có món cần mua hai cái. Nhớ cả số lượng nhé!')){say('Mới! Có món cần mua hai cái. Nhớ cả số lượng nhé!');later(mkTell,3800)}else mkTell();
 }
 async function mkTell(){
   const g=gen;MK.phase='listen';$('#mkm').hidden=true;$('#mkb').hidden=true;$('#mkq').hidden=false;const c=$('#mkc');c.innerHTML='';c.classList.remove('fade');
   say(`${KID()} ơi, ${mkWho()} muốn ăn...`);await wait(1900);
-  for(const [e,n] of MK.list){if(g!==gen)return;c.insertAdjacentHTML('beforeend',`<span class="mki">${e}<b>${n}</b></span>`);tone('pop');say(n);await wait(1400)}
-  if(g!==gen)return;say(`Nhớ chưa? ${MK.list.length} món nhé!`);await wait(2000);if(g!==gen)return;
+  for(const [e,n,q] of MK.list){if(g!==gen)return;c.insertAdjacentHTML('beforeend',`<span class="mki">${q>1?`<span class="mkq">${e}${e}</span>`:e}<b>${q>1?'2 ':''}${n}</b></span>`);tone('pop');say(q>1?`hai ${n}`:n);await wait(q>1?1700:1400)}
+  if(g!==gen)return;say(MK.units>MK.list.length?`Nhớ chưa? Tất cả ${MK.units} món nhé!`:`Nhớ chưa? ${MK.list.length} món nhé!`);await wait(2000);if(g!==gen)return;
   c.classList.add('fade');await wait(600);if(g!==gen)return;
   $('#mkq').hidden=true;MK.phase='shop';
   const all=shuffle([...MK.list,...MK.extra]);
@@ -1874,14 +1980,15 @@ async function mkTell(){
 function mkPick(b,n){
   if(MK.phase!=='shop'||b.classList.contains('taken'))return;
   const want=MK.list.find(x=>x[1]===n);
-  if(want&&!MK.got.includes(n)){MK.got.push(n);b.classList.add('taken');tone('pop');say(n);stat('market',true);
+  if(want&&(MK.cnt[n]||0)<want[2]){MK.cnt[n]=(MK.cnt[n]||0)+1;const c=MK.cnt[n];if(c>=want[2])b.classList.add('taken');MK.got.push(n);tone('pop');say(want[2]>1?(c===1?`một ${n}`:`hai ${n}`):n);stat('market',true);
+    if(want[2]>1&&c<want[2]){b.classList.remove('bump');void b.offsetWidth;b.classList.add('bump')}
     const slot=$$('#mkbi i')[MK.got.length-1];if(slot){slot.textContent=want[0];slot.classList.add('in')}
     const bk=$('#mkb');bk.classList.remove('bump');void bk.offsetWidth;bk.classList.add('bump');
-    if(MK.got.length===MK.list.length){MK.phase='done';$('#mkr').hidden=true;later(()=>{tone('munch');bipReact('happy');confetti(60);sparkEl($('#mkb'),24);
+    if(MK.got.length===MK.units){MK.phase='done';$('#mkr').hidden=true;later(()=>{tone('munch');bipReact('happy');confetti(60);sparkEl($('#mkb'),24);
       say(`${pickOne(PRAISE())} Đủ hết rồi! ${mkWho()} cảm ơn ${KID()}!`);if(D.pet.hatched){D.pet.food=Math.min(5,D.pet.food+.5)}},400);
-      if(MK.first)D.lvl.market=(D.lvl.market||0)+1;save();MK.round++;dotOn(MK.round);
+      {const lv=D.lvl.market||0;D.lvl.market=MK.first?lv+1:MK.slips>=2&&lv>0?lv-1:lv}save();MK.round++;dotOn(MK.round);
       if(MK.round>=MK.rounds){const st=starsFor(MK.miss);award(st);later(()=>showDone('market',st,'Trí nhớ siêu quá!'),2600)}else later(marketRound,2800)}
-  }else{MK.miss++;MK.first=false;stat('market',false);tone('no');bipReact('sad');b.classList.remove('nope');void b.offsetWidth;b.classList.add('nope');say(`${mkWho()} không dặn mua ${n}`)}
+  }else{MK.miss++;MK.slips=(MK.slips||0)+1;MK.first=false;stat('market',false);tone('no');bipReact('sad');b.classList.remove('nope');void b.offsetWidth;b.classList.add('nope');say(want?`Đủ ${n} rồi!`:`${mkWho()} không dặn mua ${n}`)}
 }
 
 // ---------- 3. Quy luật tiếp theo (logic) ----------
@@ -1894,33 +2001,39 @@ let PT=null;
 function startPattern(){PT={round:0,rounds:5,miss:0};patternRound()}
 function patternRound(){
   screen='brain';const lv=D.lvl.pattern||0;
-  const units=lv<2?['AB']:lv<4?['AB','AAB','ABB']:['ABC','AABB','AAB','ABB','ABC'];const unit=pickOne(units);
+  const units=lv<2?['AB']:lv<4?['AB','AAB','ABB']:lv<10?['ABC','AABB','AAB','ABB','ABC']:['ABC','AABB','ABCD','ABAC','AABC'];const unit=pickOne(units);
   const set=pickOne(lv<2?['egg','dino']:['egg','dino','shape']);const toks=PT_TOKENS[set]();
   const L=unit.length,len=Math.max(6,L*2+Math.min(L,2));const seq=Array.from({length:len},(_,i)=>unit.charCodeAt(i%L)-65);
-  const hole=lv<3?len-1:rand(L,len-1);const ans=seq[hole];
-  const used=[...new Set(seq)],distract=toks.map((t,i)=>i).filter(i=>i!==ans);
+  // from level 7 there are two gaps; they are filled left to right
+  let holes=[lv<3?len-1:rand(L,len-1)];
+  if(lv>=7){const h=rand(L,len-2);holes=[h,rand(h+1,len-1)]}
+  Object.assign(PT,{slips:0,seq,holes,hi:0,hole:holes[0],ans:seq[holes[0]],toks,first:true,tries:0,say:holes.length>1?'Có hai chỗ trống! Cái gì ở chỗ trống đầu tiên?':'Cái gì tiếp theo nào?'});
+  render(`${topBar(gdots(PT.rounds,PT.round))}${guide(PT.say)}
+    <div class="pt-track"><div class="pt-row" style="--n:${len}">${seq.map((t,i)=>`<div class="pt-cell${holes.includes(i)?' hole':''}${i===holes[0]?' cur':''}" data-i="${i}" style="animation-delay:${(i*.07).toFixed(2)}s">${holes.includes(i)?'<span class="q">?</span>':toks[t].art}</div>`).join('')}</div></div>
+    <div class="choices" id="ptc"></div>`);
+  wireCommon(()=>PT.say);ptOptions(.5);
+  const news={4:'Mới! Quy luật có ba bạn rồi!',7:'Thử thách! Có hai chỗ trống, tìm cả hai nhé!',10:'Thử thách! Quy luật dài hơn nữa!'}[lv];
+  if(news&&unlockToast('pattern'+lv,news)){say(news);later(()=>ptPlay(PT.hole),3400)}else later(()=>ptPlay(PT.hole),500);
+}
+function ptOptions(delay=0){const {seq,ans,toks}=PT;const used=[...new Set(seq)],distract=toks.map((t,i)=>i).filter(i=>i!==ans);
   const opts=shuffle([ans,...shuffle(distract.filter(i=>used.includes(i))).slice(0,1),...shuffle(distract.filter(i=>!used.includes(i))).slice(0,1)]).slice(0,3);
   while(opts.length<3){const x=distract.find(i=>!opts.includes(i));if(x==null)break;opts.push(x)}
-  Object.assign(PT,{seq,hole,ans,toks,first:true,tries:0,say:'Cái gì tiếp theo nào?'});
-  render(`${topBar(gdots(PT.rounds,PT.round))}${guide(PT.say)}
-    <div class="pt-track"><div class="pt-row" style="--n:${len}">${seq.map((t,i)=>`<div class="pt-cell${i===hole?' hole':''}" data-i="${i}" style="animation-delay:${(i*.07).toFixed(2)}s">${i===hole?'<span class="q">?</span>':toks[t].art}</div>`).join('')}</div></div>
-    <div class="choices">${opts.map((t,k)=>`<button class="pick ptpick" data-t="${t}" style="animation-delay:${(.5+k*.1).toFixed(1)}s">${toks[t].art}</button>`).join('')}</div>`);
-  wireCommon(()=>PT.say);
-  later(()=>ptPlay(hole),500);
-  $$('.ptpick').forEach(b=>b.onclick=()=>ptPick(b,+b.dataset.t));
-}
+  $('#ptc').innerHTML=opts.map((t,k)=>`<button class="pick ptpick" data-t="${t}" style="animation-delay:${(delay+k*.1).toFixed(1)}s">${toks[t].art}</button>`).join('');
+  $$('.ptpick').forEach(b=>b.onclick=()=>ptPick(b,+b.dataset.t))}
 async function ptPlay(upto,full){const g=gen;const cells=$$('.pt-cell');
-  for(let i=0;i<(full?cells.length:upto);i++){if(g!==gen)return;const c=cells[i];c.classList.remove('beat');void c.offsetWidth;c.classList.add('beat');
+  for(let i=0;i<(full?cells.length:upto);i++){if(g!==gen)return;const c=cells[i];if(c.classList.contains('hole'))continue;c.classList.remove('beat');void c.offsetWidth;c.classList.add('beat');
     try{audio();bell(PT_NOTES[PT.seq[i]],ac.currentTime+.01,.13,.45)}catch(e){}await wait(full?330:430)}
   if(!full&&g===gen)say(PT.say)}
 function ptPick(b,t){
   if(t===PT.ans){$$('.ptpick').forEach(x=>x.disabled=true);b.classList.add('right');stat('pattern',true);
-    const h=$('.pt-cell.hole');h.classList.remove('hole');h.classList.add('filled');h.innerHTML=PT.toks[t].art;sparkEl(h,18);tone('ok');bipReact('happy');
+    const h=$$('.pt-cell')[PT.hole];h.classList.remove('hole','cur');h.classList.add('filled');h.innerHTML=PT.toks[t].art;sparkEl(h,18);tone('ok');bipReact('happy');
+    if(PT.hi<PT.holes.length-1){PT.hi++;PT.hole=PT.holes[PT.hi];PT.ans=PT.seq[PT.hole];PT.tries=0;PT.say='Giỏi! Còn chỗ trống nữa, cái gì ở đây?';
+      $$('.pt-cell')[PT.hole].classList.add('cur');setSay(PT.say);later(()=>{ptOptions();ptPlay(PT.hole)},900);return}
     later(()=>ptPlay(0,true),500);later(()=>say(`${pickOne(PRAISE())} ${PT.toks[t].name}!`),400);
-    if(PT.first)D.lvl.pattern=(D.lvl.pattern||0)+1;save();PT.round++;dotOn(PT.round);
+    {const lv=D.lvl.pattern||0;D.lvl.pattern=PT.first?lv+1:PT.slips>=2&&lv>0?lv-1:lv}save();PT.round++;dotOn(PT.round);
     if(PT.round>=PT.rounds){const st=starsFor(PT.miss);award(st);later(()=>showDone('pattern',st,'Tìm ra quy luật rồi!'),3200)}else later(patternRound,3300);
-  }else{PT.miss++;PT.first=false;PT.tries++;stat('pattern',false);tone('no');bipReact('sad');b.disabled=true;b.classList.add('nope');
-    say(PT.tries>=2?'Nghe lại quy luật nhé!':`Chưa đúng. Nhìn lại hàng ${PT.seq.length>0?'này':''} nhé!`);if(PT.tries>=2)later(()=>ptPlay(PT.hole),900)}
+  }else{PT.miss++;PT.slips=(PT.slips||0)+1;PT.first=false;PT.tries++;stat('pattern',false);tone('no');bipReact('sad');b.disabled=true;b.classList.add('nope');
+    say(PT.tries>=2?'Nghe lại quy luật nhé!':'Chưa đúng. Nhìn lại hàng này nhé!');if(PT.tries>=2)later(()=>ptPlay(PT.hole),900)}
 }
 
 // ---------- 4. Chuyện gì xảy ra trước? (trình tự) ----------
@@ -1933,7 +2046,12 @@ const STORIES=[
   {c:[['seed','gieo hạt'],['🌱','nảy mầm'],['🪴','cây non'],['🌳','cây to']]},
   {c:[['🌅','buổi sáng'],['☀️','buổi trưa'],['🌇','buổi chiều'],['🌙','buổi tối']]},
   {c:[['🔧','Bíp sửa tàu'],['🚀','tàu sẵn sàng'],['launch','tàu bay lên'],['🌕','tới mặt trăng']]},
-  {c:[['egg0','quả trứng'],['egg4','trứng nứt ra'],['baby','khủng long con'],['big','khủng long lớn']]}];
+  {c:[['egg0','quả trứng'],['egg4','trứng nứt ra'],['baby','khủng long con'],['big','khủng long lớn']]},
+  {c:[['🍦','que kem mát lạnh'],['☀️','trời nắng to'],['💧','kem tan chảy']]},
+  {c:[['🪥','lấy bàn chải'],['🧴','bóp kem đánh răng'],['😁','đánh răng'],['🚰','súc miệng']]},
+  {c:[['🥚','đập trứng'],['🥣','trộn bột'],['🔥','nướng bánh'],['🎂','bánh chín thơm'],['😋','ăn bánh']]},
+  {c:[['⏰','thức dậy'],['🪥','đánh răng'],['🥣','ăn sáng'],['🎒','đeo cặp'],['🏫','tới trường']]},
+  {c:[['seed','gieo hạt'],['🌱','nảy mầm'],['🪴','cây non'],['🌳','cây to'],['🍎','ra quả']]}];
 function storyArt(k){
   const kid={color:(D.pet&&D.pet.color)||PINK,xp:20,clean:5};
   const m={egg0:()=>petEgg(0),egg4:()=>petEgg(4),baby:()=>dino({color:kid.color,xp:1,clean:5}),big:()=>dino({color:kid.color,xp:60,clean:5}),
@@ -1946,13 +2064,17 @@ let SY=null;
 function startStory(){SY={round:0,rounds:4,miss:0,used:[]};storyRound()}
 function storyRound(){
   screen='brain';const lv=D.lvl.story||0;
-  const pool=STORIES.map((s,i)=>i).filter(i=>(lv>=3||STORIES[i].c.length===3)&&!SY.used.includes(i));const si=pickOne(pool.length?pool:STORIES.map((s,i)=>i).filter(i=>STORIES[i].c.length===3));
+  // story length grows with the level: 3 pictures, then 3–4, then 4–5
+  const okLen=n=>lv<3?n===3:lv<7?n<=4:n>=4;
+  const pool=STORIES.map((s,i)=>i).filter(i=>okLen(STORIES[i].c.length)&&!SY.used.includes(i));const si=pickOne(pool.length?pool:STORIES.map((s,i)=>i).filter(i=>STORIES[i].c.length===3));
   SY.used.push(si);const cards=STORIES[si].c;let order;do{order=shuffle(cards.map((c,i)=>i))}while(order.every((v,i)=>v===i));
-  Object.assign(SY,{cards,order,slots:Array(cards.length).fill(null),lock:Array(cards.length).fill(false),first:true,say:'Xếp tranh theo thứ tự nhé! Cái gì xảy ra trước?'});
+  Object.assign(SY,{slips:0,cards,order,slots:Array(cards.length).fill(null),lock:Array(cards.length).fill(false),first:true,say:'Xếp tranh theo thứ tự nhé! Cái gì xảy ra trước?'});
   render(`${topBar(gdots(SY.rounds,SY.round))}${guide(SY.say)}
     <div class="sy-wrap"><div class="sy-slots">${cards.map((c,i)=>`${i?'<span class="sy-arrow">➜</span>':''}<button class="sy-slot" data-s="${i}"><em>${i+1}</em></button>`).join('')}</div>
     <div class="sy-pool">${order.map((ci,k)=>`<button class="sy-card" data-c="${ci}" style="animation-delay:${(k*.1).toFixed(1)}s">${storyArt(cards[ci][0])}<b>${cards[ci][1]}</b></button>`).join('')}</div></div>`);
-  wireCommon(()=>SY.say);say(SY.say);
+  wireCommon(()=>SY.say);
+  const news={3:'Mới! Có truyện bốn bức tranh rồi!',7:'Thử thách! Truyện dài năm bức tranh!'}[lv];
+  if(news&&unlockToast('story'+lv,news)){say(news);later(()=>say(SY.say),3400)}else say(SY.say);
   $$('.sy-card').forEach(b=>b.onclick=()=>syPlace(+b.dataset.c));
   $$('.sy-slot').forEach(b=>b.onclick=()=>syReturn(+b.dataset.s));
 }
@@ -1968,9 +2090,9 @@ async function syCheck(){
   if(!wrong.some(Boolean)){stat('story',true);tone('ok');bipReact('happy');SY.lock=SY.lock.map(()=>true);syDraw();
     const words=['Đầu tiên','Sau đó','Tiếp theo','Cuối cùng'];const n=SY.cards.length;
     for(let i=0;i<n;i++){if(g!==gen)return;const w=i===0?words[0]:i===n-1?words[3]:words[i===1?1:2];const el=$$('.sy-slot')[i];el.classList.add('tell');say(`${w}, ${SY.cards[i][1]}.`);sparkEl(el,10);await wait(1700);el.classList.remove('tell')}
-    if(g!==gen)return;if(SY.first)D.lvl.story=(D.lvl.story||0)+1;save();SY.round++;dotOn(SY.round);
+    if(g!==gen)return;{const lv=D.lvl.story||0;D.lvl.story=SY.first?lv+1:SY.slips>=2&&lv>0?lv-1:lv}save();SY.round++;dotOn(SY.round);
     if(SY.round>=SY.rounds){const st=starsFor(SY.miss);award(st);confetti(100);later(()=>showDone('story',st,'Kể chuyện giỏi quá!'),900)}else{confetti(50);later(()=>{SY.busy=false;storyRound()},900)}
-  }else{SY.miss++;SY.first=false;stat('story',false);tone('no');bipReact('sad');say('Chưa đúng thứ tự. Thử lại nhé!');
+  }else{SY.miss++;SY.slips=(SY.slips||0)+1;SY.first=false;stat('story',false);tone('no');bipReact('sad');say('Chưa đúng thứ tự. Thử lại nhé!');
     $$('.sy-slot').forEach((el,i)=>{if(wrong[i]){el.classList.remove('nope');void el.offsetWidth;el.classList.add('nope')}});
     await wait(900);if(g!==gen)return;SY.slots=SY.slots.map((ci,i)=>wrong[i]?null:ci);SY.lock=SY.slots.map(ci=>ci!=null);SY.busy=false;syDraw()}
 }
@@ -2211,6 +2333,18 @@ function voiceChips(){
   if(!vs.length)return '<span class="muted">Máy này chưa có giọng tiếng Việt. Cài thêm trong phần cài đặt giọng nói của máy rồi mở lại app.</span>';
   return vs.map(v=>`<button class="chip ${viVoice&&v.name===viVoice.name?'sel':''}" data-voice="${v.name.replace(/"/g,'&quot;')}">${v.name}</button>`).join('');
 }
+// what each level means, in words a parent can read at a glance
+const LV_GAMES=[['code','Lập trình Bíp'],['memory','Lật thẻ'],['catch','Hứng trứng'],['band','Ban nhạc'],['hide','Ai trốn mất'],['market','Đi chợ'],['pattern','Quy luật'],['story','Thứ tự tranh']];
+const LV_MAX={code:30,memory:7,catch:12,band:10,hide:14,market:12,pattern:14,story:12};
+function lvDesc(k){const v=D.lvl[k]||0;
+  if(k==='code'){const d=CODE_LEVELS[v];return `Màn ${v+1}: ${v<2?'bấm từng bước':v<11?'xếp mũi tên rồi chạy':d?'nhặt sao rồi về tàu':'bàn cờ ngẫu nhiên có sao'}`}
+  if(k==='memory')return v>=5?`Cấp ${v+1}: ${v>=6?16:12} thẻ khủng long giống nhau`:`Cấp ${v+1}: ${MEM_SIZES[Math.min(v,4)]} thẻ${v<2?', được xem trước':''}`;
+  if(k==='catch'){const c=catchCfg(v);return `Cấp ${v+1}: ${c.colors} màu${c.rock>.07?', đá':''}${c.gold?', trứng vàng':''}${c.sway?', lắc lư':''}${c.ptero?', thằn lằn bay':''}${c.rainbow?', cầu vồng':''}${c.every<4?', đổi màu nhanh':''}`}
+  if(k==='band')return `Cấp ${v+1}: ${v<2?3:v<5?4:5} bạn, bắt đầu ${v<2?2:v<4?3:4} nốt${v>=6?', chỉ nghe bằng tai':''}`;
+  if(k==='hide')return `Cấp ${v+1}: ${Math.min(6,3+Math.floor(v/3))} bạn${v>=4?', có bạn lạ lẻn vào':''}${v>=8?', hai bạn cùng trốn':''}`;
+  if(k==='market')return `Cấp ${v+1}: nhớ ${v<2?2:v<5?3:v<9?(v>=6?3:4):4} món${v>=6?', có món cần 2 cái':''}`;
+  if(k==='pattern')return `Cấp ${v+1}: ${v<2?'AB':v<4?'AB, AAB':v<10?'ABC, AABB':'ABCD, ABAC'}${v>=7?', hai chỗ trống':''}`;
+  if(k==='story')return `Cấp ${v+1}: truyện ${v<3?'3':v<7?'3–4':'4–5'} tranh`;return ''}
 function showParent(){
   screen='parent';let confirmReset=false;
   const rows=Object.entries(GAMES).map(([k,n])=>{const s=D.stats[k]||{ok:0,no:0};return `<tr><td>${n}</td><td>${s.ok}</td><td>${s.no}</td></tr>`}).join('');
@@ -2220,7 +2354,9 @@ function showParent(){
     <h2>Hôm nay của ${KID()}</h2>
     <p style="margin:0;font-size:20px">Đã chơi <b>${Math.round(D.used/60)} phút</b> / giới hạn ${D.limit+D.bonus} phút</p>
     <table><tr><th>Trò chơi</th><th>Đúng</th><th>Chưa đúng</th></tr>${rows}</table>
-    <p class="muted" style="margin:0">Mức hiện tại: Lập trình màn ${L.code+1} · Lật thẻ ${MEM_SIZES[Math.min(L.memory,4)]} thẻ · Hứng trứng cấp ${L.catch+1} · Ban nhạc cấp ${L.band+1}${D.pet.hatched?` · ${D.pet.name} giai đoạn ${stageOf(D.pet.xp)}/3`:''}. Các trò tự khó dần khi ${KID()} làm tốt.</p>
+    <div><b>Độ khó từng trò</b> <span class="muted">(tự lên cấp khi ${KID()} làm tốt, tự lùi khi gặp khó; bố mẹ chỉnh tay ở đây)</span>
+      <table class="lvt">${LV_GAMES.map(([k,n])=>`<tr><td>${n}</td><td class="lvd">${lvDesc(k)}</td><td style="white-space:nowrap"><button class="chip" data-lv="${k}" data-d="-1" aria-label="Dễ hơn">−</button> <button class="chip" data-lv="${k}" data-d="1" aria-label="Khó hơn">+</button></td></tr>`).join('')}</table></div>
+    ${D.pet.hatched?`<p class="muted" style="margin:0">${D.pet.name} đang ở giai đoạn ${stageOf(D.pet.xp)}/3.</p>`:''}
     <div><b>Giới hạn mỗi ngày</b><div class="row" style="margin-top:8px">${[10,15,20,30].map(m=>`<button class="chip ${m===D.limit?'sel':''}" data-m="${m}">${m} phút</button>`).join('')}</div></div>
     <div><b>Giọng đọc</b> <span class="muted">(chạm để nghe thử)</span>
       <div class="row" style="margin-top:8px">${voiceChips()}</div>
@@ -2237,6 +2373,7 @@ function showParent(){
       <div class="row" style="margin-top:6px"><button class="chip" id="rsb">♻️ Khôi phục từ mã</button></div><p id="rsm" style="margin:4px 0 0;font-weight:700"></p></div>
     <button class="big-btn" id="back" style="align-self:flex-start">Xong</button></div></div>`);
   $$('[data-m]').forEach(b=>b.onclick=()=>{D.limit=+b.dataset.m;save();showParent()});
+  $$('[data-lv]').forEach(b=>b.onclick=()=>{const k=b.dataset.lv;D.lvl[k]=clamp((D.lvl[k]||0)+(+b.dataset.d),0,LV_MAX[k]);save();showParent()});
   $('#plus').onclick=()=>{D.bonus+=10;save();showParent()};
   const sample=()=>say(`Chào ${KID()}! Mình là Bíp. Tìm quả trứng màu đỏ nào!`);
   $$('[data-voice]').forEach(b=>b.onclick=()=>{D.voice=b.dataset.voice;D.mute=false;save();pickVoice();showParent();sample()});
