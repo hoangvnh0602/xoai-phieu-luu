@@ -330,6 +330,14 @@ svg .b-armL{transform-origin:100% 50%}svg .b-armR{transform-origin:0% 50%}
 .sy-pool{flex:1;min-height:0;display:flex;gap:2%;justify-content:center;align-items:stretch}
 .sy-card{flex:1;max-width:24%;border-radius:22px;background:#fff;box-shadow:0 6px 0 rgba(29,54,70,.15);animation:popIn .45s backwards;transition:opacity .25s,transform .25s}
 .sy-card.used{opacity:.2;transform:scale(.9);pointer-events:none}
+.sy-card.right{box-shadow:0 0 0 6px #38B26A,0 6px 0 rgba(29,54,70,.15)}
+.sy-slot .sy-q{font:800 clamp(44px,7vw,80px) var(--display);color:#D99A57;animation:pulse 1s infinite}
+.sy-slot.qslot{border-color:var(--berry)}
+.sy-slots.why{align-items:center;gap:4%}.sy-slot.wbig{max-width:34%;height:100%}.sy-slot.wbig .se{font-size:clamp(56px,10vw,110px)}
+.why-q{font:800 clamp(34px,6vw,64px) var(--display);color:var(--berry);animation:pulse 1.4s infinite}
+.sy-act{flex:1;display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap}
+.sy-mic{font:800 clamp(20px,3vw,28px) var(--display);padding:12px 22px;border-radius:999px;background:#fff;box-shadow:0 4px 0 rgba(29,54,70,.15)}
+.sy-mic.on{color:#C93A55;animation:pulse 1.2s infinite}.sy-mic.play{color:var(--leaf2);animation:pulse 1.2s infinite}
 
 /* Daily missions */
 .pill.mis{background:#FFF3C4}
@@ -628,11 +636,19 @@ body.still .deco *,body.still .deco *::before,body.still .deco *::after{animatio
 .prize .e{font-size:clamp(80px,13vw,140px);line-height:1;animation:pop .6s}
 .prize b{font-family:var(--display);font-size:clamp(22px,3vw,32px)}
 .book{flex:1;min-height:0;overflow:auto;width:100%;max-width:1000px;display:grid;grid-template-columns:repeat(auto-fill,minmax(clamp(110px,15vw,160px),1fr));gap:16px;align-content:start;padding:4px}
+.book{grid-template-columns:repeat(6,1fr);max-width:min(1000px,calc((100vh - 250px) * 3.1))}@media (max-width:700px),(orientation:portrait){.book{grid-template-columns:repeat(4,1fr);max-width:1000px}}
 .sticker{background:var(--card);border-radius:26px;aspect-ratio:1;max-width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;box-shadow:0 5px 0 rgba(29,54,70,.15)}
 .sticker .e{font-size:clamp(48px,7vw,72px);line-height:1}
 .sticker b{font-family:var(--display);font-size:clamp(15px,2vw,20px)}
 .sticker.locked{background:rgba(255,255,255,.45);box-shadow:none}
 .sticker.locked .e{filter:grayscale(1) brightness(0);opacity:.18}
+.sticker.gold{background:linear-gradient(145deg,#FFF6C9,#FFD84D);box-shadow:0 5px 0 #E0A800}
+.sticker.gold.locked{background:rgba(255,228,120,.35);box-shadow:none}
+.sticker.next{outline:4px dashed var(--sun);outline-offset:-4px}.sticker.next .e{opacity:.32}.sticker.next b{color:#B07A00}
+.bk-next{position:relative;width:min(92%,560px);height:44px;border-radius:999px;background:#fff;box-shadow:0 4px 0 rgba(29,54,70,.15);overflow:hidden;display:flex;align-items:center;justify-content:center;flex:none}
+.bk-next i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,#FFE066,#FFB800)}
+.bk-next span{position:relative;font:800 clamp(16px,2.2vw,20px) var(--display)}
+.bk-nav{display:flex;align-items:center;justify-content:center;gap:14px;flex:none;font:800 clamp(16px,2.2vw,22px) var(--display)}.bk-nav .icon-btn:disabled{opacity:.3}
 body.sleep{background:#22355C;color:#F2F5FF}
 body.sleep h1{color:#FFE28A}
 .moon{font-size:clamp(90px,15vw,160px);line-height:1}
@@ -694,7 +710,7 @@ input{user-select:text;-webkit-user-select:text;color:var(--ink);background:var(
 // Each profile (child or parent test) has its own progress. Old single-save data becomes Xoài's profile.
 const KEY='xoai_v2';
 function readLS(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}}
-function norm(d){d=Object.assign({stars:0,stickers:0,limit:20,day:'',used:0,bonus:0,stats:{},voice:'',rate:1,mute:false,music:true,hist:[]},d||{});if(d.earned==null)d.earned=d.stars;
+function norm(d){d=Object.assign({stars:0,stickers:0,stkProg:0,limit:20,day:'',used:0,bonus:0,stats:{},voice:'',rate:1,mute:false,music:true,hist:[]},d||{});if(d.earned==null)d.earned=d.stars;
   d.lvl=Object.assign({count:0,color:0,shape:0,code:0,memory:0,catch:0,band:0,hide:0,market:0,pattern:0,story:0},d.lvl||{});
   d.pet=Object.assign({hatched:false,taps:0,xp:0,food:3,clean:3,fun:3,last:0,name:'Bé Cốm',color:'#FF8CC0',stageSeen:0},d.pet||{});
   if(!d.comArt){d.comArt=1;if(d.pet.color==='#5BC27A')d.pet.color='#FF8CC0';if(d.shop)d.shop.owned=(d.shop.owned||[]).map(x=>x==='skin-#5BC27A'?'skin-#FF8CC0':x)}
@@ -941,7 +957,17 @@ function warmSpecies(){let t=0;Object.entries(SPM).forEach(([k,M])=>DCOL.forEach
 function petEgg(taps=0){return `<img class="egg-img" src="${COM_SRC[taps>=2?'trung-nut':'trung']}" alt="Trứng khủng long">`}
 const COLORS=[['đỏ','#F04438'],['vàng','#FFD23F'],['xanh lá','#38B26A'],['xanh dương','#2F7DF6'],['tím','#8E5CF6'],['cam','#FF8A3D'],['hồng','#FF8CC0']];
 const COUNTABLE=[['🦕','con khủng long cổ dài'],['🦖','con khủng long bạo chúa'],['🥚','quả trứng'],['🦴','khúc xương'],['🌴','cây dừa'],['🚀','tàu vũ trụ']];
-const STICKERS=[['🦕','Cổ Dài'],['🦖','Bạo Chúa'],['🥚','Trứng Thần'],['🌋','Núi Lửa'],['🐢','Rùa Cổ'],['🦎','Thằn Lằn'],['🐊','Cá Sấu'],['🦴','Xương Vàng'],['🌴','Cây Dừa'],['🚀','Tàu Vũ Trụ'],['🛸','Đĩa Bay'],['🌙','Mặt Trăng'],['🪐','Sao Thổ'],['☄️','Sao Chổi'],['🌈','Cầu Vồng'],['🏆','Cúp Vàng'],['🐉','Rồng Xanh'],['🦋','Bươm Bướm'],['🌻','Hoa Hướng Dương'],['👑','Vương Miện']];
+const STICKERS=[['🦕','Cổ Dài'],['🦖','Bạo Chúa'],['🥚','Trứng Thần'],['🌋','Núi Lửa'],['🐢','Rùa Cổ'],['🦎','Thằn Lằn'],['🐊','Cá Sấu'],['🦴','Xương Vàng'],['🌴','Cây Dừa'],['🚀','Tàu Vũ Trụ'],['🛸','Đĩa Bay'],['🌙','Mặt Trăng'],['🪐','Sao Thổ'],['☄️','Sao Chổi'],['🌈','Cầu Vồng'],['🏆','Cúp Vàng'],['🐉','Rồng Xanh'],['🦋','Bươm Bướm'],['🌻','Hoa Hướng Dương'],['👑','Vương Miện'],
+  ['🐳','Cá Voi'],['🐬','Cá Heo'],['🐙','Bạch Tuộc'],['🦀','Cua Đỏ'],['🐠','Cá Sặc Sỡ'],['🦈','Cá Mập'],['🐚','Vỏ Ốc'],
+  ['🤖','Rô-bốt'],['👽','Bạn Ngoài Hành Tinh'],['🛰️','Vệ Tinh'],['🌟','Ngôi Sao Sáng'],['🧑‍🚀','Phi Hành Gia'],
+  ['🚒','Xe Cứu Hỏa'],['🚓','Xe Cảnh Sát'],['🚜','Máy Cày'],['🚂','Tàu Hỏa'],['🚁','Trực Thăng'],['⛵','Thuyền Buồm'],
+  ['🦁','Sư Tử'],['🐘','Voi Con'],['🦒','Hươu Cao Cổ'],['🐼','Gấu Trúc'],['🦉','Cú Mèo'],['🦜','Vẹt Xanh'],
+  ['💎','Kim Cương'],['🦄','Kỳ Lân'],['🥇','Huy Chương'],['🏰','Lâu Đài']];
+// album pages of 12; every 6th sticker is a shiny gold one
+const STK_PAGES=['Khủng long & vũ trụ','Bầu trời & đại dương','Robot & xe cộ','Muôn thú & báu vật'];
+// each sticker costs a little more than the last (8, 10, 12 … up to 30 stars), so new ones stay special instead of arriving every other game
+const stkCost=i=>Math.min(30,8+2*i);
+const stkGold=i=>i%6===5;
 const PRAISE=()=>['Giỏi quá!','Đúng rồi!',`${KID()} siêu quá!`,'Tuyệt vời!','Chính xác!'];
 const GAMES={abc:'Chữ cái',hide:'Ai trốn mất',market:'Đi chợ',pattern:'Quy luật',story:'Thứ tự tranh',code:'Lập trình Bíp',memory:'Lật thẻ',catch:'Hứng trứng',band:'Ban nhạc'};
 
@@ -963,7 +989,7 @@ function render(html,cls=''){
   document.body.classList.toggle('sleep',cls==='sleep');
   $('#app').innerHTML=`<div class="screen">${html}</div>`;
 }
-function award(n){D.stars+=n;D.earned=(D.earned||0)+n;if(D.pet.hatched)D.pet.xp+=n;save()}
+function award(n){D.stars+=n;D.earned=(D.earned||0)+n;D.stkProg=(D.stkProg||0)+n;if(D.pet.hatched)D.pet.xp+=n;save()}
 // answers are counted many times a minute; writing the whole save on each one made fast games stutter, so it waits a moment and writes once
 let saveT=0;function saveSoon(){clearTimeout(saveT);saveT=setTimeout(save,1500)}
 addEventListener('pagehide',()=>save());document.addEventListener('visibilitychange',()=>{if(document.hidden)save()});
@@ -1854,13 +1880,25 @@ function showAbcBoard(){
 }
 
 // ================= done / stickers / sleep =================
-function showBook(){
-  screen='book';
-  const cells=STICKERS.map((s,i)=>`<button class="sticker${i<D.stickers?'':' locked'}" data-s="${i}" style="animation-delay:${(i*.04).toFixed(2)}s"><span class="e">${s[0]}</span><b>${i<D.stickers?s[1]:'?'}</b></button>`).join('');
-  render(`${topBar(`<h1 style="font-size:clamp(26px,4.2vw,42px)">Sổ sticker</h1>`)}<div class="book">${cells}</div>`);
-  wireCommon(()=>'');say(`${KID()} có ${D.stickers} sticker rồi!`);
-  $$('.sticker').forEach(b=>b.onclick=()=>{const i=+b.dataset.s;b.classList.remove('wig');void b.offsetWidth;b.classList.add('wig');
-    if(i<D.stickers){tone('pop');say(STICKERS[i][1]);sparkEl(b,12)}else{tone('no');say('Chưa mở. Chơi thêm để có nhé!')}});
+let bookPage=null;
+function showBook(pg){
+  screen='book';const per=12,pages=Math.ceil(STICKERS.length/per);
+  if(pg==null)pg=bookPage!=null?bookPage:Math.min(pages-1,Math.floor(Math.min(D.stickers,STICKERS.length-1)/per));bookPage=pg=clamp(pg,0,pages-1);
+  const full=D.stickers>=STICKERS.length,need=full?0:stkCost(D.stickers)-D.stkProg,pct=full?100:clamp(D.stkProg/stkCost(D.stickers)*100,0,100);
+  const cells=STICKERS.slice(pg*per,pg*per+per).map((s,k)=>{const i=pg*per+k,has=i<D.stickers,next=i===D.stickers;
+    return `<button class="sticker${has?'':' locked'}${stkGold(i)?' gold':''}${next?' next':''}" data-s="${i}" style="animation-delay:${(k*.04).toFixed(2)}s"><span class="e">${s[0]}</span><b>${has?s[1]:next?`còn ${need} ⭐`:'?'}</b></button>`}).join('');
+  render(`${topBar(`<h1 style="font-size:clamp(24px,3.8vw,38px)">Sổ sticker · ${D.stickers}/${STICKERS.length}</h1>`)}
+    <div class="bk-next">${full?'<span>🏆 Đã sưu tầm đủ tất cả sticker!</span>':`<i style="width:${pct}%"></i><span>🎁 Sticker tiếp theo: còn <b>${need}</b> ⭐</span>`}</div>
+    <div class="bk-nav"><button class="icon-btn" id="bkp" ${pg?'':'disabled'} aria-label="Trang trước">◀</button><b>Trang ${pg+1}/${pages}: ${STK_PAGES[pg]||''}</b><button class="icon-btn" id="bkn" ${pg<pages-1?'':'disabled'} aria-label="Trang sau">▶</button></div>
+    <div class="book">${cells}</div>`);
+  wireCommon(()=>'');
+  $('#bkp').onclick=()=>{tone('tap');showBook(pg-1)};$('#bkn').onclick=()=>{tone('tap');showBook(pg+1)};
+  if(pg===bookPage&&!showBook._said){showBook._said=1;say(full?`${KID()} có đủ tất cả sticker rồi!`:`${KID()} có ${D.stickers} sticker. Còn ${need} ngôi sao nữa là có sticker mới!`)}
+  $$('.sticker').forEach(b=>b.onclick=()=>{const i=+b.dataset.s;restartAnim(b,'wig');
+    if(i<D.stickers){tone('pop');say(STICKERS[i][1]+(stkGold(i)?', sticker vàng!':''));sparkEl(b,12)}
+    else if(i===D.stickers){tone('tap');say(`Còn ${need} ngôi sao nữa là mở được sticker này!`)}
+    else{tone('no');say('Chưa mở. Chơi thêm để có nhé!')}});
+  onCleanup(()=>{showBook._said=0});
 }
 function showSleep(){
   screen='sleep';hush();musicOff();
@@ -2038,20 +2076,63 @@ function ptPick(b,t){
 
 // ---------- 4. Chuyện gì xảy ra trước? (trình tự) ----------
 const STORIES=[
+  // 3 pictures
   {c:[['egg0','quả trứng'],['egg4','trứng nứt ra'],['baby','khủng long con chào đời']]},
   {c:[['☁️','mây kéo đến'],['🌧️','trời mưa'],['🌈','cầu vồng hiện ra']]},
   {c:[['🐛','sâu con'],['cocoon','sâu làm kén'],['🦋','thành bươm bướm']]},
   {c:[['dirty','Bé Cốm lấm lem'],['bath','tắm xà phòng'],['clean','thơm tho sạch sẽ']]},
   {c:[['seed','gieo hạt'],['🌱','nảy mầm'],['🌻','nở hoa']]},
+  {c:[['🍦','que kem mát lạnh'],['☀️','trời nắng to'],['💧','kem tan chảy']]},
+  {c:[['🧊','cục đá lạnh'],['☀️','để ngoài nắng'],['💦','đá tan thành nước']]},
+  {c:[['🥱','{K} buồn ngủ'],['🛏️','lên giường nằm'],['😴','ngủ thật say']]},
+  {c:[['🍌','bóc vỏ chuối'],['😋','ăn chuối ngon'],['🗑️','bỏ vỏ vào thùng rác']]},
+  {c:[['🌧️','trời đổ mưa'],['☂️','bật ô lên'],['🏠','về nhà khô ráo']]},
+  {c:[['🐔','gà mẹ ấp trứng'],['🐣','gà con nở ra'],['🐥','gà con chạy theo mẹ']]},
+  {c:[['🦖','khủng long đói bụng'],['🍃','ăn thật nhiều lá'],['😊','no căng bụng']]},
+  {c:[['🧱','xếp khối gỗ'],['🗼','tháp cao dần'],['💥','tháp đổ ầm']]},
+  {c:[['🎈','thổi bóng bay'],['🎉','bóng to tròn'],['💥','bóng nổ bụp']]},
+  // 4 pictures
   {c:[['seed','gieo hạt'],['🌱','nảy mầm'],['🪴','cây non'],['🌳','cây to']]},
   {c:[['🌅','buổi sáng'],['☀️','buổi trưa'],['🌇','buổi chiều'],['🌙','buổi tối']]},
   {c:[['🔧','Bíp sửa tàu'],['🚀','tàu sẵn sàng'],['launch','tàu bay lên'],['🌕','tới mặt trăng']]},
   {c:[['egg0','quả trứng'],['egg4','trứng nứt ra'],['baby','khủng long con'],['big','khủng long lớn']]},
-  {c:[['🍦','que kem mát lạnh'],['☀️','trời nắng to'],['💧','kem tan chảy']]},
   {c:[['🪥','lấy bàn chải'],['🧴','bóp kem đánh răng'],['😁','đánh răng'],['🚰','súc miệng']]},
+  {c:[['🧺','gom quần áo bẩn'],['🧼','giặt thật sạch'],['☀️','phơi cho khô'],['👕','mặc áo thơm tho']]},
+  {c:[['🛒','đi siêu thị'],['🍎','chọn trái cây'],['💵','trả tiền'],['🏠','mang về nhà']]},
+  {c:[['🌧️','trời mưa'],['💧','có vũng nước'],['👢','{K} đi ủng'],['💦','nhảy tóe nước']]},
+  {c:[['🤖','Bíp hết pin'],['🔌','cắm sạc'],['🔋','pin đầy rồi'],['💃','Bíp nhảy múa']]},
+  {c:[['🍚','nấu cơm'],['🥢','dọn bát đũa'],['👨‍👩‍👦','cả nhà ăn cơm'],['🧽','rửa bát']]},
+  {c:[['😢','{K} bị ngã'],['🩹','dán băng'],['🤗','mẹ ôm'],['😊','hết đau rồi']]},
+  {c:[['🎂','sinh nhật {K}'],['🕯️','thổi nến'],['🎁','mở quà'],['🥳','cả nhà vui']]},
+  {c:[['🌋','núi lửa rung rung'],['🔥','núi lửa phun'],['🦕','khủng long chạy'],['🌴','trốn sau rừng cây']]},
+  {c:[['🧸','{K} chơi đồ chơi'],['🧩','bày ra đầy nhà'],['📦','cất vào thùng'],['✨','nhà gọn gàng']]},
+  // 5 pictures
   {c:[['🥚','đập trứng'],['🥣','trộn bột'],['🔥','nướng bánh'],['🎂','bánh chín thơm'],['😋','ăn bánh']]},
   {c:[['⏰','thức dậy'],['🪥','đánh răng'],['🥣','ăn sáng'],['🎒','đeo cặp'],['🏫','tới trường']]},
-  {c:[['seed','gieo hạt'],['🌱','nảy mầm'],['🪴','cây non'],['🌳','cây to'],['🍎','ra quả']]}];
+  {c:[['seed','gieo hạt'],['🌱','nảy mầm'],['🪴','cây non'],['🌳','cây to'],['🍎','ra quả']]},
+  {c:[['🥕','nhổ cà rốt'],['🚰','rửa sạch'],['🔪','mẹ cắt nhỏ'],['🍲','nấu canh'],['😋','cả nhà ăn ngon']]},
+  {c:[['🧑‍🚀','Bíp mặc đồ bay'],['🚀','lên tàu'],['launch','tàu cất cánh'],['🌕','đáp xuống mặt trăng'],['🚩','cắm lá cờ']]},
+  {c:[['🚌','lên xe buýt'],['🏫','tới trường'],['🎨','vẽ tranh'],['🍱','ăn trưa'],['👋','chào cô ra về']]},
+  {c:[['egg0','khủng long mẹ đẻ trứng'],['egg4','trứng nứt ra'],['baby','khủng long con'],['🍃','tập ăn lá'],['big','lớn thật to']]},
+  {c:[['🌑','trời tối'],['⭐','sao lấp lánh'],['😴','{K} ngủ ngon'],['🌅','mặt trời mọc'],['⏰','thức dậy']]}];
+// "why?" questions: what we see, the right cause, and two silly ones
+const WHY=[
+  {e:'🍦💧',see:'que kem tan chảy',q:'Vì sao que kem tan chảy?',a:['☀️','vì trời nắng nóng'],no:[['🌙','vì trời tối'],['🐟','vì có con cá']]},
+  {e:'☂️',see:'{K} bật ô',q:'Vì sao {K} bật ô?',a:['🌧️','vì trời mưa'],no:[['🎂','vì sinh nhật'],['🍌','vì ăn chuối']]},
+  {e:'🥀',see:'cây bị héo',q:'Vì sao cây bị héo?',a:['🚱','vì không ai tưới nước'],no:[['🎵','vì nghe nhạc'],['🐶','vì có chó con']]},
+  {e:'🪥',see:'{K} đánh răng',q:'Vì sao phải đánh răng?',a:['🦷','để răng chắc khỏe'],no:[['👟','để chạy nhanh'],['🎈','để có bóng bay']]},
+  {e:'🔌',see:'Bíp cắm sạc',q:'Vì sao Bíp phải cắm sạc?',a:['🔋','vì Bíp hết pin'],no:[['🍦','vì Bíp thích kem'],['🌈','vì có cầu vồng']]},
+  {e:'🧥',see:'{K} mặc áo ấm',q:'Vì sao {K} mặc áo ấm?',a:['🥶','vì trời lạnh'],no:[['🍉','vì ăn dưa hấu'],['🚗','vì có ô tô']]},
+  {e:'🌈',see:'cầu vồng hiện ra',q:'Vì sao cầu vồng hiện ra?',a:['🌦️','vì mưa xong có nắng'],no:[['🌙','vì trời tối'],['🧸','vì có gấu bông']]},
+  {e:'🧼',see:'{K} rửa tay',q:'Vì sao phải rửa tay trước khi ăn?',a:['🦠','để sạch vi khuẩn'],no:[['🎨','để vẽ tranh'],['💤','để buồn ngủ']]},
+  {e:'💥',see:'tháp khối bị đổ',q:'Vì sao tháp khối bị đổ?',a:['🗼','vì xếp cao quá'],no:[['🍌','vì ăn chuối'],['🎶','vì hát hay']]},
+  {e:'🦖',see:'khủng long ăn thật nhiều lá',q:'Vì sao khủng long ăn nhiều lá?',a:['🍽️','vì khủng long đói bụng'],no:[['❄️','vì có tuyết'],['🚀','vì muốn bay']]},
+  {e:'😢',see:'bạn nhỏ khóc',q:'Vì sao bạn nhỏ khóc?',a:['🩹','vì bạn bị ngã đau'],no:[['🎁','vì được quà'],['🍰','vì ăn bánh ngon']]},
+  {e:'🧢',see:'{K} đội mũ',q:'Vì sao {K} đội mũ khi ra ngoài?',a:['☀️','vì trời nắng'],no:[['🌙','vì có mặt trăng'],['🐠','vì có cá']]},
+  {e:'🐥',see:'gà con chạy theo mẹ',q:'Vì sao gà con chạy theo gà mẹ?',a:['🐔','để mẹ che chở'],no:[['🚂','để đi tàu hỏa'],['🧊','vì thích đá lạnh']]},
+  {e:'😴',see:'{K} buồn ngủ',q:'Vì sao {K} buồn ngủ?',a:['🌙','vì trời tối rồi'],no:[['☀️','vì trời vừa sáng'],['🎈','vì có bóng bay']]},
+  {e:'🌻',see:'hoa nở thật đẹp',q:'Vì sao hoa nở đẹp?',a:['🚿','vì được tưới nước mỗi ngày'],no:[['📺','vì xem ti vi'],['🧦','vì đi tất']]},
+  {e:'🏃',see:'mọi người chạy vào nhà',q:'Vì sao mọi người chạy vào nhà?',a:['⛈️','vì trời sắp mưa to'],no:[['🌈','vì có cầu vồng'],['🍦','vì có kem']]}];
 function storyArt(k){
   const kid={color:(D.pet&&D.pet.color)||PINK,xp:20,clean:5};
   const m={egg0:()=>petEgg(0),egg4:()=>petEgg(4),baby:()=>dino({color:kid.color,xp:1,clean:5}),big:()=>dino({color:kid.color,xp:60,clean:5}),
@@ -2061,17 +2142,29 @@ function storyArt(k){
     launch:()=>'<span class="se launch">🚀</span>'};
   return m[k]?m[k]():`<span class="se">${k}</span>`}
 let SY=null;
-function startStory(){SY={round:0,rounds:4,miss:0,used:[]};storyRound()}
+// {K} in a caption becomes the child's name, so the stories are about them
+const syTxt=t=>t.replace(/\{K\}/g,KID());
+const capOf=c=>syTxt(c[1]);
+function startStory(){SY={round:0,rounds:4,miss:0,used:[],told:0,whyUsed:[]};storyRound()}
+// round types: put pictures in order, guess what happens next, and "why?" (cause and effect). The order rounds end with the child retelling the story.
 function storyRound(){
-  screen='brain';const lv=D.lvl.story||0;
+  screen='brain';const lv=D.lvl.story||0;SY.busy=false;
+  const type=lv<2?'order':['order','next','order','why'][SY.round%4];
+  if(type==='why')return whyRound(lv);
   // story length grows with the level: 3 pictures, then 3–4, then 4–5
   const okLen=n=>lv<3?n===3:lv<7?n<=4:n>=4;
-  const pool=STORIES.map((s,i)=>i).filter(i=>okLen(STORIES[i].c.length)&&!SY.used.includes(i));const si=pickOne(pool.length?pool:STORIES.map((s,i)=>i).filter(i=>STORIES[i].c.length===3));
-  SY.used.push(si);const cards=STORIES[si].c;let order;do{order=shuffle(cards.map((c,i)=>i))}while(order.every((v,i)=>v===i));
-  Object.assign(SY,{slips:0,cards,order,slots:Array(cards.length).fill(null),lock:Array(cards.length).fill(false),first:true,say:'Xếp tranh theo thứ tự nhé! Cái gì xảy ra trước?'});
+  const all=STORIES.map((s,i)=>i);
+  const pool=all.filter(i=>okLen(STORIES[i].c.length)&&!SY.used.includes(i)&&!(D.syRecent||[]).includes(i));
+  const pool2=all.filter(i=>okLen(STORIES[i].c.length)&&!SY.used.includes(i));
+  const si=pickOne(pool.length?pool:pool2.length?pool2:all.filter(i=>STORIES[i].c.length===3));
+  SY.used.push(si);D.syRecent=[si,...(D.syRecent||[]).filter(x=>x!==si)].slice(0,Math.floor(STORIES.length*.6));
+  const cards=STORIES[si].c;
+  if(type==='next')return nextRound(cards);
+  let order;do{order=shuffle(cards.map((c,i)=>i))}while(order.every((v,i)=>v===i));
+  Object.assign(SY,{type,slips:0,cards,order,slots:Array(cards.length).fill(null),lock:Array(cards.length).fill(false),first:true,say:'Xếp tranh theo thứ tự nhé! Cái gì xảy ra trước?'});
   render(`${topBar(gdots(SY.rounds,SY.round))}${guide(SY.say)}
     <div class="sy-wrap"><div class="sy-slots">${cards.map((c,i)=>`${i?'<span class="sy-arrow">➜</span>':''}<button class="sy-slot" data-s="${i}"><em>${i+1}</em></button>`).join('')}</div>
-    <div class="sy-pool">${order.map((ci,k)=>`<button class="sy-card" data-c="${ci}" style="animation-delay:${(k*.1).toFixed(1)}s">${storyArt(cards[ci][0])}<b>${cards[ci][1]}</b></button>`).join('')}</div></div>`);
+    <div class="sy-pool" id="syPool">${order.map((ci,k)=>`<button class="sy-card" data-c="${ci}" style="animation-delay:${(k*.1).toFixed(1)}s">${storyArt(cards[ci][0])}<b>${capOf(cards[ci])}</b></button>`).join('')}</div></div>`);
   wireCommon(()=>SY.say);
   const news={3:'Mới! Có truyện bốn bức tranh rồi!',7:'Thử thách! Truyện dài năm bức tranh!'}[lv];
   if(news&&unlockToast('story'+lv,news)){say(news);later(()=>say(SY.say),3400)}else say(SY.say);
@@ -2080,22 +2173,90 @@ function storyRound(){
 }
 function syDraw(){
   $$('.sy-slot').forEach((el,i)=>{const ci=SY.slots[i];el.classList.toggle('full',ci!=null);el.classList.toggle('locked',SY.lock[i]);
-    el.innerHTML=ci==null?`<em>${i+1}</em>`:`<span class="sy-in">${storyArt(SY.cards[ci][0])}<b>${SY.cards[ci][1]}</b></span><em>${i+1}</em>`});
+    el.innerHTML=ci==null?`<em>${i+1}</em>`:`<span class="sy-in">${storyArt(SY.cards[ci][0])}<b>${capOf(SY.cards[ci])}</b></span><em>${i+1}</em>`});
   $$('.sy-card').forEach(el=>{el.classList.toggle('used',SY.slots.includes(+el.dataset.c))})}
-function syPlace(ci){if(SY.busy||SY.slots.includes(ci))return;const i=SY.slots.indexOf(null);if(i<0)return;SY.slots[i]=ci;tone('pop');say(SY.cards[ci][1]);syDraw();
+function syPlace(ci){if(SY.busy||SY.slots.includes(ci))return;const i=SY.slots.indexOf(null);if(i<0)return;SY.slots[i]=ci;tone('pop');say(capOf(SY.cards[ci]));syDraw();
   if(!SY.slots.includes(null)){SY.busy=true;later(syCheck,600)}}
 function syReturn(i){if(SY.busy||SY.lock[i]||SY.slots[i]==null)return;SY.slots[i]=null;tone('tap');syDraw()}
+const SY_WORDS=n=>Array.from({length:n},(_,i)=>i===0?'Đầu tiên':i===n-1?'Cuối cùng':i===1?'Sau đó':'Tiếp theo');
 async function syCheck(){
   const g=gen;const wrong=SY.slots.map((ci,i)=>ci!==i);
   if(!wrong.some(Boolean)){stat('story',true);tone('ok');bipReact('happy');SY.lock=SY.lock.map(()=>true);syDraw();
-    const words=['Đầu tiên','Sau đó','Tiếp theo','Cuối cùng'];const n=SY.cards.length;
-    for(let i=0;i<n;i++){if(g!==gen)return;const w=i===0?words[0]:i===n-1?words[3]:words[i===1?1:2];const el=$$('.sy-slot')[i];el.classList.add('tell');say(`${w}, ${SY.cards[i][1]}.`);sparkEl(el,10);await wait(1700);el.classList.remove('tell')}
-    if(g!==gen)return;{const lv=D.lvl.story||0;D.lvl.story=SY.first?lv+1:SY.slips>=2&&lv>0?lv-1:lv}save();SY.round++;dotOn(SY.round);
-    if(SY.round>=SY.rounds){const st=starsFor(SY.miss);award(st);confetti(100);later(()=>showDone('story',st,'Kể chuyện giỏi quá!'),900)}else{confetti(50);later(()=>{SY.busy=false;storyRound()},900)}
+    const words=SY_WORDS(SY.cards.length);
+    for(let i=0;i<SY.cards.length;i++){if(g!==gen)return;const el=$$('.sy-slot')[i];el.classList.add('tell');say(`${words[i]}, ${capOf(SY.cards[i])}.`);sparkEl(el,10);await wait(1800);el.classList.remove('tell')}
+    if(g!==gen)return;syOffer();
   }else{SY.miss++;SY.slips=(SY.slips||0)+1;SY.first=false;stat('story',false);tone('no');bipReact('sad');say('Chưa đúng thứ tự. Thử lại nhé!');
-    $$('.sy-slot').forEach((el,i)=>{if(wrong[i]){el.classList.remove('nope');void el.offsetWidth;el.classList.add('nope')}});
+    $$('.sy-slot').forEach((el,i)=>{if(wrong[i])restartAnim(el,'nope')});
     await wait(900);if(g!==gen)return;SY.slots=SY.slots.map((ci,i)=>wrong[i]?null:ci);SY.lock=SY.slots.map(ci=>ci!=null);SY.busy=false;syDraw()}
 }
+function syAdvance(){SY.type=null;const lv=D.lvl.story||0;D.lvl.story=SY.first?lv+1:SY.slips>=2&&lv>0?lv-1:lv;save();SY.round++;dotOn(SY.round);
+  if(SY.round>=SY.rounds){const st=starsFor(SY.miss)+Math.min(2,SY.told);award(st);confetti(100);later(()=>showDone('story',st,SY.told?'Bé kể chuyện hay quá!':'Kể chuyện giỏi quá!'),900)}
+  else{confetti(50);later(storyRound,900)}}
+// after a correct order: invite the child to tell the story in their own words
+function syOffer(){const p=$('#syPool');if(!p)return;
+  p.innerHTML=`<div class="sy-act"><button class="big-btn go pulse" id="syTell">🎤 ${KID()} kể lại</button><button class="big-btn alt" id="syNext">▶ Truyện khác</button></div>`;
+  SY.say=`${KID()} kể lại truyện cho Bíp nghe nhé!`;setSay(SY.say);say(SY.say);
+  $('#syTell').onclick=()=>{tone('tap');syTell()};$('#syNext').onclick=()=>{tone('tap');syAdvance()}}
+const tapOr=(el,ms)=>new Promise(r=>{const t=setTimeout(r,ms);if(el)el.onclick=()=>{clearTimeout(t);tone('tap');r()}});
+async function syTell(){
+  const g=gen,p=$('#syPool');let rec=null,stream=null;const chunks=[];
+  // the child's own voice is recorded when the tablet allows the microphone, then played back; without it the guided telling still works
+  try{stream=await navigator.mediaDevices.getUserMedia({audio:true});rec=new MediaRecorder(stream);rec.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)}}catch(e){rec=null}
+  const stop=()=>{try{rec&&rec.state!=='inactive'&&rec.stop()}catch(e){}try{stream&&stream.getTracks().forEach(t=>t.stop())}catch(e){}};onCleanup(stop);
+  if(g!==gen){stop();return}
+  musicOff();
+  p.innerHTML=`<div class="sy-act"><div class="sy-mic${rec?' on':''}">${rec?'🔴 Đang thu giọng':'🎤'}</div><button class="big-btn go" id="syGo">Xong tranh này ▶</button></div>`;
+  const words=SY_WORDS(SY.cards.length);
+  for(let i=0;i<SY.cards.length;i++){if(g!==gen)return;const el=$$('.sy-slot')[i];el.classList.add('tell');
+    SY.say=`${words[i]}...`;setSay(`${words[i]}... <span class="muted">(${KID()} kể tranh số ${i+1})</span>`);
+    hush();say(`${words[i]}`);await wait(1300);if(g!==gen)return;
+    if(i===0&&rec)try{rec.start()}catch(e){rec=null}
+    await tapOr($('#syGo'),12000);if(g!==gen)return;el.classList.remove('tell');sparkEl(el,8)}
+  let url=null;
+  if(rec){await new Promise(r=>{rec.onstop=r;stop();setTimeout(r,1500)});if(chunks.length)url=URL.createObjectURL(new Blob(chunks,{type:chunks[0].type||'audio/mp4'}))}else stop();
+  if(g!==gen)return;SY.told++;stat('story',true);bipReact('happy');tone('chime');confetti(60);
+  if(url){p.innerHTML=`<div class="sy-act"><div class="sy-mic play">🎧 Nghe ${KID()} kể nè!</div></div>`;say(`Hay quá! Cùng nghe lại ${KID()} kể nhé!`);await wait(2200);if(g!==gen)return;
+    await new Promise(r=>{const a=new Audio(url);a.onended=a.onerror=r;a.play().catch(r);onCleanup(()=>{try{a.pause()}catch(e){}});
+      const els=$$('.sy-slot');let k=0;const iv=setInterval(()=>{els.forEach(e=>e.classList.remove('tell'));if(els[k])els[k].classList.add('tell');k=(k+1)%els.length},1800);onCleanup(()=>clearInterval(iv));a.addEventListener('ended',()=>{clearInterval(iv);els.forEach(e=>e.classList.remove('tell'))})});
+    if(g!==gen)return}
+  say(`${pickOne(['Bé kể chuyện hay quá!','Kể rõ ràng ghê!','Bíp thích truyện này lắm!'])} Thưởng thêm một ngôi sao!`);musicOn();
+  later(syAdvance,2600)}
+// ---------- "what happens next?" ----------
+function nextRound(cards){
+  const n=cards.length,ans=cards[n-1],mine=new Set(cards.map(x=>x[0]));
+  // wrong choices come only from unrelated stories, so there is exactly one sensible ending
+  const seen=new Set([ans[0]]),others=[];for(const st of shuffle(STORIES)){if(st.c.some(x=>mine.has(x[0])))continue;const c=st.c[st.c.length-1];if(seen.has(c[0]))continue;seen.add(c[0]);others.push(c)}
+  const opts=shuffle([ans,others[0],others[1]]);
+  Object.assign(SY,{type:'next',slips:0,first:true,cards,ans,say:'Chuyện gì xảy ra tiếp theo?'});
+  render(`${topBar(gdots(SY.rounds,SY.round))}${guide(SY.say)}
+    <div class="sy-wrap"><div class="sy-slots">${cards.map((c,i)=>`${i?'<span class="sy-arrow">➜</span>':''}<div class="sy-slot ${i<n-1?'full locked':'qslot'}" data-s="${i}">${i<n-1?`<span class="sy-in">${storyArt(c[0])}<b>${capOf(c)}</b></span>`:'<span class="sy-q">?</span>'}<em>${i+1}</em></div>`).join('')}</div>
+    <div class="sy-pool">${opts.map((c,k)=>`<button class="sy-card" data-k="${c===ans?1:0}" style="animation-delay:${(.3+k*.1).toFixed(1)}s">${storyArt(c[0])}<b>${capOf(c)}</b></button>`).join('')}</div></div>`);
+  wireCommon(()=>SY.say);
+  const intro=unlockToast('storynext','Mới! Đoán xem chuyện gì xảy ra tiếp theo!');
+  (async()=>{const g=gen;if(intro){say('Mới! Đoán xem chuyện gì xảy ra tiếp theo!');await wait(3200)}
+    const w=SY_WORDS(n);for(let i=0;i<n-1;i++){if(g!==gen)return;const el=$$('.sy-slot')[i];el.classList.add('tell');say(`${w[i]}, ${capOf(cards[i])}.`);await wait(1700);el.classList.remove('tell')}
+    if(g===gen)say(SY.say)})();
+  $$('.sy-card').forEach(b=>b.onclick=()=>{if(SY.busy)return;
+    if(b.dataset.k==='1'){SY.busy=true;stat('story',true);tone('ok');bipReact('happy');b.classList.add('right');
+      const q=$('.qslot');q.classList.add('full','locked');q.innerHTML=`<span class="sy-in">${storyArt(ans[0])}<b>${capOf(ans)}</b></span><em>${n}</em>`;sparkEl(q,20);
+      say(`${pickOne(PRAISE())} ${SY_WORDS(n)[n-1]}, ${capOf(ans)}.`);later(syAdvance,2600)}
+    else{SY.miss++;SY.slips++;SY.first=false;stat('story',false);tone('no');bipReact('sad');b.disabled=true;b.classList.add('used');say(`Chưa hợp lý. Sau khi ${capOf(cards[n-2])} thì sao nhỉ?`)}})}
+// ---------- "why?" (cause and effect) ----------
+function whyRound(lv){
+  const pool=WHY.map((w,i)=>i).filter(i=>!SY.whyUsed.includes(i)&&!(D.whyRecent||[]).includes(i));const wi=pickOne(pool.length?pool:WHY.map((w,i)=>i));
+  SY.whyUsed.push(wi);D.whyRecent=[wi,...(D.whyRecent||[]).filter(x=>x!==wi)].slice(0,Math.floor(WHY.length*.6));
+  const W=WHY[wi],q=syTxt(W.q),opts=shuffle([[...W.a,1],...W.no.map(x=>[...x,0])]);
+  Object.assign(SY,{type:'why',slips:0,first:true,say:q});
+  render(`${topBar(gdots(SY.rounds,SY.round))}${guide(q)}
+    <div class="sy-wrap"><div class="sy-slots why"><div class="sy-slot full locked wbig"><span class="sy-in"><span class="se">${W.e}</span><b>${syTxt(W.see)}</b></span></div><div class="why-q">Vì sao?</div></div>
+    <div class="sy-pool">${opts.map((o,k)=>`<button class="sy-card" data-k="${o[2]}" style="animation-delay:${(.3+k*.1).toFixed(1)}s"><span class="se">${o[0]}</span><b>${syTxt(o[1])}</b></button>`).join('')}</div></div>`);
+  wireCommon(()=>SY.say);
+  const intro=unlockToast('storywhy','Mới! Câu hỏi Vì sao? Nghĩ thật kỹ nhé!');
+  if(intro){say('Mới! Câu hỏi Vì sao? Nghĩ thật kỹ nhé!');later(()=>say(q),3200)}else say(q);
+  $$('.sy-card').forEach(b=>b.onclick=()=>{if(SY.busy)return;
+    if(b.dataset.k==='1'){SY.busy=true;stat('story',true);tone('ok');bipReact('happy');b.classList.add('right');sparkEl(b,20);
+      say(`${pickOne(PRAISE())} ${syTxt(W.see)}, ${syTxt(W.a[1])}.`);later(syAdvance,3000)}
+    else{SY.miss++;SY.slips++;SY.first=false;stat('story',false);tone('no');bipReact('sad');b.disabled=true;b.classList.add('used');say('Hmm, chưa đúng. Nghĩ lại nhé!')}})}
 
 // ================= Nhiệm vụ hôm nay + cửa hàng + lịch sử =================
 const TASK_NAME={brain:'Chơi ở Vườn Tư Duy',abc:'Học chữ ở Lâu Đài',code:'Đưa Bíp về tàu',memory:'Lật thẻ khủng long',catch:'Hứng trứng',band:'Chơi ban nhạc'};
@@ -2269,18 +2430,19 @@ function rewardScreen(opt){
 const MEDAL=[['#E8A86B','#B8733F','Đồng'],['#DDE6EE','#9FB0C0','Bạc'],['#FFD84D','#E0A800','Vàng']];
 function showDone(kind,n,title){
   screen='done';hush();
-  const prevEarned=Math.max(0,D.earned-n);
-  const earned=Math.min(STICKERS.length,Math.floor(D.earned/5));const news=[];const mt=markTask(kind)||(BRAIN.includes(kind)?markTask('brain'):null);
-  while(D.stickers<earned){news.push(STICKERS[D.stickers]);D.stickers++}save();
+  const mt=markTask(kind)||(BRAIN.includes(kind)?markTask('brain'):null);
+  const c0=stkCost(Math.min(D.stickers,STICKERS.length-1)),p0=Math.max(0,D.stkProg-n);const news=[];
+  while(D.stickers<STICKERS.length&&D.stkProg>=stkCost(D.stickers)){D.stkProg-=stkCost(D.stickers);news.push(STICKERS[D.stickers]);D.stickers++}save();
+  const cN=stkCost(Math.min(D.stickers,STICKERS.length-1)),need=cN-D.stkProg;
   const ns=news[news.length-1],rate=clamp(n>3?3:n,1,3),[m1,m2]=MEDAL[rate-1];
   const allStickers=D.stickers>=STICKERS.length;
-  const fromPct=ns?(prevEarned%5)/5*100:(prevEarned%5)/5*100,toPct=ns?100:(D.earned%5)/5*100;
+  const fromPct=clamp(p0/c0*100,0,100),toPct=ns?100:clamp(D.stkProg/cN*100,0,100);
   render(`<div class="win"><div class="rays"></div>
     <div class="win-cast"><div class="win-bip">${bip('bip dance')}</div>${D.pet.hatched?`<div class="win-pet">${dino(D.pet)}</div>`:''}</div>
     <div class="ribbon"><span>${title}</span></div>
     <div class="slots">${[0,1,2].map(i=>`<div class="slot3${i===1?' mid':''}"><span class="st-empty">★</span><span class="st-full" style="--m1:${m1};--m2:${m2}">★</span></div>`).join('')}</div>
     <div class="win-row"><div class="pill big">⭐ +<b id="wN">0</b></div>
-      ${allStickers&&!ns?'':`<div class="stk-bar"><i id="wBar" style="width:${fromPct}%"></i><span>${ns?'Sticker mới!':`Còn ${5-D.earned%5} ⭐ nữa có sticker`}</span><em>${ns?ns[0]:'🎁'}</em></div>`}</div>
+      ${allStickers&&!ns?'':`<div class="stk-bar"><i id="wBar" style="width:${fromPct}%"></i><span>${ns?'Sticker mới!':`Còn ${need} ⭐ nữa có sticker`}</span><em>${ns?ns[0]:'🎁'}</em></div>`}</div>
     ${ns?`<div class="prize win-prize" id="wPrize" hidden><span class="e">${ns[0]}</span><b>Sticker mới: ${ns[1]}</b></div>`:''}
     ${missionBanner(mt)}
     <div class="row done-btns" id="wBtns"><button class="big-btn go pulse" id="again2">▶ Chơi tiếp</button><button class="big-btn alt" id="home2">🏠 Về nhà</button></div></div>`);
