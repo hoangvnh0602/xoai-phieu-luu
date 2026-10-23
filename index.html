@@ -270,10 +270,10 @@ svg .b-armL{transform-origin:100% 50%}svg .b-armR{transform-origin:0% 50%}
 @keyframes hopIn{from{transform:translateY(60%) scale(.4);opacity:0}}
 .slot2.blink{animation:blinkHi 1.2s}
 @keyframes blinkHi{0%,40%,80%{background:rgba(255,224,138,.9)}20%,60%,100%{background:transparent}}
-.bushes span{position:absolute;bottom:-6%;width:26%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 35% 30%,#7FD68E,#2A8F53 70%);border:5px solid #1D3646;transform:translateY(110%);transition:transform .45s cubic-bezier(.4,1.4,.5,1);z-index:3}
-.bushes span::before,.bushes span::after{content:"";position:absolute;width:55%;aspect-ratio:1;border-radius:50%;background:#4DBB6A;border:5px solid #1D3646;top:-18%;left:8%}
-.bushes span::after{left:auto;right:4%;top:-8%;width:45%;background:#5FC274}
-.meadow.cover .bushes span{transform:translateY(-12%)}
+.bushes{position:absolute;left:-4%;right:-4%;bottom:0;height:93%;z-index:3;transform:translateY(112%);transition:transform .5s cubic-bezier(.4,1.35,.5,1);pointer-events:none}
+.meadow.cover .bushes{transform:translateY(0)}
+.bushes .hedge{position:absolute;inset:0;width:100%;height:100%;display:block}
+.bushes i{position:absolute;font-style:normal;font-size:clamp(22px,4vw,40px);z-index:2}
 .hide-count{position:absolute;top:8%;left:50%;transform:translateX(-50%);font-family:var(--display);font-weight:800;font-size:clamp(40px,7vw,72px);color:var(--berry);text-shadow:0 4px 0 #fff;z-index:4}
 .hide-count.tick{animation:popIn .5s}
 .hchoices .pick svg{width:100%;height:auto}
@@ -1395,7 +1395,7 @@ function startBand(){
     if(B.free){B.mode='free';B.say=`Chơi tự do! ${KID()} chạm khủng long để hát nhé.`;setSay(B.say);say(B.say)}else playSeq()};
   later(playSeq,700);
 }
-function bandNote(i){try{audio();const f=BAND[i][2],t=ac.currentTime+.01;bell(f,t,.2,.8);osc('triangle',f/2,t,.35,.05,{a:.02})}catch(e){}
+function bandNote(i){try{audio();const f=BAND[i][2],t=ac.currentTime+.01;bell(f,t,.36,.9);osc('triangle',f/2,t,.4,.09,{a:.02})}catch(e){}
   const pad=$$('.bpad')[i];if(!pad)return;pad.classList.remove('sing');void pad.offsetWidth;pad.classList.add('sing');clearTimeout(pad._t);pad._t=setTimeout(()=>pad.classList.remove('sing'),420);
   const n=document.createElement('span');n.className='note-fx';n.textContent=pickOne(['♪','♫','♬']);n.style.left=(35+Math.random()*30)+'%';pad.appendChild(n);setTimeout(()=>n.remove(),1200)}
 async function playSeq(){
@@ -1769,7 +1769,7 @@ function hideRound(){
   Object.assign(HD,{cast,gone,first:true,say:'Nhìn kỹ các bạn khủng long nhé!'});
   render(`${topBar(gdots(HD.rounds,HD.round))}${guide(HD.say)}
     <div class="meadow" id="md"><div class="sunbeam"></div><div class="lineup" style="--n:${n}">${cast.map((d,i)=>`<div class="slot2" data-i="${i}" style="animation-delay:${(i*.1).toFixed(1)}s">${dinoArt(d.k,d.c)}</div>`).join('')}</div>
-      <div class="bushes">${Array.from({length:6},(_,i)=>`<span style="left:${i*18-4}%;transition-delay:${(i*.05).toFixed(2)}s"></span>`).join('')}</div><div class="hide-count" id="hcnt"></div></div>
+      <div class="bushes"><svg class="hedge" viewBox="0 0 1000 400" preserveAspectRatio="none"><defs><linearGradient id="hg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7FD68E"/><stop offset=".35" stop-color="#4DBB6A"/><stop offset="1" stop-color="#2A8F53"/></linearGradient></defs><path d="M0 400 L0 45 Q70 -23 140 22 Q215 -23 290 40 Q360 -27 430 18 Q505 -27 580 38 Q650 -25 720 20 Q790 -25 860 40 Q930 -21 1000 24 L1000 400 Z" fill="url(#hg)" stroke="#1D3646" stroke-width="7" vector-effect="non-scaling-stroke"/><g fill="none" stroke="#2A8F53" stroke-width="4" stroke-linecap="round" vector-effect="non-scaling-stroke" opacity=".55"><path d="M90 170 q30 -25 60 0"/><path d="M330 150 q30 -25 60 0"/><path d="M560 190 q30 -25 60 0"/><path d="M800 160 q30 -25 60 0"/><path d="M200 280 q30 -25 60 0"/><path d="M680 290 q30 -25 60 0"/></g></svg>${[12,38,63,86].map((x,i)=>`<i style="left:${x}%;top:${20+(i%2)*16}%">${['🌸','🍃','🌼','🍃'][i]}</i>`).join('')}</div><div class="hide-count" id="hcnt"></div></div>
     <div class="choices hchoices" id="hc"></div>`);
   wireCommon(()=>HD.say);say(HD.say);
   const look=2400+n*550,g=gen;
