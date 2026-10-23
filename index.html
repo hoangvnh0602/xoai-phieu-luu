@@ -370,6 +370,69 @@ svg .b-armL{transform-origin:100% 50%}svg .b-armR{transform-origin:0% 50%}
 .wl{font-size:13px;font-weight:800;white-space:nowrap}.wt{font-size:10px;color:#FFB800;letter-spacing:1px;min-height:12px}
 textarea.code{width:100%;box-sizing:border-box;margin-top:8px;min-height:64px;border-radius:14px;border:2px solid #CFDDE6;padding:8px 10px;font:13px/1.35 ui-monospace,Menlo,monospace;color:var(--ink);background:#F7FAFC;user-select:text;-webkit-user-select:text;word-break:break-all;resize:vertical}
 
+/* Reward chest */
+.rays{position:absolute;left:50%;top:42%;width:240vmax;height:240vmax;margin:-120vmax 0 0 -120vmax;background:repeating-conic-gradient(rgba(255,226,120,.38) 0 9deg,transparent 9deg 22deg);animation:spin 26s linear infinite;pointer-events:none;
+  -webkit-mask:radial-gradient(circle,#000 0,#000 18%,transparent 52%);mask:radial-gradient(circle,#000 0,#000 18%,transparent 52%)}
+.reward{position:fixed;inset:0;z-index:150;background:radial-gradient(circle at 50% 42%,#4C3B9E,#241B57 70%);display:grid;place-items:center;overflow:hidden;animation:fadeIn .3s;
+  padding:env(safe-area-inset-top,0px) max(16px,env(safe-area-inset-right,0px)) env(safe-area-inset-bottom,0px) max(16px,env(safe-area-inset-left,0px))}
+.reward.out{animation:fadeOut .35s forwards}@keyframes fadeOut{to{opacity:0}}
+.rw-in{position:relative;display:flex;flex-direction:column;align-items:center;gap:clamp(8px,2vh,18px);text-align:center;width:100%;max-width:760px}
+.rw-title{color:#FFE28A;text-shadow:0 5px 0 rgba(0,0,0,.25);animation:popIn .6s cubic-bezier(.3,1.6,.5,1)}
+.rw-sub{color:#fff;font-family:var(--display);font-weight:800;font-size:clamp(20px,3vw,28px);min-height:1.3em;animation:pulse 1.2s ease-in-out infinite}
+.rw-chest{width:min(52vmin,320px);animation:chestDrop .6s cubic-bezier(.3,1.5,.5,1) backwards,float 2.4s ease-in-out .7s infinite}
+.rw-chest svg{width:100%;height:auto;overflow:visible;filter:drop-shadow(0 14px 0 rgba(0,0,0,.25))}
+@keyframes chestDrop{from{transform:translateY(-70vh) rotate(-12deg)}}
+.chest .lid{transform-box:fill-box;transform-origin:10% 100%;transition:transform .5s cubic-bezier(.3,1.7,.5,1)}
+.chest .glowin{opacity:0;transition:opacity .4s}
+.rw-chest.shaking{animation:chestShake .12s 7 alternate}
+@keyframes chestShake{from{transform:rotate(-5deg) scale(1.02)}to{transform:rotate(5deg) scale(.98)}}
+.rw-chest.open{animation:none}
+.rw-chest.open .lid{transform:rotate(-38deg) translateY(-14px)}
+.rw-chest.open .glowin{opacity:1;animation:pulse 1s ease-in-out infinite}
+.rw-star{position:fixed;z-index:160;font-size:clamp(34px,6vw,54px);pointer-events:none;transform:translate(-50%,-50%);animation:starOut 1.3s cubic-bezier(.2,.8,.4,1) forwards}
+@keyframes starOut{0%{transform:translate(-50%,-50%) scale(.3)}40%{transform:translate(calc(-50% + var(--dx)),-260%) scale(1.3)}100%{transform:translate(calc(-50% + var(--dx)),-900%) scale(.6);opacity:0}}
+.rw-prize{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;align-items:center;width:100%}
+.rw-card{background:#fff;border-radius:26px;padding:14px 22px;display:flex;flex-direction:column;align-items:center;gap:2px;box-shadow:0 8px 0 rgba(0,0,0,.25);animation:flipIn .6s cubic-bezier(.3,1.4,.5,1) backwards;min-width:150px}
+.rw-card.gift{animation-delay:.35s}
+.rw-card b{font-family:var(--display);font-size:clamp(20px,3vw,28px)}
+.rw-card span{color:var(--soft);font-weight:700}
+.rw-plus{font-size:clamp(40px,7vw,64px)!important;color:#E0A800}
+.rw-pet{width:clamp(130px,22vw,190px)}.rw-pet svg{width:100%;height:auto}
+.prize[hidden],.rw-prize[hidden]{display:none!important}
+#rwok{width:100%;max-width:340px;animation:popIn .5s .7s backwards}
+/* Celebration */
+.win{flex:1;min-height:0;width:100%;max-width:1040px;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(8px,1.6vh,16px);text-align:center;overflow:hidden}
+.win .rays{top:34%}
+.win-cast{position:relative;display:flex;align-items:flex-end;justify-content:center;gap:clamp(10px,3vw,40px);height:clamp(110px,22vh,190px)}
+.win-bip .bip{width:auto;height:clamp(100px,20vh,170px)}
+.win-pet{height:100%;aspect-ratio:1671/1958;animation:popIn .6s .3s backwards}.win-pet svg{width:100%;height:100%}
+.win-pet .dino.jump{animation:jump .7s ease 3}
+.ribbon{position:relative;background:linear-gradient(#FF7A93,#E2435F);color:#fff;font-family:var(--display);font-weight:800;font-size:clamp(26px,4.6vw,48px);line-height:1.1;padding:.25em 1.2em;border-radius:14px;box-shadow:0 6px 0 #B7283F;
+  animation:ribbonIn .7s cubic-bezier(.3,1.6,.5,1) .1s backwards;max-width:92%;text-wrap:balance}
+.ribbon::before,.ribbon::after{content:"";position:absolute;top:22%;width:1.1em;height:100%;background:#C8324C;z-index:-1}
+.ribbon::before{left:-.7em;clip-path:polygon(0 0,100% 0,100% 100%,0 100%,35% 50%)}.ribbon::after{right:-.7em;clip-path:polygon(0 0,100% 0,65% 50%,100% 100%,0 100%)}
+@keyframes ribbonIn{from{transform:scale(.2) rotate(-8deg);opacity:0}}
+.slots{display:flex;gap:clamp(6px,2vw,18px);align-items:flex-end}
+.slot3{position:relative;width:clamp(72px,12vw,120px);aspect-ratio:1;display:grid;place-items:center}
+.slot3.mid{width:clamp(92px,15vw,150px);transform:translateY(-12%)}
+.slot3 span{position:absolute;inset:0;display:grid;place-items:center;font-size:clamp(78px,13vw,130px);line-height:1}
+.slot3.mid span{font-size:clamp(100px,16vw,160px)}
+.st-empty{color:rgba(29,54,70,.14)}
+.st-full{background:linear-gradient(var(--m1),var(--m2));-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:3px #1D3646;transform:scale(0);opacity:0}
+.slot3.on .st-full{animation:slam .5s cubic-bezier(.2,1.8,.4,1) forwards}
+@keyframes slam{0%{transform:scale(3) rotate(-40deg);opacity:0}60%{transform:scale(.85) rotate(6deg);opacity:1}100%{transform:scale(1) rotate(0);opacity:1}}
+.win-row{display:flex;gap:14px;align-items:center;flex-wrap:wrap;justify-content:center;animation:popIn .5s 1.6s backwards}
+.pill.big{font-size:clamp(22px,3.4vw,32px);padding:8px 22px;font-variant-numeric:tabular-nums}
+.stk-bar{position:relative;width:min(70vw,360px);height:38px;background:#fff;border-radius:999px;box-shadow:0 4px 0 rgba(29,54,70,.15);overflow:hidden;display:flex;align-items:center;justify-content:center}
+.stk-bar i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,#FFE066,#FFB800);border-radius:999px;transition:width .9s cubic-bezier(.3,1.2,.5,1)}
+.stk-bar span{position:relative;font-weight:800;font-size:16px}
+.stk-bar em{position:absolute;right:8px;font-style:normal;font-size:24px}
+.win-prize{animation:flipIn .7s cubic-bezier(.3,1.4,.5,1)}
+#wBtns{justify-content:center;animation:popIn .5s 2.2s backwards}
+.big-btn.pulse{animation:btnPulse 1.4s ease-in-out 3s infinite}
+@keyframes btnPulse{50%{transform:scale(1.07)}}
+@media (max-height:620px){.win-cast{height:90px}.win-bip .bip{height:84px}}
+
 /* Quick games */
 .dots{display:flex;gap:10px}
 .dots i{width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,.75)}
@@ -1412,9 +1475,9 @@ function bandPress(i){
   if(i===B.seq[B.pos]){B.pos++;
     if(B.pos<B.seq.length)return;
     B.mode='wait';stat('band',true);B.round++;const d=$$('#bdots i')[B.round-1];d&&d.classList.add('on');
-    later(()=>{tone('ok');bipReact('happy');sparkEl($('.band-row'),30);say(pickOne(PRAISE()))},450);
-    if(B.round>=B.rounds){award(3);if(B.miss<=1)D.lvl.band++;save();later(()=>{confetti(110);tone('roar')},1200);later(()=>showDone('band',3,'Ban nhạc tuyệt vời!'),2600);return}
-    B.seq.push(rand(0,B.n-1));later(playSeq,1900);
+    later(()=>{bipReact('happy');sparkEl($('.band-row'),30);say(pickOne(PRAISE()))},350);
+    if(B.round>=B.rounds){award(3);if(B.miss<=1)D.lvl.band++;save();later(async()=>{say('Cả ban nhạc cùng hát nào!');await wait(1300);confetti(110);await bandJingle(true);later(()=>showDone('band',3,'Ban nhạc tuyệt vời!'),400)},900);return}
+    B.seq.push(rand(0,B.n-1));later(async()=>{await bandJingle(false);later(playSeq,500)},800);
   }else{
     B.mode='wait';B.miss++;stat('band',false);later(()=>{tone('no');bipReact('sad');say('Gần đúng rồi! Nghe lại nhé.')},350);later(playSeq,2200);
   }
@@ -1703,22 +1766,6 @@ function showAbcBoard(){
 }
 
 // ================= done / stickers / sleep =================
-function showDone(kind,n,title){
-  screen='done';
-  const earned=Math.min(STICKERS.length,Math.floor(D.earned/5));const news=[];const mt=markTask(kind)||(BRAIN.includes(kind)?markTask('brain'):null);
-  while(D.stickers<earned){news.push(STICKERS[D.stickers]);D.stickers++}save();
-  const ns=news[news.length-1];
-  const k=Math.min(n,8);
-  render(`<div class="center"><div class="done-bip">${bip('bip dance')}</div><h1 class="done-title">${title}</h1>
-    <div class="stars">${Array.from({length:k},(_,i)=>`<span class="dstar" style="animation-delay:${(.3+i*.28).toFixed(2)}s">⭐</span>`).join('')}</div>
-    ${ns?`<div class="prize" style="animation-delay:${(.5+k*.28).toFixed(2)}s"><span class="e">${ns[0]}</span><b>Sticker mới: ${ns[1]}</b></div>`:`<p class="muted" style="font-size:22px;margin:0">Thêm ${5-D.earned%5} ngôi sao nữa là có sticker mới!</p>`}
-    ${missionBanner(mt)}
-    <div class="row done-btns" style="justify-content:center;animation-delay:${(.6+k*.28).toFixed(2)}s"><button class="big-btn" id="again2">Chơi tiếp</button><button class="big-btn alt" id="home2">Về nhà</button></div></div>`);
-  for(let i=0;i<k;i++)later(()=>tone('pop'),300+i*280);
-  later(()=>confetti(ns?160:90),200);if(ns)later(()=>{tone('ok');sparkEl($('.prize'),40)},600+k*280);
-  say((ns?`${title} ${KID()} được sticker mới, ${ns[1]}!`:`${title} ${KID()} được ${n} ngôi sao!`)+(mt?` Xong nhiệm vụ ${taskName(mt)}!`:''));if(mt)later(()=>tone('chime'),900);
-  $('#again2').onclick=()=>{tone('tap');startGame(kind)};$('#home2').onclick=()=>{tone('tap');showHome()};
-}
 function showBook(){
   screen='book';
   const cells=STICKERS.map((s,i)=>`<button class="sticker${i<D.stickers?'':' locked'}" data-s="${i}" style="animation-delay:${(i*.04).toFixed(2)}s"><span class="e">${s[0]}</span><b>${i<D.stickers?s[1]:'?'}</b></button>`).join('');
@@ -1947,8 +1994,8 @@ function missionSheet(auto){
   const close=()=>{const s=$('#sw');s&&s.remove()};
   $('#sw').onclick=e=>{if(e.target.id==='sw'){tone('tap');close()}};
   $$('[data-mt]').forEach(b=>b.onclick=()=>{const t=d.tasks[+b.dataset.mt];tone('tap');close();const i=STATIONS.findIndex(s=>s.g===t.g);const st=$(`[data-st="${i}"]`);st&&st.click()});
-  if($('#claim'))$('#claim').onclick=()=>{d.claimed=true;award(5);save();tone('ok');later(()=>tone('chime'),300);confetti(180);bipReact('happy');close();
-    const sp=$('#starN');if(sp)sp.textContent=D.stars;updateMissionPill();say(`Giỏi quá! ${KID()} làm xong cả ba nhiệm vụ, được thêm năm ngôi sao!`)};
+  if($('#claim'))$('#claim').onclick=()=>{d.claimed=true;award(5);save();close();const gift=pickGift();
+    rewardScreen({title:'Xong 3 nhiệm vụ!',stars:5,gift,extra:gift?0:3,onClose:()=>{const sp=$('#starN');if(sp)sp.textContent=D.stars;updateMissionPill();if(D.pet.hatched&&$('#mp'))$('#mp').innerHTML=dino(D.pet)}})};
   if(auto)say(`Hôm nay có ba nhiệm vụ: ${d.tasks.map(taskName).join(', ')}.`);
   else say(all?(d.claimed?'Xong hết rồi!':'Mở rương quà nào!'):`${KID()} đã làm ${n} trên ba nhiệm vụ.`);
 }
@@ -2029,6 +2076,113 @@ function weekHTML(){
 function backupCode(){return 'XPL1.'+btoa(unescape(encodeURIComponent(JSON.stringify(S))))}
 function readBackup(code){const raw=String(code||'').trim().replace(/\s+/g,'');if(!raw.startsWith('XPL1.'))throw new Error('Mã không đúng định dạng.');
   let obj;try{obj=JSON.parse(decodeURIComponent(escape(atob(raw.slice(5)))))}catch(e){throw new Error('Mã bị thiếu hoặc bị sửa.')}if(!obj||!Array.isArray(obj.profiles)||!obj.profiles.length||!obj.data)throw new Error('Mã không có dữ liệu hồ sơ.');return obj}
+
+// ================= real sound files (optional) =================
+// When a file is listed here it replaces the built-in synthesized sound with the same name.
+// Files live in snd/ next to the app (see the sound list given to the parent). Missing files fall back silently.
+const SND=Object.assign({},window.__SND||{});
+const sndBuf={};let sndLoading=false;
+function loadSounds(){if(sndLoading||!ac)return;sndLoading=true;
+  Object.entries(SND).forEach(([k,url])=>{fetch(url).then(r=>r.ok?r.arrayBuffer():Promise.reject()).then(b=>new Promise((ok,no)=>ac.decodeAudioData(b,ok,no))).then(buf=>{sndBuf[k]=buf;if(k==='music'&&MUS.on){musicOff();musicOn()}}).catch(()=>{})})}
+function playSnd(k,vol=1,bus){const b=sndBuf[k];if(!b)return null;try{const s=ac.createBufferSource(),g=ac.createGain();s.buffer=b;g.gain.value=vol;s.connect(g).connect(bus||sfxBus);s.start();return s}catch(e){return null}}
+const _tone=tone;
+tone=function(kind){try{audio();loadSounds();if(playSnd(kind))return}catch(e){}_tone(kind)};
+const _musicOn=musicOn,_musicOff=musicOff;let musicSrc=null;
+musicOn=function(){if(!D.music||MUS.on)return;try{audio();loadSounds()}catch(e){}
+  if(sndBuf.music){MUS.on=true;musicBus.gain.cancelScheduledValues(ac.currentTime);musicBus.gain.setTargetAtTime(.55,ac.currentTime,.6);musicSrc=playSnd('music',1,musicBus);if(musicSrc)musicSrc.loop=true;return}
+  _musicOn()};
+musicOff=function(){if(musicSrc){try{musicSrc.stop()}catch(e){}musicSrc=null;MUS.on=false;try{musicBus.gain.setTargetAtTime(0,ac.currentTime,.15)}catch(e){}return}_musicOff()};
+
+// extra built-in sounds for the celebrations
+Object.assign(SFX,{
+  win:t=>{[[523,659,784],[587,740,880],[659,830,988]].forEach((ch,i)=>ch.forEach(f=>bell(f,t+i*.16,.09,.5)));[1047,1319,1568,2093].forEach((f,i)=>bell(f,t+.5+i*.08,.13,.9));osc('triangle',131,t+.5,.9,.12)},
+  starslam:t=>{noise(t,.08,.2,{f:2500,type:'bandpass',q:1});bell(1568,t,.14,.7);bell(2093,t+.05,.07,.6)},
+  drum:t=>{for(let i=0;i<10;i++)noise(t+i*.07,.05,.08+i*.012,{f:600+i*40,type:'bandpass',q:2})},
+  chest:t=>{noise(t,.25,.25,{f:300,to:1800,type:'bandpass',q:.8});[784,988,1175,1568,1976,2349].forEach((f,i)=>bell(f,t+.12+i*.06,.12,1.1))},
+  coin:t=>{bell(1319,t,.09,.25);bell(1976,t+.06,.08,.35)}});
+
+// ================= reward chest screen =================
+function chestSVG(){return `<svg class="chest" viewBox="0 0 220 200" aria-hidden="true">
+  <defs><linearGradient id="cw" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E0A060"/><stop offset="1" stop-color="#A9653A"/></linearGradient>
+    <radialGradient id="cg" cx=".5" cy=".6" r=".6"><stop offset="0" stop-color="#FFF6C8"/><stop offset=".6" stop-color="#FFD84D"/><stop offset="1" stop-color="#FFB800" stop-opacity="0"/></radialGradient></defs>
+  <ellipse class="glowin" cx="110" cy="96" rx="80" ry="46" fill="url(#cg)"/>
+  <g class="body"><rect x="22" y="92" width="176" height="92" rx="14" fill="url(#cw)" stroke="#1D3646" stroke-width="6"/>
+    <rect x="22" y="110" width="176" height="14" fill="#FFC83D" stroke="#1D3646" stroke-width="5"/>
+    <rect x="60" y="92" width="16" height="92" fill="#FFC83D" stroke="#1D3646" stroke-width="5"/><rect x="144" y="92" width="16" height="92" fill="#FFC83D" stroke="#1D3646" stroke-width="5"/>
+    <rect x="95" y="104" width="30" height="34" rx="6" fill="#FFE066" stroke="#1D3646" stroke-width="5"/><circle cx="110" cy="119" r="5" fill="#1D3646"/></g>
+  <g class="lid"><path d="M22 96 Q22 30 110 30 Q198 30 198 96 Z" fill="url(#cw)" stroke="#1D3646" stroke-width="6" stroke-linejoin="round"/>
+    <path d="M60 96 Q60 38 68 34 L84 32 Q76 40 76 96 Z M144 96 Q144 40 136 32 L152 34 Q160 38 160 96 Z" fill="#FFC83D" stroke="#1D3646" stroke-width="5" stroke-linejoin="round"/>
+    <ellipse cx="84" cy="50" rx="26" ry="8" fill="#fff" opacity=".35" transform="rotate(-12 84 50)"/></g></svg>`}
+function pickGift(){if(!D.pet.hatched)return null;const sd=shopData();const c=SHOP.filter(it=>it.slot!=='skin'&&!sd.owned.includes(it.id)&&it.price<=20);return c.length?pickOne(c):null}
+function rewardScreen(opt){
+  hush();const ov=document.createElement('div');ov.className='reward';ov.id='rw';
+  ov.innerHTML=`<div class="rays"></div><div class="rw-in"><h1 class="rw-title">${opt.title}</h1><div class="rw-sub">Chạm vào rương nào!</div>
+    <button class="rw-chest" id="rwc" aria-label="Mở rương">${chestSVG()}</button><div class="rw-prize" id="rwp" hidden></div></div>`;
+  document.body.appendChild(ov);const g=gen;let opened=false;
+  tone('whoosh');later(()=>{tone('bonk');sparkEl($('#rwc'),10)},520);say(`Rương quà của ${KID()} đây! Chạm vào rương nào!`);
+  const close=()=>{tone('tap');ov.classList.add('out');setTimeout(()=>ov.remove(),350);opt.onClose&&opt.onClose()};
+  $('#rwc').onclick=async()=>{if(opened)return;opened=true;const ch=$('#rwc');ch.classList.add('shaking');tone('drum');$('.rw-sub').textContent='Rương đang mở...';
+    await wait(900);if(!document.body.contains(ov))return;
+    ch.classList.remove('shaking');ch.classList.add('open');tone('chest');confetti(200);const r=ch.getBoundingClientRect();
+    sparkAt(r.left+r.width/2,r.top+r.height*.4,70,['#FFD84D','#FFF3B0','#FFB800','#fff']);
+    // stars burst out and climb up
+    for(let i=0;i<opt.stars;i++)setTimeout(()=>{const s=document.createElement('div');s.className='rw-star';s.textContent='⭐';s.style.left=(r.left+r.width/2)+'px';s.style.top=(r.top+r.height*.35)+'px';
+      s.style.setProperty('--dx',((i-(opt.stars-1)/2)*70)+'px');document.body.appendChild(s);tone('coin');setTimeout(()=>s.remove(),1400)},250+i*140);
+    await wait(900);if(!document.body.contains(ov))return;
+    const gift=opt.gift;const sd=shopData();
+    if(gift){sd.owned.push(gift.id);D.pet.wear=D.pet.wear||{};D.pet.wear[gift.slot]=gift.id}else if(opt.extra)award(opt.extra);save();
+    $('.rw-sub').textContent='';
+    const pr=$('#rwp');pr.hidden=false;pr.innerHTML=`<div class="rw-card"><b class="rw-plus">+<span id="rwn">0</span> ⭐</b><span>ngôi sao</span></div>
+      ${gift?`<div class="rw-card gift"><div class="rw-pet">${dino({...D.pet})}</div><b>Quà bất ngờ: ${gift.name}!</b><span>${D.pet.name} đã đội vào rồi</span></div>`:opt.extra?`<div class="rw-card"><b class="rw-plus">+${opt.extra} ⭐</b><span>thưởng thêm</span></div>`:''}
+      <button class="big-btn go" id="rwok">Tuyệt quá!</button>`;
+    let k=0;const iv=setInterval(()=>{k++;const n=$('#rwn');if(n)n.textContent=k;tone('coin');if(k>=opt.stars)clearInterval(iv)},110);
+    say(gift?`Được ${opt.stars} ngôi sao, và quà bất ngờ: ${gift.name} cho ${D.pet.name}!`:`Được ${opt.stars+(opt.extra||0)} ngôi sao!`);
+    if(gift)later(()=>{tone('roar');sparkEl($('.rw-pet'),24)},1200);
+    $('#rwok').onclick=close};
+}
+
+// ================= celebration after a game =================
+const MEDAL=[['#E8A86B','#B8733F','Đồng'],['#DDE6EE','#9FB0C0','Bạc'],['#FFD84D','#E0A800','Vàng']];
+function showDone(kind,n,title){
+  screen='done';hush();
+  const prevEarned=Math.max(0,D.earned-n);
+  const earned=Math.min(STICKERS.length,Math.floor(D.earned/5));const news=[];const mt=markTask(kind)||(BRAIN.includes(kind)?markTask('brain'):null);
+  while(D.stickers<earned){news.push(STICKERS[D.stickers]);D.stickers++}save();
+  const ns=news[news.length-1],rate=clamp(n>3?3:n,1,3),[m1,m2]=MEDAL[rate-1];
+  const allStickers=D.stickers>=STICKERS.length;
+  const fromPct=ns?(prevEarned%5)/5*100:(prevEarned%5)/5*100,toPct=ns?100:(D.earned%5)/5*100;
+  render(`<div class="win"><div class="rays"></div>
+    <div class="win-cast"><div class="win-bip">${bip('bip dance')}</div>${D.pet.hatched?`<div class="win-pet">${dino(D.pet)}</div>`:''}</div>
+    <div class="ribbon"><span>${title}</span></div>
+    <div class="slots">${[0,1,2].map(i=>`<div class="slot3${i===1?' mid':''}"><span class="st-empty">★</span><span class="st-full" style="--m1:${m1};--m2:${m2}">★</span></div>`).join('')}</div>
+    <div class="win-row"><div class="pill big">⭐ +<b id="wN">0</b></div>
+      ${allStickers&&!ns?'':`<div class="stk-bar"><i id="wBar" style="width:${fromPct}%"></i><span>${ns?'Sticker mới!':`Còn ${5-D.earned%5} ⭐ nữa có sticker`}</span><em>${ns?ns[0]:'🎁'}</em></div>`}</div>
+    ${ns?`<div class="prize win-prize" id="wPrize" hidden><span class="e">${ns[0]}</span><b>Sticker mới: ${ns[1]}</b></div>`:''}
+    ${missionBanner(mt)}
+    <div class="row done-btns" id="wBtns"><button class="big-btn go pulse" id="again2">▶ Chơi tiếp</button><button class="big-btn alt" id="home2">🏠 Về nhà</button></div></div>`);
+  const slots=$$('.slot3');
+  later(()=>{tone('win');confetti(120)},250);
+  for(let i=0;i<rate;i++)later(()=>{const s=slots[i];s.classList.add('on');tone('starslam');try{audio();bell([784,988,1175][i],ac.currentTime+.02,.16,.8)}catch(e){}sparkEl(s,22)},900+i*480);
+  const tCount=900+rate*480+150;
+  for(let k=1;k<=n;k++)later(()=>{const e=$('#wN');if(e)e.textContent=k;tone('coin')},tCount+k*90);
+  const tBar=tCount+n*90+250;later(()=>{const b=$('#wBar');if(b)b.style.width=toPct+'%'},tBar);
+  if(ns)later(()=>{const p=$('#wPrize');if(p){p.hidden=false;tone('chest');sparkEl(p,40);confetti(160)}},tBar+900);
+  if(D.pet.hatched)later(()=>{const sv=$('.win-pet svg');sv&&sv.querySelector('.dino').classList.add('jump');tone('roar')},1400);
+  say((rate===3?`Ba ngôi sao! ${title}`:`${title} ${KID()} được ${n} ngôi sao!`)+(ns?` Có sticker mới, ${ns[1]}!`:'')+(mt?` Xong nhiệm vụ ${taskName(mt)}!`:''));
+  if(mt)later(()=>tone('chime'),tBar+400);
+  $('#again2').onclick=()=>{tone('tap');startGame(kind)};$('#home2').onclick=()=>{tone('tap');showHome()};
+}
+
+// ================= band: little songs =================
+const BAND_SONGS=[[0,1,2,1,0,2,0],[0,2,1,3,2,1,0],[2,1,0,1,2,2,2,1,1,1,2,4,4]];
+async function bandJingle(full){
+  const g=gen;const pads=$$('.bpad'),n=pads.length;if(!n)return;
+  if(playSnd(full?'band-finale':'band-round')){pads.forEach((p,i)=>setTimeout(()=>p.classList.add('sing'),i*120));await wait(full?5000:2200);pads.forEach(p=>p.classList.remove('sing'));return}
+  const song=(full?[0,1,2,3,4,3,2,1,0,2,4,2,0]:pickOne(BAND_SONGS.slice(0,2))).map(i=>i%n);
+  const step=full?.2:.17;
+  for(const i of song){if(g!==gen)return;bandNote(i);try{audio();osc('triangle',BAND[i][2]/4,ac.currentTime+.01,.18,.06)}catch(e){}await wait(step*1000)}
+  if(g!==gen)return;try{audio();const t=ac.currentTime+.02;[0,2,4].forEach(j=>bell(BAND[j%n][2],t,.18,1.2));noise(t,.3,.12,{f:6000,type:'highpass'})}catch(e){}
+  pads.forEach(p=>{p.classList.remove('sing');void p.offsetWidth;p.classList.add('sing')});await wait(900);pads.forEach(p=>p.classList.remove('sing'))}
 
 // ================= parent area =================
 function showGate(next){
