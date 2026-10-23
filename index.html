@@ -163,6 +163,13 @@ svg .b-armL{transform-origin:100% 50%}svg .b-armR{transform-origin:0% 50%}
 @keyframes stIn{from{transform:translate(-50%,-50%) scale(0)}}
 .st-ring{width:calc(var(--mh)*.19);height:calc(var(--mh)*.19);border-radius:50%;display:grid;place-items:center;border:calc(var(--mh)*.012) solid #fff;box-shadow:0 calc(var(--mh)*.014) 0 rgba(29,54,70,.28);animation:stBob 3s ease-in-out infinite;overflow:hidden}
 .st-ring svg{width:76%;height:76%;overflow:visible}
+.st-name{position:relative;z-index:2}
+.station:not(.pic) .st-ring{width:calc(var(--mh)*.16);height:calc(var(--mh)*.16)}
+.mapimg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;user-select:none}
+.st-img{width:80%;height:80%;object-fit:contain}
+.station.pic .st-ring{width:calc(var(--mh)*.2);height:calc(var(--mh)*.165);background:none!important;border:0;border-radius:0;box-shadow:none;overflow:visible}
+.station.pic .st-img{width:100%;height:100%;filter:drop-shadow(0 calc(var(--mh)*.012) 0 rgba(29,54,70,.22))}
+.station.pic.mtask .st-ring{box-shadow:none}.station.pic.mtask .st-img{filter:drop-shadow(0 0 calc(var(--mh)*.012) #FFC83D) drop-shadow(0 0 calc(var(--mh)*.03) #FFE28A)}
 @keyframes stBob{50%{transform:translateY(calc(var(--mh)*-.012))}}
 .station.go .st-ring{animation:stGo .45s cubic-bezier(.3,1.6,.5,1)}
 @keyframes stGo{40%{transform:scale(.85)}70%{transform:scale(1.12)}}
@@ -1080,17 +1087,21 @@ function editProfile(p){
 }
 // ---------- adventure map (home) ----------
 const STATIONS=[
-  {g:'code',name:'Rừng Mũi Tên',x:17,y:30,col:'#A8E6BC'},
-  {g:'memory',name:'Hang Thẻ Bài',x:44,y:19,col:'#FFC6D3'},
-  {g:'catch',name:'Tổ Trứng',x:76,y:27,col:'#FFE08A'},
-  {g:'pet',name:'',x:79,y:68,col:'#CBE6FF'},
-  {g:'book',name:'Rương Sticker',x:19,y:72,col:'#FFE0B3'},
-  {g:'band',name:'Sân Khấu Nhạc',x:33,y:47,col:'#FFD1A8'},
-  {g:'abc',name:'Lâu Đài Chữ',x:62,y:44,col:'#FFD6E8'},
-  {g:'brain',name:'Vườn Tư Duy',x:49,y:60,col:'#D7F5C9'}];
+  {g:'code',name:'Rừng Mũi Tên',x:27.4,y:27.1,col:'#A8E6BC'},
+  {g:'memory',name:'Hang Thẻ Bài',x:50.2,y:23.7,col:'#FFC6D3'},
+  {g:'catch',name:'Tổ Trứng',x:71.6,y:29.5,col:'#FFE08A'},
+  {g:'pet',name:'',x:69.4,y:74.2,col:'#CBE6FF'},
+  {g:'book',name:'Rương Sticker',x:36.9,y:73.6,col:'#FFE0B3'},
+  {g:'band',name:'Sân Khấu Nhạc',x:21.1,y:51.4,col:'#FFD1A8'},
+  {g:'abc',name:'Lâu Đài Chữ',x:78.8,y:51.2,col:'#FFD6E8'},
+  {g:'brain',name:'Vườn Tư Duy',x:50.4,y:50.1,col:'#D7F5C9'}];
+// illustrated buildings for the stations (img/st-*.webp) and the island itself (img/map.webp)
+const ST_IMG=Object.fromEntries(['code','memory','catch','book','band','abc','brain'].map(k=>[k,(window.__IMG&&window.__IMG['st-'+k])||`img/st-${k}.webp`]));
+const MAP_IMG=(window.__IMG&&window.__IMG.map)||'img/map.webp';
 const K_='#1D3646';
 function nested(svg,x,y,w,h){return svg.replace(/<svg class="[^"]*" viewBox="0 0 120 100" aria-hidden="true">/,`<svg x="${x}" y="${y}" width="${w}" height="${h}" viewBox="0 0 120 100">`)}
 function stArt(g){
+  if(ST_IMG[g])return `<img class="st-img" src="${ST_IMG[g]}" alt="" draggable="false">`;
   if(g==='code')return bip('x','wave');
   if(g==='memory')return `<svg viewBox="0 0 100 100"><g stroke="${K_}" stroke-width="4" stroke-linejoin="round"><rect x="10" y="22" width="42" height="58" rx="8" fill="#2F7DF6" transform="rotate(-12 31 51)"/><rect x="46" y="18" width="44" height="60" rx="8" fill="#FFF3C4" transform="rotate(9 68 48)"/></g>
     <text x="31" y="60" font-family="Baloo 2,system-ui" font-weight="800" font-size="30" fill="#fff" text-anchor="middle" transform="rotate(-12 31 51)">?</text>${nested(dinoArt('trex','#FF9F45'),47,28,42,38)}</svg>`;
@@ -1114,7 +1125,8 @@ function stBadge(g){const p=D.pet;
 const TRAIL='M170 187 Q300 100 440 119 Q620 120 760 169 Q870 290 790 425 Q640 480 490 375 Q330 320 190 450';
 function palm(x,y,s=1,delay=0){return `<g transform="translate(${x} ${y}) scale(${s})"><g class="palm" style="animation-delay:${delay}s"><path d="M0 0 Q8 -48 -4 -92" stroke="#8C5A2B" stroke-width="10" fill="none" stroke-linecap="round"/>
   <g fill="#2A8F53"><ellipse cx="-34" cy="-90" rx="30" ry="8" transform="rotate(25 -4 -92)"/><ellipse cx="26" cy="-90" rx="30" ry="8" transform="rotate(-25 -4 -92)"/><ellipse cx="-32" cy="-98" rx="28" ry="7" transform="rotate(-15 -4 -92)"/><ellipse cx="24" cy="-98" rx="28" ry="7" transform="rotate(15 -4 -92)"/><ellipse cx="-4" cy="-112" rx="8" ry="20"/></g></g></g>`}
-function mapSVG(){
+function mapSVG(){return `<img class="mapbg mapimg" src="${MAP_IMG}" alt="" draggable="false">`}
+function mapSVGold(){
   const waves=[0,1,2,3,4,5].map(i=>`<path d="M-60 ${40+i*105} q30 -14 60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="4" stroke-linecap="round" style="animation-delay:${-i*1.1}s"/>`).join('');
   return `<svg class="mapbg" viewBox="0 0 1000 625" preserveAspectRatio="none" aria-hidden="true">
   <rect width="1000" height="625" fill="#6EC6F0"/><g class="waves">${waves}</g>
@@ -1137,12 +1149,12 @@ function showHome(){
   screen='home';
   if(D.lastSt==null||D.lastSt>=STATIONS.length)D.lastSt=0;const dly=ensureDaily(),todo=dly.tasks.filter(t=>!t.done).map(t=>t.g);
   const st=STATIONS.map((s,i)=>{const [b,alert]=stBadge(s.g);const nm=s.g==='pet'?(D.pet.hatched?'Nhà '+D.pet.name:'Trứng bí ẩn'):s.name;
-    return `<button class="station${todo.includes(s.g)?' mtask':''}" data-st="${i}" style="left:${s.x}%;top:${s.y}%;--d:${(i*.09).toFixed(2)}s" aria-label="${nm}">
+    return `<button class="station${todo.includes(s.g)?' mtask':''}${ST_IMG[s.g]?' pic':''}" data-st="${i}" style="left:${s.x}%;top:${s.y}%;--d:${(i*.09).toFixed(2)}s" aria-label="${nm}">
       <span class="st-ring" style="background:${s.col};animation-delay:${(-i*.5).toFixed(1)}s">${stArt(s.g)}</span><span class="st-name">${nm}</span><span class="st-badge${alert?' alert':''}">${b}</span></button>`}).join('');
   render(`<div class="top"><div class="row"><button class="pill" id="who" aria-label="Đổi người chơi" ${isTest()?'style="background:#FFE08A"':''}>${curP().icon} ${curP().name} ⇄</button><div class="pill">⭐ <span id="starN">${D.stars}</span></div><button class="pill mis" id="mis" aria-label="Nhiệm vụ hôm nay"></button>${D.pet.hatched?'<button class="pill" id="shopP" aria-label="Cửa hàng">🛍️</button>':''}</div>
       <div class="row"><button class="icon-btn" id="mus" aria-label="Nhạc nền" style="width:48px;height:48px;font-size:22px">${D.music?'🎵':'🔇'}</button><button class="icon-btn lock" id="lock" aria-label="Dành cho bố mẹ">🔒</button></div></div>
     <div class="map-holder"><div class="map" id="map">${mapSVG()}${st}
-      <div class="mapbip" id="mb">${bip('x','walk')}</div>${D.pet.hatched?`<button class="mappet" id="mp" aria-label="${D.pet.name}" style="left:30%;top:42%">${dino(D.pet)}</button>`:''}
+      <div class="mapbip" id="mb">${bip('x','walk')}</div>${D.pet.hatched?`<button class="mappet" id="mp" aria-label="${D.pet.name}" style="left:34%;top:57%">${dino(D.pet)}</button>`:''}
       <div class="map-time" aria-label="Thời gian chơi còn lại">⏳<div class="timebar"><i style="width:${leftPct()}%"></i></div></div>
     </div></div>`);
   sizeMap();onResize(sizeMap);placeMB(D.lastSt,false);
@@ -1154,13 +1166,13 @@ function showHome(){
     moving=true;D.lastSt=i;save();tone('whoosh');placeMB(i,true);later(open,950)});
   $('#lock').onclick=isTest()?()=>{parentBack='home';showParent()}:showGate;
   $('#who').onclick=()=>{hush();tone('tap');musicOff();showStart()};
-  if($('#mp')){MP=[30,42];later(wander,1500);$('#mp').onclick=()=>{const mp=$('#mp');mp.classList.remove('hop');void mp.offsetWidth;mp.classList.add('hop');later(()=>mp.classList.remove('hop'),700);tone('roar');sparkEl(mp,14);if(Date.now()-lastSay>2500)say(pickOne([`${D.pet.name} đây!`,'Rawr!',`Chào ${KID()}!`]))}}
+  if($('#mp')){MP=[34,57];later(wander,1500);$('#mp').onclick=()=>{const mp=$('#mp');mp.classList.remove('hop');void mp.offsetWidth;mp.classList.add('hop');later(()=>mp.classList.remove('hop'),700);tone('roar');sparkEl(mp,14);if(Date.now()-lastSay>2500)say(pickOne([`${D.pet.name} đây!`,'Rawr!',`Chào ${KID()}!`]))}}
   updateMissionPill();$('#mis').onclick=()=>{tone('tap');missionSheet(false)};if($('#shopP'))$('#shopP').onclick=()=>{tone('tap');showShop()};
   if(!dly.announced){dly.announced=true;save();later(()=>{if(!$('#sw'))missionSheet(true)},1100)}
   $('#mus').onclick=()=>{D.music=!D.music;save();if(D.music)musicOn();else musicOff();$('#mus').textContent=D.music?'🎵':'🔇';tone('tap')};
   musicOn();
 }
-const SPOTS=[[30,42],[62,82],[36,88],[57,33],[10,58],[92,64],[88,82],[74,50],[90,47],[50,40]];
+const SPOTS=[[58,64],[62,42],[9,56],[13,32],[34,57],[50,78],[27,82],[89,40],[90,70],[38,40]];
 let MP=null;
 function wander(){const mp=$('#mp');if(!mp)return;let nxt;do{nxt=pickOne(SPOTS)}while(MP&&nxt[0]===MP[0]&&nxt[1]===MP[1]);
   mp.classList.toggle('flip',nxt[0]<MP[0]);const dist=Math.hypot(nxt[0]-MP[0],(nxt[1]-MP[1])*.62);const dur=clamp(dist*.11,1.4,4.5);
