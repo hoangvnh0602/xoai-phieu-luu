@@ -75,7 +75,13 @@ h1{font-family:var(--display);font-weight:800;font-size:clamp(34px,6vw,64px);lin
 
 /* Robot guide */
 .guide{display:flex;align-items:center;gap:clamp(8px,2vw,20px);max-width:1000px;width:100%}
-.bip{width:clamp(56px,9vw,100px);flex:none;animation:bob 2.4s ease-in-out infinite;overflow:visible;cursor:pointer}
+.bip{width:clamp(62px,10vw,110px);flex:none;animation:bob 2.4s ease-in-out infinite;overflow:visible;cursor:pointer}
+svg .bp{transition:opacity .16s}
+svg .p-talk,svg .p-happy,svg .p-sad,svg .p-walk{opacity:0}
+body.talking .bip .p-idle{opacity:0}body.talking .bip .p-talk{opacity:1}
+.bip.happy .bp,.bip.sad .bp{opacity:0!important}.bip.happy .p-happy,.bip.sad .p-sad{opacity:1!important}
+.walk .p-idle{opacity:0}.walk .p-walk{opacity:1}
+svg .bpg{transform-box:fill-box;transform-origin:50% 50%;transition:transform .2s}.flip svg .bpg{transform:scaleX(-1)}
 @keyframes bob{50%{transform:translateY(-6px)}}
 svg .b-eye{transform-box:fill-box;transform-origin:center;animation:blink 4.6s infinite}
 @keyframes blink{0%,93%,100%{transform:scaleY(1)}96%{transform:scaleY(.1)}}
@@ -845,15 +851,16 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden)musicOff();
 
 // ================= art =================
 let GID=0;
-function bip(cls='bip'){return `<svg class="${cls}" viewBox="0 0 120 150" aria-label="Robot Bíp"><line x1="60" y1="10" x2="60" y2="30" stroke="#1D3646" stroke-width="5" stroke-linecap="round"/><circle class="b-ant" cx="60" cy="10" r="8" fill="#FFC83D" stroke="#1D3646" stroke-width="4"/>
-<g class="b-arm b-armL"><rect x="2" y="104" width="22" height="12" rx="6" fill="#38B26A" stroke="#1D3646" stroke-width="3.5"/></g><g class="b-arm b-armR"><rect x="96" y="104" width="22" height="12" rx="6" fill="#38B26A" stroke="#1D3646" stroke-width="3.5"/></g>
-<rect x="32" y="104" width="56" height="40" rx="12" fill="#38B26A" stroke="#1D3646" stroke-width="5"/><circle class="b-ant" cx="60" cy="124" r="7" fill="#FFC83D" stroke="#1D3646" stroke-width="3"/>
-<g class="b-head"><rect x="14" y="30" width="92" height="70" rx="16" fill="#FF8A3D" stroke="#1D3646" stroke-width="5"/>
-<rect x="6" y="54" width="10" height="20" rx="4" fill="#38B26A" stroke="#1D3646" stroke-width="3"/><rect x="104" y="54" width="10" height="20" rx="4" fill="#38B26A" stroke="#1D3646" stroke-width="3"/>
-<g class="b-eye"><circle cx="42" cy="62" r="14" fill="#fff" stroke="#1D3646" stroke-width="4"/><circle cx="78" cy="62" r="14" fill="#fff" stroke="#1D3646" stroke-width="4"/>
-<g class="b-pupil"><circle cx="45" cy="64" r="6" fill="#1D3646"/><circle cx="81" cy="64" r="6" fill="#1D3646"/><circle cx="47" cy="61" r="2" fill="#fff"/><circle cx="83" cy="61" r="2" fill="#fff"/></g></g>
-<circle cx="28" cy="84" r="5" fill="#FF5C7A" opacity=".45"/><circle cx="92" cy="84" r="5" fill="#FF5C7A" opacity=".45"/>
-<path class="b-mouth" d="M48 84 Q60 94 72 84" fill="#7A2335" stroke="#1D3646" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></g></svg>`}
+// Bíp is drawn from six illustrated poses (img/bip-*.webp), all on one shared 520×640 canvas so they line up when swapped.
+// Guide Bíp stacks the poses and CSS shows one: idle (waving, or thinking in Vườn Tư Duy), pointing at the bubble while talking, happy or dizzy after an answer.
+const BIP_IMG=Object.fromEntries(['wave','happy','sad','point','walk','think'].map(k=>[k,(window.__IMG&&window.__IMG['bip-'+k])||`img/bip-${k}.webp`]));
+function bip(cls='bip',pose){
+  const im=(k,c)=>`<image class="bp ${c}" href="${BIP_IMG[k]}" x="0" y="0" width="520" height="640"/>`;
+  let layers;
+  if(pose==='walk')layers=im('wave','p-idle')+im('walk','p-walk');
+  else if(pose||/dance/.test(cls))layers=im(pose||'happy','p-on');
+  else layers=im(screen==='brain'?'think':'wave','p-idle')+im('point','p-talk')+im('happy','p-happy')+im('sad','p-sad');
+  return `<svg class="${cls}" viewBox="0 0 520 640" aria-label="Robot Bíp"><g class="bpg">${layers}</g></svg>`}
 function bipReact(kind){const b=$('.guide .bip');if(!b)return;b.classList.remove('happy','sad');clearTimeout(b._rt);requestAnimationFrame(()=>requestAnimationFrame(()=>{b.classList.add(kind);b._rt=setTimeout(()=>b.classList.remove(kind),900)}))}
 function egg(c,cracks=0){const cr=[
   'M30 50 L40 58 L34 66 L44 72','M66 40 L58 50 L68 56 L60 64','M50 92 L56 82 L48 76 L58 68','M22 78 L34 80 L30 90','M74 78 L66 84 L76 92'
@@ -1084,7 +1091,7 @@ const STATIONS=[
 const K_='#1D3646';
 function nested(svg,x,y,w,h){return svg.replace(/<svg class="[^"]*" viewBox="0 0 120 100" aria-hidden="true">/,`<svg x="${x}" y="${y}" width="${w}" height="${h}" viewBox="0 0 120 100">`)}
 function stArt(g){
-  if(g==='code')return bip('x');
+  if(g==='code')return bip('x','wave');
   if(g==='memory')return `<svg viewBox="0 0 100 100"><g stroke="${K_}" stroke-width="4" stroke-linejoin="round"><rect x="10" y="22" width="42" height="58" rx="8" fill="#2F7DF6" transform="rotate(-12 31 51)"/><rect x="46" y="18" width="44" height="60" rx="8" fill="#FFF3C4" transform="rotate(9 68 48)"/></g>
     <text x="31" y="60" font-family="Baloo 2,system-ui" font-weight="800" font-size="30" fill="#fff" text-anchor="middle" transform="rotate(-12 31 51)">?</text>${nested(dinoArt('trex','#FF9F45'),47,28,42,38)}</svg>`;
   if(g==='catch')return `<svg viewBox="0 0 100 100"><g stroke="${K_}" stroke-width="3.5"><ellipse cx="36" cy="48" rx="13" ry="17" fill="#FF8CC0"/><ellipse cx="64" cy="46" rx="13" ry="17" fill="#4C9BF5"/><ellipse cx="50" cy="54" rx="13" ry="17" fill="#FFD23F"/>
@@ -1135,7 +1142,7 @@ function showHome(){
   render(`<div class="top"><div class="row"><button class="pill" id="who" aria-label="Đổi người chơi" ${isTest()?'style="background:#FFE08A"':''}>${curP().icon} ${curP().name} ⇄</button><div class="pill">⭐ <span id="starN">${D.stars}</span></div><button class="pill mis" id="mis" aria-label="Nhiệm vụ hôm nay"></button>${D.pet.hatched?'<button class="pill" id="shopP" aria-label="Cửa hàng">🛍️</button>':''}</div>
       <div class="row"><button class="icon-btn" id="mus" aria-label="Nhạc nền" style="width:48px;height:48px;font-size:22px">${D.music?'🎵':'🔇'}</button><button class="icon-btn lock" id="lock" aria-label="Dành cho bố mẹ">🔒</button></div></div>
     <div class="map-holder"><div class="map" id="map">${mapSVG()}${st}
-      <div class="mapbip" id="mb">${bip('x')}</div>${D.pet.hatched?`<button class="mappet" id="mp" aria-label="${D.pet.name}" style="left:30%;top:42%">${dino(D.pet)}</button>`:''}
+      <div class="mapbip" id="mb">${bip('x','walk')}</div>${D.pet.hatched?`<button class="mappet" id="mp" aria-label="${D.pet.name}" style="left:30%;top:42%">${dino(D.pet)}</button>`:''}
       <div class="map-time" aria-label="Thời gian chơi còn lại">⏳<div class="timebar"><i style="width:${leftPct()}%"></i></div></div>
     </div></div>`);
   sizeMap();onResize(sizeMap);placeMB(D.lastSt,false);
@@ -1162,7 +1169,8 @@ function wander(){const mp=$('#mp');if(!mp)return;let nxt;do{nxt=pickOne(SPOTS)}
   later(wander,dur*1000+rand(1500,4000))}
 function sizeMap(){const h=$('.map-holder'),m=$('#map');if(!h||!m)return;const w=Math.min(h.clientWidth,h.clientHeight*1.6);m.style.width=w+'px';m.style.height=(w/1.6)+'px';m.style.setProperty('--mh',(w/1.6)+'px')}
 function placeMB(i,anim){const mb=$('#mb');if(!mb)return;const s=STATIONS[i];if(!anim){mb.style.transition='none'}
-  mb.style.left=(s.x-7)+'%';mb.style.top=(s.y-3)+'%';
+  const nx=s.x-7,ox=parseFloat(mb.style.left);if(anim&&!isNaN(ox)&&Math.abs(nx-ox)>1)mb.classList.toggle('flip',nx<ox);
+  mb.style.left=nx+'%';mb.style.top=(s.y-3)+'%';
   if(!anim){void mb.offsetWidth;mb.style.transition=''}else{mb.classList.add('walk');later(()=>mb.classList.remove('walk'),850)}}
 function startGame(k){({code:startCode,memory:startMemory,catch:startCatch,pet:showPet,band:startBand,abc:showAbc,hide:startHide,market:startMarket,pattern:startPattern,story:startStory}[k]||showHome)()}
 
@@ -1223,7 +1231,7 @@ function codeLevel(){
   render(`${topBar(`<div class="pill">Màn ${D.lvl.code+1}</div>`)}
     ${guide(C.say)}
     <div class="code-wrap">
-      <div class="board-holder"><div class="board" id="board" style="grid-template-columns:repeat(${L.w},1fr);grid-template-rows:repeat(${L.h},1fr)">${cells.join('')}<div class="tok" id="tok">${bip('x')}</div></div></div>
+      <div class="board-holder"><div class="board" id="board" style="grid-template-columns:repeat(${L.w},1fr);grid-template-rows:repeat(${L.h},1fr)">${cells.join('')}<div class="tok" id="tok">${bip('x','walk')}</div></div></div>
       <div class="controls">
         ${C.direct?'':'<div class="strip" id="strip"></div>'}
         <div class="dpad">${dpad}</div>
@@ -1260,7 +1268,7 @@ function boardFx(e,x,y){const b=$('#board');if(!b)return;const el=document.creat
 function puff([x,y]){const b=$('#board');if(!b)return;const cw=100/C.L.w,ch=100/C.L.h;
   for(let i=0;i<3;i++){const p=document.createElement('div');p.className='puff';const s=cw*(.22+Math.random()*.12);
     p.style.width=s+'%';p.style.aspectRatio='1';p.style.left=(x*cw+cw*(.2+Math.random()*.5))+'%';p.style.top=(y*ch+ch*(.62+Math.random()*.15))+'%';p.style.animationDelay=(i*.06)+'s';b.appendChild(p);setTimeout(()=>p.remove(),800)}}
-function stepTo(nx,ny){puff(C.pos);C.pos=[nx,ny];placeTok();const t=$('#tok');t.classList.add('walk');clearTimeout(C.walkT);C.walkT=setTimeout(()=>t.classList.remove('walk'),420)}
+function stepTo(nx,ny){puff(C.pos);const t=$('#tok');if(nx!==C.pos[0])t.classList.toggle('flip',nx<C.pos[0]);C.pos=[nx,ny];placeTok();t.classList.add('walk');clearTimeout(C.walkT);C.walkT=setTimeout(()=>t.classList.remove('walk'),420)}
 function bonk(){const t=$('#tok');t.classList.remove('bump','walk');void t.offsetWidth;t.classList.add('bump');tone('bonk');stat('code',false);boardFx('💫',C.pos[0],C.pos[1]);bipReact('sad')}
 function press(k){
   if(C.running)return;tone('tap');say(AWORD[k]);
@@ -1994,7 +2002,7 @@ function marketRound(){
   const list=pool.slice(0,len).map(([e,n],i)=>[e,n,qty&&(i===0||(lv>=9&&i===2)||Math.random()<.25)?2:1]);
   Object.assign(MK,{slips:0,list:shuffle(list),extra:pool.slice(len,len+Math.min(8,len*2+2)-len),got:[],cnt:{},units:list.reduce((a,x)=>a+x[2],0),first:true,replays:0,phase:'listen',say:`Nghe ${mkWho()} dặn nhé!`});
   render(`${topBar(gdots(MK.rounds,MK.round))}${guide(MK.say)}
-    <div class="mk-wrap"><div class="mk-req" id="mkq"><div class="mk-pet">${D.pet.hatched?dino(D.pet):bip('x')}</div><div class="mk-cloud" id="mkc"></div></div>
+    <div class="mk-wrap"><div class="mk-req" id="mkq"><div class="mk-pet">${D.pet.hatched?dino(D.pet):bip('x','point')}</div><div class="mk-cloud" id="mkc"></div></div>
       <div class="mk-market" id="mkm" hidden><div class="awning"></div><div class="mk-stall" id="mks"></div></div>
       <div class="mk-basket" id="mkb" hidden><span class="bk">🧺</span><span class="bi" id="mkbi">${'<i></i>'.repeat(MK.units)}</span></div></div>
     <div class="row" style="justify-content:center"><button class="chipbtn" id="mkr" hidden>🔁 Nghe dặn lại (1 lần)</button></div>`);
