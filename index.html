@@ -336,6 +336,7 @@ svg .b-armL{transform-origin:100% 50%}svg .b-armR{transform-origin:0% 50%}
 .sy-slot.nope{animation:shake .45s}
 .sy-in,.sy-card{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;width:100%;height:100%;position:relative}
 .sy-in svg,.sy-card svg{width:86%;max-height:72%;height:auto}
+.sy-img{width:92%;height:72%;object-fit:contain;pointer-events:none}
 .sy-in .se,.sy-card .se{font-size:clamp(44px,8vw,88px);line-height:1}
 .se.launch{display:inline-block;animation:float 1.6s ease-in-out infinite;transform:rotate(-30deg)}
 .sy-in .ov,.sy-card .ov{position:absolute;top:8%;right:10%;font-size:clamp(24px,4vw,40px)}
@@ -2114,28 +2115,28 @@ const STORIES=[
   {c:[['🐛','sâu con'],['cocoon','sâu làm kén'],['🦋','thành bươm bướm']]},
   {c:[['dirty','Bé Cốm lấm lem'],['bath','tắm xà phòng'],['clean','thơm tho sạch sẽ']]},
   {c:[['seed','gieo hạt'],['🌱','nảy mầm'],['🌻','nở hoa']]},
-  {c:[['🍦','que kem mát lạnh'],['☀️','trời nắng to'],['💧','kem tan chảy']]},
+  {c:[['pic:icecream-0','que kem mát lạnh'],['pic:icecream-1','trời nắng to'],['pic:icecream-2','kem tan chảy']]},
   {c:[['🧊','cục đá lạnh'],['☀️','để ngoài nắng'],['💦','đá tan thành nước']]},
-  {c:[['🥱','{K} buồn ngủ'],['🛏️','lên giường nằm'],['😴','ngủ thật say']]},
-  {c:[['🍌','bóc vỏ chuối'],['😋','ăn chuối ngon'],['🗑️','bỏ vỏ vào thùng rác']]},
-  {c:[['🌧️','trời đổ mưa'],['☂️','bật ô lên'],['🏠','về nhà khô ráo']]},
-  {c:[['🐔','gà mẹ ấp trứng'],['🐣','gà con nở ra'],['🐥','gà con chạy theo mẹ']]},
+  {c:[['pic:sleep-0','{K} buồn ngủ'],['pic:sleep-1','lên giường nằm'],['pic:sleep-2','ngủ thật say']]},
+  {c:[['pic:banana-0','bóc vỏ chuối'],['pic:banana-1','ăn chuối ngon'],['pic:banana-2','bỏ vỏ vào thùng rác']]},
+  {c:[['pic:rain-0','trời đổ mưa'],['pic:rain-1','bật ô lên'],['pic:rain-2','về nhà khô ráo']]},
+  {c:[['pic:chicken-0','gà mẹ ấp trứng'],['pic:chicken-1','gà con nở ra'],['pic:chicken-2','gà con chạy theo mẹ']]},
   {c:[['🦖','khủng long đói bụng'],['🍃','ăn thật nhiều lá'],['😊','no căng bụng']]},
-  {c:[['🧱','xếp khối gỗ'],['🗼','tháp cao dần'],['💥','tháp đổ ầm']]},
+  {c:[['pic:blocks-0','xếp khối gỗ'],['pic:blocks-1','tháp cao dần'],['pic:blocks-2','tháp đổ ầm']]},
   {c:[['🎈','thổi bóng bay'],['🎉','bóng to tròn'],['💥','bóng nổ bụp']]},
   // 4 pictures
   {c:[['seed','gieo hạt'],['🌱','nảy mầm'],['🪴','cây non'],['🌳','cây to']]},
   {c:[['🌅','buổi sáng'],['☀️','buổi trưa'],['🌇','buổi chiều'],['🌙','buổi tối']]},
   {c:[['🔧','Bíp sửa tàu'],['🚀','tàu sẵn sàng'],['launch','tàu bay lên'],['🌕','tới mặt trăng']]},
   {c:[['egg0','quả trứng'],['egg4','trứng nứt ra'],['baby','khủng long con'],['big','khủng long lớn']]},
-  {c:[['🪥','lấy bàn chải'],['🧴','bóp kem đánh răng'],['😁','đánh răng'],['🚰','súc miệng']]},
+  {c:[['pic:teeth-0','lấy bàn chải'],['pic:teeth-1','bóp kem đánh răng'],['pic:teeth-2','đánh răng'],['pic:teeth-3','súc miệng']]},
   {c:[['🧺','gom quần áo bẩn'],['🧼','giặt thật sạch'],['☀️','phơi cho khô'],['👕','mặc áo thơm tho']]},
   {c:[['🛒','đi siêu thị'],['🍎','chọn trái cây'],['💵','trả tiền'],['🏠','mang về nhà']]},
   {c:[['🌧️','trời mưa'],['💧','có vũng nước'],['👢','{K} đi ủng'],['💦','nhảy tóe nước']]},
   {c:[['🤖','Bíp hết pin'],['🔌','cắm sạc'],['🔋','pin đầy rồi'],['💃','Bíp nhảy múa']]},
   {c:[['🍚','nấu cơm'],['🥢','dọn bát đũa'],['👨‍👩‍👦','cả nhà ăn cơm'],['🧽','rửa bát']]},
-  {c:[['😢','{K} bị ngã'],['🩹','dán băng'],['🤗','mẹ ôm'],['😊','hết đau rồi']]},
-  {c:[['🎂','sinh nhật {K}'],['🕯️','thổi nến'],['🎁','mở quà'],['🥳','cả nhà vui']]},
+  {c:[['pic:fall-0','{K} bị ngã'],['pic:fall-1','dán băng'],['pic:fall-2','mẹ ôm'],['pic:fall-3','hết đau rồi']]},
+  {c:[['pic:birthday-0','sinh nhật {K}'],['pic:birthday-1','thổi nến'],['pic:birthday-2','mở quà'],['pic:birthday-3','cả nhà vui']]},
   {c:[['🌋','núi lửa rung rung'],['🔥','núi lửa phun'],['🦕','khủng long chạy'],['🌴','trốn sau rừng cây']]},
   {c:[['🧸','{K} chơi đồ chơi'],['🧩','bày ra đầy nhà'],['📦','cất vào thùng'],['✨','nhà gọn gàng']]},
   // 5 pictures
@@ -2166,6 +2167,7 @@ const WHY=[
   {e:'🌻',see:'hoa nở thật đẹp',q:'Vì sao hoa nở đẹp?',a:['🚿','vì được tưới nước mỗi ngày'],no:[['📺','vì xem ti vi'],['🧦','vì đi tất']]},
   {e:'🏃',see:'mọi người chạy vào nhà',q:'Vì sao mọi người chạy vào nhà?',a:['⛈️','vì trời sắp mưa to'],no:[['🌈','vì có cầu vồng'],['🍦','vì có kem']]}];
 function storyArt(k){
+  if(k.startsWith('pic:')){const id='s-'+k.slice(4);return `<img class="sy-img" src="${(window.__IMG&&window.__IMG[id])||'img/'+id+'.webp'}" alt="" draggable="false">`}
   const kid={color:(D.pet&&D.pet.color)||PINK,xp:20,clean:5};
   const m={egg0:()=>petEgg(0),egg4:()=>petEgg(4),baby:()=>dino({color:kid.color,xp:1,clean:5}),big:()=>dino({color:kid.color,xp:60,clean:5}),
     cocoon:()=>`<svg viewBox="0 0 100 100"><path d="M10 14 Q50 4 92 14" stroke="#8C5A2B" stroke-width="6" fill="none" stroke-linecap="round"/><path d="M50 11 L50 22" stroke="#8C5A2B" stroke-width="3"/><ellipse cx="50" cy="56" rx="16" ry="32" fill="#C9A26B" stroke="#1D3646" stroke-width="3.5"/><path d="M36 44 Q50 50 64 44 M35 58 Q50 64 65 58 M38 72 Q50 77 62 72" stroke="#8C5A2B" stroke-width="3" fill="none"/></svg>`,
