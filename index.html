@@ -525,6 +525,8 @@ textarea.code{width:100%;box-sizing:border-box;margin-top:8px;min-height:64px;bo
 .slot{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;transition:transform .15s}
 .slot svg{width:72%;height:72%}
 .slot.cur{transform:scale(1.2);box-shadow:0 0 0 4px var(--ink)}
+.slot.extra{position:relative;box-shadow:0 0 0 4px #e53935,0 0 14px #e53935;animation:wiggle .6s 2;filter:saturate(.6)}
+.slot.extra::after{content:'✕';position:absolute;top:-8px;right:-8px;width:22px;height:22px;border-radius:50%;background:#e53935;color:#fff;font:700 14px/22px system-ui;text-align:center}
 .slot.empty{border:3px dashed #B9CBD6;color:#B9CBD6;font-weight:800;font-size:24px}
 .dpad{display:grid;grid-template-columns:repeat(3,1fr);grid-template-areas:". u ." "l . r" ". d .";gap:8px;width:100%;max-width:290px;align-self:center}
 .dpad button{aspect-ratio:1;border-radius:22px;display:grid;place-items:center;box-shadow:0 6px 0 rgba(29,54,70,.25)}
@@ -1401,7 +1403,7 @@ function placeTok(anim=true){const t=$('#tok');if(!t)return;
   if(!anim){void t.offsetWidth;t.style.transition=''}}
 function drawStrip(){const s=$('#strip');if(!s)return;
   s.innerHTML=C.prog.map((k,i)=>`<button class="slot" data-i="${i}" style="background:${ACOL[k]}" aria-label="Bỏ mũi tên ${AWORD[k]}">${arrow(k)}</button>`).join('')+(C.prog.length<C.max?'<span class="slot empty">+</span>':'');
-  $$('.slot[data-i]').forEach(b=>b.onclick=()=>{if(C.running)return;C.prog.splice(+b.dataset.i,1);drawStrip();tone('tap')})}
+  $$('.slot[data-i]').forEach(b=>b.onclick=()=>{if(C.running)return;C.prog.splice(+b.dataset.i,1);drawStrip();tone('tap');if(C.over){C.over=false;setSay(C.say)}})}
 function markSlot(i){$$('.slot[data-i]').forEach((s,j)=>s.classList.toggle('cur',j===i))}
 const blocked=(x,y)=>x<0||y<0||x>=C.L.w||y>=C.L.h||C.L.rocks.has(x+','+y);
 const atGoal=()=>C.pos[0]===C.L.g[0]&&C.pos[1]===C.L.g[1];
@@ -1429,7 +1431,13 @@ async function runProg(){
       await wait(1400);if(g!==gen)return;resetRun();say(C.fails>=2?'Bấm bóng đèn để xem gợi ý nhé!':'Sửa lại mũi tên nhé!');return}
     stepTo(nx,ny);tone('step');pickStar();await wait(480);
     if(g!==gen)return;
-    if(atGoal()&&allStars()){markSlot(-1);codeWin();return}
+    if(atGoal()&&allStars()){markSlot(-1);const extra=C.prog.length-1-i;
+      if(!extra){codeWin();return}
+      // reaching the rocket only counts when it is the very last arrow: extra arrows are a mistake to fix
+      C.fails++;stat('code',false);tone('no');bipReact('sad');
+      $$('.slot[data-i]').forEach((el,j)=>{if(j>i)el.classList.add('extra')});
+      {C.over=true;const m=`Bíp tới tàu rồi, nhưng còn dư ${NUMW[extra]} mũi tên màu đỏ. Chạm để bỏ bớt nhé!`;setSay(m);say(m)}
+      await wait(2600);if(g!==gen)return;C.running=false;C.pos=[...C.L.b];resetStars();placeTok();return}
   }
   await wait(300);if(g!==gen)return;C.fails++;stat('code',false);say(atGoal()?'Còn sao chưa nhặt kìa! Sửa mũi tên nhé!':'Bíp chưa tới tàu. Thêm mũi tên nữa nhé!');await wait(1500);if(g!==gen)return;resetRun();
 }
