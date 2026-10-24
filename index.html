@@ -837,9 +837,19 @@ function voiceHelp(short){
 let lastSay=0;
 let talkT=0;
 function talking(on,ms){clearTimeout(talkT);document.body.classList.toggle('talking',on);duck(on);if(on)talkT=setTimeout(()=>{document.body.classList.remove('talking');duck(false)},ms)}
-function say(t){if(D.mute)return;if(!canSpeak(t,say))return;lastSay=Date.now();const est=Math.min(6000,600+String(t).length*75);
-  try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='vi-VN';if(viVoice)u.voice=viVoice;u.rate=D.rate||1;u.pitch=1;
-    u.onend=u.onerror=()=>talking(false);talking(true,est);speechSynthesis.speak(u)}catch(e){}}
+let sayId=0;
+// say(t, then): `then` runs when this sentence ends by itself; a newer sentence cancels it. Without a Vietnamese voice we stay silent
+// (an English voice would teach wrong sounds) but still run `then` after a reading-length pause so the game keeps flowing.
+function say(t,then){const id=++sayId,est=Math.min(6000,600+String(t).length*75);const done=()=>{if(then&&id===sayId){const f=then;then=null;f()}};
+  const quiet=()=>setTimeout(done,Math.min(4000,400+String(t).length*55));
+  if(D.mute){quiet();return}
+  if(!viVoice){if(!voicesReady){setTimeout(()=>{if(id!==sayId)return;if(viVoice)say(t,then);else{noVoiceNotice();quiet()}},700);return}noVoiceNotice();quiet();return}
+  lastSay=Date.now();
+  try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='vi-VN';u.voice=viVoice;u.rate=D.rate||1;u.pitch=1;
+    u.onend=()=>{talking(false);done()};u.onerror=()=>{talking(false);done()};talking(true,est);speechSynthesis.speak(u);
+    if(then)setTimeout(done,est+3000) /* some browsers never send 'end' */}catch(e){quiet()}}
+// intro of a new twist, then always the instruction for this screen
+function sayThen(a,b,after){say(a,()=>say(b,after))}
 function hush(){talking(false);try{speechSynthesis.cancel()}catch(e){}}
 function setSay(t){const s=$('#say');if(!s)return;s.innerHTML=t;const b=s.closest('.bubble');b.classList.remove('pop');void b.offsetWidth;b.classList.add('pop')}
 
@@ -1094,7 +1104,7 @@ function bumpStars(){const s=$('#starN');if(s)s.textContent=D.stars}
 const ICONS=['🦕','🦖','🐢','🦎','🐉','🐊','🦋','🐝','🐱','🐶','🐰','🦊','🐼','🐨','🦁','🐯','🐸','🐧','🚀','🤖','🌈','⭐','🌻','🍉','🧪','👨','👩','👴'];
 const clean=s=>s.replace(/[<>&"'`$\\]/g,'').trim();
 function goFull(){try{const el=document.documentElement;const f=el.requestFullscreen||el.webkitRequestFullscreen;if(f){const r=f.call(el);r&&r.catch&&r.catch(()=>{})}}catch(e){}}
-function enterProfile(id){useProfile(id);goFull();musicOn();warmSkin(D.pet.color);warmSpecies();if(overLimit())showSleep();else{showHome();say(`Chào ${KID()}! Hôm nay mình chơi gì nào?`)}}
+function enterProfile(id){showHome._back=false;useProfile(id);goFull();musicOn();warmSkin(D.pet.color);warmSpecies();if(overLimit())showSleep();else{showHome();say(`Chào ${KID()}! Hôm nay mình chơi gì nào?`)}}
 function showStart(manage=false){
   screen='start';
   const cards=S.profiles.map(p=>`<button class="pcard" data-p="${p.id}"><span class="pic">${p.icon}</span><b>${p.name}</b>${p.pin?'<i class="pl" aria-label="Có mã">🔒</i>':''}${p.test?'<small>Người lớn</small>':''}${manage?'<i class="pe">✏️</i>':''}</button>`).join('');
@@ -1255,6 +1265,8 @@ function showHome(){
   if($('#mp')){MP=[34,57];later(wander,1500);$('#mp').onclick=()=>{const mp=$('#mp');mp.classList.remove('hop');void mp.offsetWidth;mp.classList.add('hop');later(()=>mp.classList.remove('hop'),700);tone('roar');sparkEl(mp,14);if(Date.now()-lastSay>2500)say(pickOne([`${D.pet.name} đây!`,'Rawr!',`Chào ${KID()}!`]))}}
   updateMissionPill();$('#mis').onclick=()=>{tone('tap');missionSheet(false)};if($('#shopP'))$('#shopP').onclick=()=>{tone('tap');showShop()};
   if(!dly.announced){dly.announced=true;save();later(()=>{if(!$('#sw'))missionSheet(true)},1100)}
+  else if(showHome._back){const nx=dly.tasks.find(t=>!t.done);later(()=>{if($('#sw'))return;say(nx?`${KID()} chọn trò nhé! Nhiệm vụ tiếp theo là ${taskName(nx)}.${dly.fire&&!dly.fireDone?' Trò có ngọn lửa được gấp đôi sao!':''}`:'Chạm vào một trạm để chơi nhé!')},600)}
+  showHome._back=true;
   $('#mus').onclick=()=>{D.music=!D.music;save();if(D.music)musicOn();else musicOff();$('#mus').textContent=D.music?'🎵':'🔇';tone('tap')};
   musicOn();
 }
@@ -1344,7 +1356,7 @@ function codeLevel(){
   $('#hint').onclick=showHint;
   if(!C.direct){$('#clear').onclick=()=>{if(C.running)return;C.prog=[];drawStrip();tone('tap')};$('#run').onclick=runProg;drawStrip()}
   sizeBoard();onResize(sizeBoard);
-  if(def&&def.news&&unlockToast('code'+D.lvl.code,def.news)){say(def.news);later(()=>say(C.say),3000)}
+  if(def&&def.news&&unlockToast('code'+D.lvl.code,def.news)){sayThen(def.news,C.say)}
   else say(D.lvl.code===0?'Giúp Bíp về tàu vũ trụ nào! Bấm mũi tên để Bíp đi.':C.say);
 }
 function pickStar(){const k=C.pos.join(',');if(!C.L.stars.includes(k)||C.got.includes(k))return;C.got.push(k);
@@ -1422,7 +1434,7 @@ function startMemory(){
   const cards=$$('.card');
   cards.forEach(c=>c.onclick=()=>flip(c,cards));
   const news=lv===5?'Mới! Các bạn khủng long trông giống nhau hơn. Nhìn kỹ cả hình và màu nhé!':lv===3?'Mới! Nhiều thẻ hơn rồi đó!':'';
-  if(news&&unlockToast('memory'+lv,news)){M.lock=true;say(news);later(()=>{M.lock=false;say(M.say)},3600)}
+  if(news&&unlockToast('memory'+lv,news)){M.lock=true;sayThen(news,M.say);later(()=>{M.lock=false},3000)}
   else if(D.lvl.memory<2){cards.forEach(c=>c.classList.add('up'));say('Nhìn kỹ các thẻ nhé!');
     later(()=>{cards.forEach(c=>c.classList.remove('up'));M.lock=false;later(()=>say(M.say),500)},n<=6?3000:4000)}
   else{M.lock=false;say(M.say)}
@@ -1470,7 +1482,7 @@ function startCatch(){
   wireCommon(()=>K.say);
   document.body.classList.add('still');onCleanup(()=>{document.body.classList.remove('still');save()});
   const news=CATCH_FEATS[lv];
-  if(news&&unlockToast('catch'+lv,news)){say(news);later(()=>say(K.say+' Kéo cái tổ qua lại nha!'),3200);K.spawn=3.4}
+  if(news&&unlockToast('catch'+lv,news)){sayThen(news,K.say+' Kéo cái tổ qua lại nha!');K.spawn=3.4}
   else say(K.say+' Kéo cái tổ qua lại nha!');
   const cv=$('#cv'),ctx=cv.getContext('2d');let W=0,H=0,rect=null;
   // capped at 1.5x: on a retina iPad a 2x canvas is four times the pixels to repaint every frame, with no visible gain for big cartoon eggs
@@ -1694,7 +1706,7 @@ async function playSeq(){
   if(!vis){B.say='Nghe thật kỹ nhé!';setSay(B.say)}
   for(const i of B.seq){if(g!==gen||B.free)return;bandNote(i,vis);await wait(Math.max(420,720-D.lvl.band*40))}
   if(g!==gen||B.free)return;$$('.bpad').forEach(p=>p.classList.remove('dim'));
-  B.mode='play';B.say=`Đến lượt ${KID()}! Hát lại ${B.seq.length} nốt nhé.`;setSay(B.say);say(`Đến lượt ${KID()}!`);
+  B.mode='play';B.say=`Đến lượt ${KID()}! Chạm các bạn khủng long theo đúng thứ tự Bíp vừa hát nhé.`;setSay(B.say);say(B.say);
 }
 function bandPress(i){
   if(B.free){bandNote(i);return}
@@ -1988,7 +2000,7 @@ function showAbcBoard(){
   screen='abcboard';const ab=abcData();
   render(`${topBar(`<div class="pill">📖 ${ab.learned.length}/29 chữ</div>`)}${guide('Chạm vào chữ để nghe nhé!')}
     <div class="lboard">${ABC_ORDER.map((l,i)=>{const on=ab.learned.includes(l);return `<button class="ltile${on?' on':''}" data-l="${l}" style="--c:${lcol(l)};animation-delay:${(i*.025).toFixed(3)}s" aria-label="Chữ ${l}"><span>${hwSVG(l,{fixed:true,w:.5,pad:.3})}</span>${on?`<em>${LTR[l][3]}</em>`:''}</button>`}).join('')}</div>`);
-  wireCommon(()=>'Chạm vào chữ để nghe nhé!');
+  wireCommon(()=>'Chạm vào chữ để nghe nhé!');say('Chạm vào chữ để nghe nhé!');
   $('#home').onclick=()=>{tone('tap');showAbc()};
   $$('.ltile').forEach(b=>b.onclick=()=>{const l=b.dataset.l;b.classList.remove('wig');void b.offsetWidth;b.classList.add('wig');tone('pop');
     setSay(`<span class="inlhw" style="color:${lcol(l)}">${hwSVG(l,{w:.5,pad:.2})}</span> · ${LTR[l][3]} ${wordHTML(l)}`);say(`${lsay(l)}. ${LTR[l][2]}`)});
@@ -2065,7 +2077,7 @@ function hideRound(){
     <div class="choices hchoices" id="hc"></div>`);
   wireCommon(()=>HD.say);
   const news=mode==='new'?['hidenew','Mới! Có một bạn lạ lẻn vào. Tìm bạn mới nhé!']:mode==='two'?['hidetwo','Thử thách! Hai bạn cùng trốn một lúc!']:null;
-  const intro=news&&unlockToast(news[0],news[1]);say(intro?news[1]:HD.say);
+  const intro=news&&unlockToast(news[0],news[1]);if(intro)sayThen(news[1],HD.say);else say(HD.say);
   const look=2400+n*550+(mode==='two'?800:0)+(intro?2500:0),g=gen;
   // a visible countdown helps a 4-year-old know when the leaves will come
   const steps=3;for(let s=0;s<steps;s++)later(()=>{const c=$('#hcnt');if(c){c.textContent=steps-s;c.classList.remove('tick');void c.offsetWidth;c.classList.add('tick');tone('step')}},look-steps*800+s*800);
@@ -2160,7 +2172,7 @@ function patternRound(){
   // from level 7 there are two gaps; they are filled left to right
   let holes=[lv<3?len-1:rand(L,len-1)];
   if(lv>=7){const h=rand(L,len-2);holes=[h,rand(h+1,len-1)]}
-  Object.assign(PT,{slips:0,seq,holes,hi:0,hole:holes[0],ans:seq[holes[0]],toks,first:true,tries:0,say:holes.length>1?'Có hai chỗ trống! Cái gì ở chỗ trống đầu tiên?':'Cái gì tiếp theo nào?'});
+  Object.assign(PT,{slips:0,seq,holes,hi:0,hole:holes[0],ans:seq[holes[0]],toks,first:true,tries:0,say:holes.length>1?'Có hai chỗ trống! Cái gì ở chỗ trống đầu tiên? Chọn ở dưới nhé.':'Cái gì vào chỗ trống nào? Chọn ở dưới nhé.'});
   render(`${topBar(gdots(PT.rounds,PT.round))}${guide(PT.say)}
     <div class="pt-track"><div class="pt-row" style="--n:${len}">${seq.map((t,i)=>`<div class="pt-cell${holes.includes(i)?' hole':''}${i===holes[0]?' cur':''}" data-i="${i}" style="animation-delay:${(i*.07).toFixed(2)}s">${holes.includes(i)?'<span class="q">?</span>':toks[t].art}</div>`).join('')}</div></div>
     <div class="choices" id="ptc"></div>`);
@@ -2283,7 +2295,7 @@ function storyRound(){
     <div class="sy-pool" id="syPool">${order.map((ci,k)=>`<button class="sy-card" data-c="${ci}" style="animation-delay:${(k*.1).toFixed(1)}s">${storyArt(cards[ci][0])}<b>${capOf(cards[ci])}</b></button>`).join('')}</div></div>`);
   wireCommon(()=>SY.say);
   const news={3:'Mới! Có truyện bốn bức tranh rồi!',7:'Thử thách! Truyện dài năm bức tranh!'}[lv];
-  if(news&&unlockToast('story'+lv,news)){say(news);later(()=>say(SY.say),3400)}else say(SY.say);
+  if(news&&unlockToast('story'+lv,news))sayThen(news,SY.say);else say(SY.say);
   $$('.sy-card').forEach(b=>b.onclick=()=>syPlace(+b.dataset.c));
   $$('.sy-slot').forEach(b=>b.onclick=()=>syReturn(+b.dataset.s));
 }
@@ -2383,7 +2395,7 @@ function whyRound(lv){
     <div class="sy-pool">${opts.map((o,k)=>`<button class="sy-card" data-k="${o[2]}" style="animation-delay:${(.3+k*.1).toFixed(1)}s"><span class="se">${o[0]}</span><b>${syTxt(o[1])}</b></button>`).join('')}</div></div>`);
   wireCommon(()=>SY.say);
   const intro=unlockToast('storywhy','Mới! Câu hỏi Vì sao? Nghĩ thật kỹ nhé!');
-  if(intro){say('Mới! Câu hỏi Vì sao? Nghĩ thật kỹ nhé!');later(()=>say(q),3200)}else say(q);
+  if(intro)sayThen('Mới! Câu hỏi Vì sao? Nghĩ thật kỹ nhé!',q);else say(q);
   $$('.sy-card').forEach(b=>b.onclick=()=>{if(SY.busy)return;
     if(b.dataset.k==='1'){SY.busy=true;stat('story',true);tone('ok');bipReact('happy');b.classList.add('right');sparkEl(b,20);
       say(`${pickOne(PRAISE())} ${syTxt(W.see)}, ${syTxt(W.a[1])}.`);later(syAdvance,3000)}
@@ -2404,10 +2416,11 @@ function startNum(){NM={round:0,rounds:5,miss:0};numRound()}
 function numRound(){
   screen='brain';const lv=Math.floor(D.lvl.num||0),cf=numCfg(lv),type=cf.types[NM.round%cf.types.length];
   Object.assign(NM,{lv,cf,type,first:true,slips:0,busy:false});
-  const news={0:'Mới! Đếm cùng Bé Cốm. Chạm vào từng cái để đếm nhé!',2:'Mới! Bên nào nhiều hơn?',4:'Mới! Tìm số còn thiếu!',6:'Thử thách! Đếm tới mười, và tìm bên ít hơn!'}[lv];
-  const intro=news&&unlockToast('num'+lv,news);
+  const news={count:'Mới! Đếm cùng Bé Cốm.',give:'Mới! Hái quả cho Bé Cốm. Hái xong thì bấm nút Xong rồi.',more:'Mới! So sánh hai bên.',less:'Thử thách! Lần này tìm bên ít hơn.',miss:'Mới! Dãy số bị mất một số.'}[type];
+  const intro=unlockToast('num-'+type,news);
   ({count:numCount,give:numGive,more:numMore,less:numMore,miss:numMiss})[type](intro?news:'');
 }
+const numSay=(news,t,then)=>news?sayThen(news,t,then):say(t,then);
 function numFrame(body,sayTxt){render(`${topBar(gdots(NM.rounds,NM.round))}${guide(sayTxt)}<div class="nm-wrap">${body}</div>`);wireCommon(()=>NM.say)}
 function numOptions(ans,max,dots){const s=new Set([ans]);while(s.size<3){const v=clamp(ans+pickOne([-2,-1,1,2]),1,max);s.add(v);if(s.size<3&&max<4)s.add(rand(1,max))}
   return shuffle([...s]).map((n,k)=>`<button class="pick nm-pick" data-n="${n}" style="animation-delay:${(k*.1).toFixed(1)}s">${numCard(n,dots)}</button>`).join('')}
@@ -2419,29 +2432,29 @@ function scatter(n,set,cls=''){return Array.from({length:n},(_,i)=>`<button clas
 // count: tap each one (one number per object), then pick how many there are
 function numCount(news){
   const set=numSet(),n=rand(NM.lv<2?2:3,NM.cf.max);Object.assign(NM,{n,set,counted:0,say:`Đếm xem có mấy ${set.name} nào! Chạm vào từng ${set.name.split(' ')[0]} nhé.`});
-  numFrame(`<div class="nm-field" id="nf">${scatter(n,set)}</div><div class="choices" id="nc"></div>`,NM.say);say(news||NM.say);
-  const ask=()=>{if($('#nc').innerHTML)return;NM.say=`Có tất cả mấy ${set.name}?`;setSay(NM.say);say(NM.say);$('#nc').innerHTML=numOptions(n,NM.cf.max,NM.cf.dots);
+  numFrame(`<div class="nm-field" id="nf">${scatter(n,set)}</div><div class="choices" id="nc"></div>`,NM.say);
+  // from level 4 the child may answer without touching every one: the number cards come right after the instruction
+  numSay(news,NM.say,NM.lv>=4?()=>ask():null);
+  const ask=()=>{if($('#nc').innerHTML)return;NM.say=`Có tất cả mấy ${set.name}? Chọn số ở dưới nhé.`;setSay(NM.say);say(NM.say);$('#nc').innerHTML=numOptions(n,NM.cf.max,NM.cf.dots);
     $$('.nm-pick').forEach(b=>b.onclick=()=>{if(+b.dataset.n===n){b.classList.add('right');numWin(`${pickOne(PRAISE())} Có ${NUMW[n]} ${set.name}!`)}
       else{b.disabled=true;b.classList.add('nope');numMissTap('Chưa đúng. Mình đếm lại cùng nhau nhé!');recount()}})};
   const recount=async()=>{const g=gen;const its=$$('#nf .nm-it');its.forEach(x=>{x.classList.remove('on');x.querySelector('.nm-badge').textContent=''});
     for(let i=0;i<its.length;i++){if(g!==gen)return;its[i].classList.add('on');its[i].querySelector('.nm-badge').textContent=i+1;tone('pop');say(NUMW[i+1]);await wait(750)}};
   $$('#nf .nm-it').forEach(b=>b.onclick=()=>{if(b.classList.contains('on'))return;NM.counted++;b.classList.add('on');b.querySelector('.nm-badge').textContent=NM.counted;tone('pop');hush();say(NUMW[NM.counted]);
     if(NM.counted===n)later(ask,900)});
-  // from level 4 the child may answer without touching every one
-  if(NM.lv>=4)later(ask,news?3800:2500);
 }
 // give: Bé Cốm asks for a number; pick exactly that many and say "xong" (knowing when to stop = understanding the number)
 function numGive(news){
-  const f=pickOne(NUM_FRUIT),k=rand(NM.lv<2?2:3,Math.min(NM.cf.max,NM.lv<2?5:8)),total=Math.min(10,k+rand(2,4));Object.assign(NM,{k,f,taken:0,say:`${mkWho()} muốn ăn ${NUMW[k]} ${f[1]}. Hái đủ ${NUMW[k]} quả nhé!`});
+  const f=pickOne(NUM_FRUIT),k=rand(NM.lv<2?2:3,Math.min(NM.cf.max,NM.lv<2?5:8)),total=Math.min(10,k+rand(2,4));const who=D.pet.hatched?D.pet.name:'Bé Cốm';Object.assign(NM,{k,f,who,taken:0,say:`${who} muốn ăn ${NUMW[k]} ${f[1]}. Hái đủ ${NUMW[k]} quả rồi bấm Xong nhé!`});
   numFrame(`<div class="nm-give"><div class="nm-tree" id="nt">${Array.from({length:total},(_,i)=>`<button class="nm-fr" data-i="${i}" style="animation-delay:${(i*.05).toFixed(2)}s">${f[0]}</button>`).join('')}</div>
       <div class="nm-side"><div class="nm-want">${numCard(k,true)}</div><div class="nm-pet">${D.pet.hatched?dino(D.pet):`<img src="${COM_SRC.dung}" alt="">`}</div>
-      <div class="nm-basket" id="nb"><span class="bk">🧺</span><span class="nm-in" id="nbi"></span><b id="nbn">0</b></div><button class="big-btn go" id="ndone">✓ Xong rồi!</button></div></div>`,NM.say);say(news||NM.say);
+      <div class="nm-basket" id="nb"><span class="bk">🧺</span><span class="nm-in" id="nbi"></span><b id="nbn">0</b></div><button class="big-btn go" id="ndone">✓ Xong rồi!</button></div></div>`,NM.say);numSay(news,NM.say);
   const draw=()=>{$('#nbi').textContent=f[0].repeat(NM.taken);$('#nbn').textContent=NM.taken};
   $$('#nt .nm-fr').forEach(b=>b.onclick=()=>{if(NM.busy||b.classList.contains('taken'))return;b.classList.add('taken');NM.taken++;draw();tone('pop');hush();say(NUMW[Math.min(10,NM.taken)]);restartAnim($('#nb'),'bump')});
   $('#nb').onclick=()=>{if(NM.busy||!NM.taken)return;const t=$$('#nt .nm-fr.taken').pop();t&&t.classList.remove('taken');NM.taken--;draw();tone('tap')};
   $('#ndone').onclick=()=>{if(NM.busy)return;tone('tap');
-    if(NM.taken===k){numWin(`${pickOne(PRAISE())} Đủ ${NUMW[k]} ${f[1]} rồi! ${mkWho()} cảm ơn ${KID()}!`);tone('munch')}
-    else if(NM.taken>k)numMissTap(`Nhiều quá rồi! ${mkWho()} chỉ cần ${NUMW[k]} quả thôi. Chạm vào giỏ để bỏ bớt nhé.`);
+    if(NM.taken===k){numWin(`${pickOne(PRAISE())} Đủ ${NUMW[k]} ${f[1]} rồi! ${NM.who} cảm ơn ${KID()}!`);tone('munch')}
+    else if(NM.taken>k)numMissTap(`Nhiều quá rồi! ${NM.who} chỉ cần ${NUMW[k]} quả thôi. Chạm vào giỏ để bỏ bớt nhé.`);
     else numMissTap(`Chưa đủ đâu! Mới có ${NUMW[NM.taken]} quả. Hái thêm nhé.`)};
 }
 // more / less: two groups; at higher levels the smaller group is spread wider so length does not give the answer away
@@ -2450,7 +2463,7 @@ function numMore(news){
   const ans=less?(a<b?0:1):(a>b?0:1),wide=NM.lv>=3;Object.assign(NM,{say:less?`Bên nào ít ${set.name} hơn?`:`Bên nào nhiều ${set.name} hơn?`});
   const grp=(n,i,big)=>`<button class="nm-grp${big?' big':''}" data-g="${i}">${Array.from({length:n},()=>`<span class="nm-gi">${set.art()}<b class="nm-badge"></b></span>`).join('')}</button>`;
   const fewer=a<b?0:1;
-  numFrame(`<div class="nm-two">${grp(a,0,wide&&fewer===0)}<span class="nm-vs">?</span>${grp(b,1,wide&&fewer===1)}</div>`,NM.say);say(news||NM.say);
+  numFrame(`<div class="nm-two">${grp(a,0,wide&&fewer===0)}<span class="nm-vs">?</span>${grp(b,1,wide&&fewer===1)}</div>`,NM.say);numSay(news,NM.say+' Chạm vào bên đó nhé.');
   $$('.nm-grp').forEach(el=>el.onclick=async()=>{if(NM.busy)return;
     if(+el.dataset.g===ans){el.classList.add('right');numWin(`${pickOne(PRAISE())} Bên này có ${NUMW[[a,b][ans]]}, bên kia có ${NUMW[[a,b][1-ans]]}.`)}
     else{numMissTap('Mình đếm thử từng bên nhé!');NM.busy=true;const g=gen;
@@ -2459,10 +2472,11 @@ function numMore(news){
 }
 // missing number on a number track
 function numMiss(news){
-  const len=Math.min(NM.cf.max,NM.lv<8?6:10),start=1,hole=rand(2,len);Object.assign(NM,{say:'Số nào còn thiếu?'});
+  const len=Math.min(NM.cf.max,NM.lv<8?6:10),start=1,hole=rand(2,len);Object.assign(NM,{say:'Số nào còn thiếu? Chọn số ở dưới nhé.'});
   numFrame(`<div class="nm-track">${Array.from({length:len},(_,i)=>{const v=start+i;return `<div class="nm-step${v===hole?' hole':''}" style="animation-delay:${(i*.07).toFixed(2)}s">${v===hole?'<span class="q">?</span>':numCard(v,NM.cf.dots)}</div>`}).join('')}</div>
     <div class="choices">${numOptions(hole,len,NM.cf.dots)}</div>`,NM.say);
-  (async()=>{const g=gen;if(news){say(news);await wait(3200)}for(let v=start;v<start+len;v++){if(g!==gen)return;if(v===hole){say('hmm');await wait(600);continue}say(NUMW[v]);await wait(700)}if(g===gen)say(NM.say)})();
+  const seq=Array.from({length:len},(_,i)=>start+i).map(v=>v===hole?'...':NUMW[v]).join(', ');
+  numSay(news,`Cùng đọc nhé: ${seq}. ${NM.say}`);
   $$('.nm-pick').forEach(b=>b.onclick=()=>{if(+b.dataset.n===hole){b.classList.add('right');const h=$('.nm-step.hole');h.classList.remove('hole');h.innerHTML=numCard(hole,NM.cf.dots);sparkEl(h,16);numWin(`${pickOne(PRAISE())} Số ${NUMW[hole]}!`)}
     else{b.disabled=true;b.classList.add('nope');numMissTap(`Chưa đúng. Sau số ${NUMW[hole-1]} là số mấy nhỉ?`)}})
 }
