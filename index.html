@@ -69,6 +69,8 @@ button{font:inherit;color:inherit;border:0;cursor:pointer;background:none;paddin
 button:focus-visible{outline:4px solid var(--berry);outline-offset:3px}
 h1{font-family:var(--display);font-weight:800;font-size:clamp(34px,6vw,64px);line-height:1;margin:0;text-wrap:balance;text-align:center}
 .top{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.novoice{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:90;width:min(92vw,620px);background:#fff;border-radius:22px;padding:14px 18px;box-shadow:0 10px 30px rgba(29,54,70,.25);display:flex;flex-direction:column;gap:6px;font-size:16px;line-height:1.4;animation:popIn .4s}
+.novoice b{font-family:var(--display);font-size:19px}.novoice .chip{align-self:flex-end}
 button.pill{min-height:48px}
 .pill{background:var(--card);border-radius:999px;padding:8px 16px;font-weight:800;font-size:clamp(16px,2.4vw,22px);display:flex;align-items:center;gap:8px;box-shadow:0 4px 0 rgba(29,54,70,.15);white-space:nowrap}
 .icon-btn{width:clamp(48px,7vw,64px);height:clamp(48px,7vw,64px);border-radius:50%;background:var(--card);display:grid;place-items:center;font-size:clamp(24px,3.5vw,32px);box-shadow:0 4px 0 rgba(29,54,70,.15);flex:none}
@@ -782,11 +784,24 @@ let viVoice=null;
 function viVoices(){try{return speechSynthesis.getVoices().filter(v=>/^vi/i.test(v.lang))}catch(e){return[]}}
 function voiceScore(v){let s=0;if(/natural|neural|premium|enhanced|online|google/i.test(v.name))s+=10;if(/compact/i.test(v.name))s-=5;return s}
 function pickVoice(){const vs=viVoices();viVoice=vs.find(v=>v.name===D.voice)||vs.sort((a,b)=>voiceScore(b)-voiceScore(a))[0]||null}
-try{pickVoice();speechSynthesis.onvoiceschanged=()=>{pickVoice();if(screen==='parent')showParent()}}catch(e){}
+// voices arrive a moment after launch on some browsers; until then we wait rather than conclude there is no Vietnamese voice
+let voicesReady=false;setTimeout(()=>{voicesReady=true},2500);
+try{pickVoice();if(viVoice)voicesReady=true;speechSynthesis.onvoiceschanged=()=>{pickVoice();if(viVoice||speechSynthesis.getVoices().length)voicesReady=true;if(screen==='parent')showParent()}}catch(e){}
+const IS_WIN=/Windows/i.test(navigator.userAgent),IS_EDGE=/Edg\//.test(navigator.userAgent);
+// without a Vietnamese voice the browser reads Vietnamese with an English voice, which teaches wrong sounds; stay silent and tell the parent instead
+function canSpeak(t,again){if(viVoice)return true;if(!voicesReady){if(!again)setTimeout(()=>{if(viVoice)again(t)},600);return false}noVoiceNotice();return false}
+let noVoiceShown=false;
+function noVoiceNotice(){if(noVoiceShown||!document.body)return;noVoiceShown=true;
+  const n=document.createElement('div');n.className='novoice';n.innerHTML=`<b>🔇 Máy này chưa có giọng đọc tiếng Việt</b><span>Bíp sẽ tạm không đọc để bé không nghe sai dấu. ${voiceHelp(true)}</span><button class="chip" id="nvOk">Đã hiểu</button>`;
+  document.body.appendChild(n);$('#nvOk').onclick=()=>n.remove();setTimeout(()=>n.remove(),20000)}
+function voiceHelp(short){
+  if(IS_WIN&&!IS_EDGE)return 'Cách nhanh nhất: mở app bằng trình duyệt <b>Microsoft Edge</b> (có sẵn giọng Việt tự nhiên HoaiMy, NamMinh khi có mạng).';
+  if(IS_WIN)return 'Edge cần có mạng để dùng giọng Việt HoaiMy/NamMinh. Nếu đang có mạng mà vẫn không có: Cài đặt Windows → Thời gian & ngôn ngữ → Ngôn ngữ & khu vực → Thêm ngôn ngữ → Tiếng Việt (chọn cả Chuyển văn bản thành giọng nói), rồi mở lại trình duyệt.';
+  return 'Vào Cài đặt của máy → Giọng nói / Chuyển văn bản thành giọng nói → tải giọng Tiếng Việt, rồi mở lại app.'}
 let lastSay=0;
 let talkT=0;
 function talking(on,ms){clearTimeout(talkT);document.body.classList.toggle('talking',on);duck(on);if(on)talkT=setTimeout(()=>{document.body.classList.remove('talking');duck(false)},ms)}
-function say(t){if(D.mute)return;lastSay=Date.now();const est=Math.min(6000,600+String(t).length*75);
+function say(t){if(D.mute)return;if(!canSpeak(t,say))return;lastSay=Date.now();const est=Math.min(6000,600+String(t).length*75);
   try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='vi-VN';if(viVoice)u.voice=viVoice;u.rate=D.rate||1;u.pitch=1;
     u.onend=u.onerror=()=>talking(false);talking(true,est);speechSynthesis.speak(u)}catch(e){}}
 function hush(){talking(false);try{speechSynthesis.cancel()}catch(e){}}
@@ -1401,7 +1416,7 @@ function catchCfg(lv){return{colors:lv<2?2:lv<4?3:4,goal:lv<6?8:9,every:lv<6?4:3
 let K=null,pteroImg=null;const cImg={};
 function catchImg(k){if(!cImg[k]){cImg[k]=new Image();cImg[k].src=OBJ_IMG[k]}const i=cImg[k];return i.complete&&i.naturalWidth?i:null}
 // speaking a number on every catch used to cancel the voice mid-word and restyle the whole page; this one never interrupts and never touches the page
-function sayLite(t){if(D.mute)return;setTimeout(()=>{try{if(speechSynthesis.speaking||speechSynthesis.pending)return;const u=new SpeechSynthesisUtterance(t);u.lang='vi-VN';if(viVoice)u.voice=viVoice;u.rate=D.rate||1;lastSay=Date.now();speechSynthesis.speak(u)}catch(e){}},0)}
+function sayLite(t){if(D.mute||!viVoice)return;setTimeout(()=>{try{if(speechSynthesis.speaking||speechSynthesis.pending)return;const u=new SpeechSynthesisUtterance(t);u.lang='vi-VN';if(viVoice)u.voice=viVoice;u.rate=D.rate||1;lastSay=Date.now();speechSynthesis.speak(u)}catch(e){}},0)}
 function restartAnim(el,cls){if(!el)return;el.classList.remove(cls);requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add(cls)))}
 function unlockToast(key,text){D.seen=D.seen||{};if(!text||D.seen[key])return false;D.seen[key]=1;save();
   const t=document.createElement('div');t.className='unlock';t.innerHTML=`<b>✨</b><span>${text}</span>`;$('#app .screen').appendChild(t);later(()=>t.remove(),4200);tone('chime');return true}
@@ -2547,7 +2562,7 @@ let parentBack='home';
 function leaveParent(){if(parentBack==='start')return showStart();overLimit()?showSleep():showHome()}
 function voiceChips(){
   const vs=viVoices();
-  if(!vs.length)return '<span class="muted">Máy này chưa có giọng tiếng Việt. Cài thêm trong phần cài đặt giọng nói của máy rồi mở lại app.</span>';
+  if(!vs.length)return `<span class="muted">Máy này chưa có giọng tiếng Việt nên Bíp đang tạm không đọc. ${voiceHelp()}</span>`;
   return vs.map(v=>`<button class="chip ${viVoice&&v.name===viVoice.name?'sel':''}" data-voice="${v.name.replace(/"/g,'&quot;')}">${v.name}</button>`).join('');
 }
 // what each level means, in words a parent can read at a glance
