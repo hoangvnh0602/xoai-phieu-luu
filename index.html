@@ -2291,7 +2291,7 @@ async function voiceLib(){const el=$('#vlib');if(!el)return;let list=[];try{list
   if(!list.length){el.innerHTML=`<span class="muted">Chưa có bài kể nào. Trong trò Thứ tự tranh, sau khi xếp đúng, bấm “🎤 ${KID()} kể lại”: giọng bé sẽ được lưu ở đây để bố mẹ nghe lại.</span>`;return}
   const urls=[];el.innerHTML=`<p class="muted" style="margin:0 0 4px">${list.length} bài kể gần nhất, lưu trên máy này (tối đa 30).</p>`+list.map((r,i)=>{const u=URL.createObjectURL(r.blob);urls.push(u);
     return `<div class="vrow"><span class="vt"><b>${r.title}</b><br><small>${new Date(r.t).toLocaleString('vi-VN',{weekday:'short',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})} · ${Math.max(1,Math.round(r.sec||0))} giây</small></span>
-      <button class="chip" data-vp="${i}">▶ Nghe</button><a class="chip" href="${u}" download="xoai-ke-chuyen-${new Date(r.t).toISOString().slice(0,10)}.${/mp4|aac/.test(r.blob.type)?'m4a':'webm'}">⬇ Tải về</a><button class="chip" data-vd="${r.id}" aria-label="Xoá">🗑</button></div>`}).join('');
+      <button class="chip" data-vp="${i}">▶ Nghe</button>${window.__IMG?'':`<a class="chip" href="${u}" download="xoai-ke-chuyen-${new Date(r.t).toISOString().slice(0,10)}.${/mp4|aac/.test(r.blob.type)?'m4a':'webm'}">⬇ Tải về</a>`}<button class="chip" data-vd="${r.id}" aria-label="Xoá">🗑</button></div>`}).join('');
   let cur=null;$$('[data-vp]').forEach(b=>b.onclick=()=>{if(cur){cur.pause()}hush();musicOff();cur=new Audio(urls[+b.dataset.vp]);cur.play().catch(()=>{})});
   $$('[data-vd]').forEach(b=>b.onclick=async()=>{await VDB.del(b.dataset.vd);voiceLib()});
   onCleanup(()=>{if(cur)cur.pause();urls.forEach(u=>URL.revokeObjectURL(u))})}
