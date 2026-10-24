@@ -69,6 +69,7 @@ button{font:inherit;color:inherit;border:0;cursor:pointer;background:none;paddin
 button:focus-visible{outline:4px solid var(--berry);outline-offset:3px}
 h1{font-family:var(--display);font-weight:800;font-size:clamp(34px,6vw,64px);line-height:1;margin:0;text-wrap:balance;text-align:center}
 .top{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px}
+button.pill{min-height:48px}
 .pill{background:var(--card);border-radius:999px;padding:8px 16px;font-weight:800;font-size:clamp(16px,2.4vw,22px);display:flex;align-items:center;gap:8px;box-shadow:0 4px 0 rgba(29,54,70,.15);white-space:nowrap}
 .icon-btn{width:clamp(48px,7vw,64px);height:clamp(48px,7vw,64px);border-radius:50%;background:var(--card);display:grid;place-items:center;font-size:clamp(24px,3.5vw,32px);box-shadow:0 4px 0 rgba(29,54,70,.15);flex:none}
 .lock{opacity:.55;font-size:20px;width:44px;height:44px}
@@ -135,7 +136,7 @@ svg .b-armL{transform-origin:100% 50%}svg .b-armR{transform-origin:0% 50%}
 .guide{animation:popIn .45s backwards}
 .quick{width:100%;max-width:1040px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .quick span{font-weight:800;color:var(--soft)}
-.chipbtn{background:var(--card);border-radius:999px;padding:10px 18px;font-weight:800;font-size:clamp(16px,2.2vw,20px);box-shadow:0 4px 0 rgba(29,54,70,.15)}
+.chipbtn{background:var(--card);border-radius:999px;padding:10px 20px;min-height:52px;font-weight:800;font-size:clamp(17px,2.3vw,21px);box-shadow:0 4px 0 rgba(29,54,70,.15)}
 .bottom{width:100%;max-width:1040px;display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap}
 .big-btn{background:var(--berry);color:#fff;font-family:var(--display);font-weight:800;font-size:clamp(22px,3.2vw,32px);border-radius:999px;padding:10px 30px;box-shadow:0 6px 0 #C93A55}
 .big-btn:active{transform:translateY(4px);box-shadow:0 2px 0 #C93A55}
@@ -293,7 +294,7 @@ svg .b-armL{transform-origin:100% 50%}svg .b-armR{transform-origin:0% 50%}
 .hchoices .pick svg{width:100%;height:auto}
 .mk-wrap{flex:1;min-height:0;width:100%;max-width:1040px;position:relative;display:flex;flex-direction:column;gap:12px}
 .mk-req{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;gap:3%;border-radius:30px;background:linear-gradient(#FFF7E8,#FFE6F0);box-shadow:0 10px 0 rgba(29,54,70,.12);padding:3%}
-.mk-pet{flex:0 0 34%;max-height:100%;display:grid;place-items:center}.mk-pet svg{width:100%;height:auto;max-height:100%}
+.mk-pet{flex:0 0 34%;align-self:stretch;position:relative;min-height:0}.mk-pet svg{position:absolute;inset:0;width:100%;height:100%}
 .mk-cloud{flex:1;min-height:40%;background:#fff;border-radius:40px;box-shadow:0 6px 0 rgba(29,54,70,.12);display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:4%;padding:3%;position:relative;transition:opacity .5s,transform .5s}
 .mk-cloud::before{content:"";position:absolute;left:-18px;top:50%;border:14px solid transparent;border-right:20px solid #fff;border-left:0;transform:translateY(-50%)}
 .mk-cloud.fade{opacity:0;transform:scale(.85)}
@@ -368,8 +369,8 @@ svg .b-armL{transform-origin:100% 50%}svg .b-armR{transform-origin:0% 50%}
 .mbanner span{color:var(--soft);font-size:.85em;margin-left:.4em}
 /* Shop */
 .shop{flex:1;min-height:0;width:100%;max-width:1040px;display:flex;gap:clamp(12px,2vw,24px)}
-.shop-pet{flex:1;min-width:0;border-radius:30px;background:radial-gradient(ellipse at 50% 85%,#FFE6F0,#FFF7E8 60%,#FFF);box-shadow:0 8px 0 rgba(29,54,70,.14);display:grid;place-items:center;padding:6% 4% 4%;overflow:hidden}
-.shop-pet svg{width:100%;max-height:100%;height:auto}
+.shop-pet{position:relative;flex:1;min-width:0;border-radius:30px;background:radial-gradient(ellipse at 50% 85%,#FFE6F0,#FFF7E8 60%,#FFF);box-shadow:0 8px 0 rgba(29,54,70,.14);display:grid;place-items:center;padding:6% 4% 4%;overflow:hidden}
+.shop-pet svg{position:absolute;left:4%;top:6%;width:92%;height:90%}
 .shop-pet .dino{animation:breathe 3s ease-in-out infinite}
 .shop-right{flex:1.25;min-width:0;display:flex;flex-direction:column;gap:12px;min-height:0}
 .shop-grid{flex:1;min-height:0;overflow:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(clamp(96px,12vw,126px),1fr));gap:10px;align-content:start;padding:4px}
@@ -526,7 +527,8 @@ textarea.code{width:100%;box-sizing:border-box;margin-top:8px;min-height:64px;bo
   .code-wrap{flex-direction:column;align-items:center}
   .controls{width:100%;max-width:560px;display:grid;grid-template-columns:1fr 1fr;align-items:center}
   .controls .strip{grid-column:1/-1}
-  .dpad{max-width:210px}
+  .dpad{max-width:260px}
+  .board-holder{width:100%;flex:1 1 0}
 }
 
 /* Memory */
@@ -1153,6 +1155,7 @@ function mapSVGold(){
   <g fill="#FFD23F"><circle cx="262" cy="258" r="5"/><circle cx="432" cy="488" r="5"/><circle cx="712" cy="392" r="5"/></g>
   </svg>`}
 function showHome(){
+  if(window.__updReady){window.__updReady=false;location.reload();return}
   screen='home';
   if(D.lastSt==null||D.lastSt>=STATIONS.length)D.lastSt=0;const dly=ensureDaily(),todo=dly.tasks.filter(t=>!t.done).map(t=>t.g);
   const st=STATIONS.map((s,i)=>{const [b,alert]=stBadge(s.g);const nm=s.g==='pet'?(D.pet.hatched?'Nhà '+D.pet.name:'Trứng bí ẩn'):s.name;
@@ -1346,7 +1349,7 @@ function startMemory(){
   else{M.lock=false;say(M.say)}
 }
 function sizeMem(){const h=$('.mem-holder'),m=$('#mem');if(!h||!m)return;const gap=14;
-  const cw=Math.floor(Math.min((h.clientWidth-gap*(M.cols-1))/M.cols,((h.clientHeight-gap*(M.rows-1))/M.rows)*.75,170));
+  const cw=Math.floor(Math.min((h.clientWidth-gap*(M.cols-1))/M.cols,((h.clientHeight-gap*(M.rows-1))/M.rows)*.75,240));
   m.style.width=(cw*M.cols+gap*(M.cols-1))+'px';m.style.setProperty('--cw',cw+'px')}
 function flip(c,cards){
   if(M.lock||c.classList.contains('up'))return;tone('tap');c.classList.add('up');M.open.push(+c.dataset.i);
@@ -2543,6 +2546,9 @@ function showParent(){
     <div><b>Độ khó từng trò</b> <span class="muted">(tự lên cấp khi ${KID()} làm tốt, tự lùi khi gặp khó; bố mẹ chỉnh tay ở đây)</span>
       <table class="lvt">${LV_GAMES.map(([k,n])=>`<tr><td>${n}</td><td class="lvd">${lvDesc(k)}</td><td style="white-space:nowrap"><button class="chip" data-lv="${k}" data-d="-1" aria-label="Dễ hơn">−</button> <button class="chip" data-lv="${k}" data-d="1" aria-label="Khó hơn">+</button></td></tr>`).join('')}</table></div>
     ${D.pet.hatched?`<p class="muted" style="margin:0">${D.pet.name} đang ở giai đoạn ${stageOf(D.pet.xp)}/3.</p>`:''}
+    ${(D.errLog||[]).length?`<div><b>Lỗi gần đây</b> <span class="muted">(app đã tự đưa bé về bản đồ; chụp màn hình phần này gửi cho Claude để sửa)</span>
+      <table class="lvt">${D.errLog.map(e=>`<tr><td style="white-space:nowrap">${new Date(e.t).toLocaleString('vi-VN',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit'})}</td><td>${e.s}</td><td class="lvd">${e.m.replace(/</g,'&lt;')}</td></tr>`).join('')}</table>
+      <button class="chip" id="clrErr">Xoá danh sách lỗi</button></div>`:''}
     <div><b>Giới hạn mỗi ngày</b><div class="row" style="margin-top:8px">${[10,15,20,30].map(m=>`<button class="chip ${m===D.limit?'sel':''}" data-m="${m}">${m} phút</button>`).join('')}</div></div>
     <div><b>Giọng đọc</b> <span class="muted">(chạm để nghe thử)</span>
       <div class="row" style="margin-top:8px">${voiceChips()}</div>
@@ -2559,6 +2565,7 @@ function showParent(){
       <div class="row" style="margin-top:6px"><button class="chip" id="rsb">♻️ Khôi phục từ mã</button></div><p id="rsm" style="margin:4px 0 0;font-weight:700"></p></div>
     <button class="big-btn" id="back" style="align-self:flex-start">Xong</button></div></div>`);
   $$('[data-m]').forEach(b=>b.onclick=()=>{D.limit=+b.dataset.m;save();showParent()});
+  if($('#clrErr'))$('#clrErr').onclick=()=>{D.errLog=[];save();showParent()};
   $$('[data-lv]').forEach(b=>b.onclick=()=>{const k=b.dataset.lv;D.lvl[k]=clamp((D.lvl[k]||0)+(+b.dataset.d),0,LV_MAX[k]);save();showParent()});
   $('#plus').onclick=()=>{D.bonus+=10;save();showParent()};
   const sample=()=>say(`Chào ${KID()}! Mình là Bíp. Tìm quả trứng màu đỏ nào!`);
@@ -2577,11 +2584,18 @@ function showParent(){
   $('#back').onclick=leaveParent;
 }
 document.addEventListener('contextmenu',e=>e.preventDefault());
+// if something breaks inside a game, note it for the parent page and bring the child back to the map with a friendly message
+let lastCrash=0;
+function onCrash(msg){try{const log=(D.errLog=D.errLog||[]);log.unshift({t:Date.now(),s:screen,m:String(msg).slice(0,160)});log.length=Math.min(log.length,10);save()}catch(e){}
+  if(Date.now()-lastCrash<4000||['start','gate','parent','sleep'].includes(screen))return;lastCrash=Date.now();
+  try{hush();say('Ối, Bíp bị vấp một chút. Mình về bản đồ nhé!');later(()=>{},0);setTimeout(()=>{try{showHome()}catch(e){}},1600)}catch(e){}}
+addEventListener('error',e=>onCrash(e.message||'error'));
+addEventListener('unhandledrejection',e=>onCrash((e.reason&&e.reason.message)||'promise'));
 showStart();
 </script>
 
 <script>
-if('serviceWorker' in navigator){addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}
+if('serviceWorker' in navigator){const had=!!navigator.serviceWorker.controller;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(had)window.__updReady=true});addEventListener('load',()=>navigator.serviceWorker.register('sw.js').then(r=>{document.addEventListener('visibilitychange',()=>{if(!document.hidden)r.update().catch(()=>{})})}).catch(()=>{}))}
 try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
 </script>
 </body>
