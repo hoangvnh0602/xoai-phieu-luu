@@ -336,7 +336,7 @@ svg .b-armL{transform-origin:100% 50%}svg .b-armR{transform-origin:0% 50%}
 .sy-slot.nope{animation:shake .45s}
 .sy-in,.sy-card{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;width:100%;height:100%;position:relative}
 .sy-in svg,.sy-card svg{width:86%;max-height:72%;height:auto}
-.sy-img{width:92%;height:72%;object-fit:contain;pointer-events:none}
+.sy-img{width:92%;flex:1 1 0;min-height:0;max-height:74%;object-fit:contain;pointer-events:none;margin-top:8%}
 .sy-in .se,.sy-card .se{font-size:clamp(44px,8vw,88px);line-height:1}
 .se.launch{display:inline-block;animation:float 1.6s ease-in-out infinite;transform:rotate(-30deg)}
 .sy-in .ov,.sy-card .ov{position:absolute;top:8%;right:10%;font-size:clamp(24px,4vw,40px)}
@@ -2132,16 +2132,16 @@ const STORIES=[
   {c:[['pic:teeth-0','lấy bàn chải'],['pic:teeth-1','bóp kem đánh răng'],['pic:teeth-2','đánh răng'],['pic:teeth-3','súc miệng']]},
   {c:[['🧺','gom quần áo bẩn'],['🧼','giặt thật sạch'],['☀️','phơi cho khô'],['👕','mặc áo thơm tho']]},
   {c:[['🛒','đi siêu thị'],['🍎','chọn trái cây'],['💵','trả tiền'],['🏠','mang về nhà']]},
-  {c:[['🌧️','trời mưa'],['💧','có vũng nước'],['👢','{K} đi ủng'],['💦','nhảy tóe nước']]},
-  {c:[['🤖','Bíp hết pin'],['🔌','cắm sạc'],['🔋','pin đầy rồi'],['💃','Bíp nhảy múa']]},
+  {c:[['pic:puddle-0','trời mưa'],['pic:puddle-1','có vũng nước'],['pic:puddle-2','{K} đi ủng'],['pic:puddle-3','nhảy tóe nước']]},
+  {c:[['pic:bip-0','Bíp hết pin'],['pic:bip-1','cắm sạc'],['pic:bip-2','pin đầy rồi'],['pic:bip-3','Bíp nhảy múa']]},
   {c:[['🍚','nấu cơm'],['🥢','dọn bát đũa'],['👨‍👩‍👦','cả nhà ăn cơm'],['🧽','rửa bát']]},
   {c:[['pic:fall-0','{K} bị ngã'],['pic:fall-1','dán băng'],['pic:fall-2','mẹ ôm'],['pic:fall-3','hết đau rồi']]},
   {c:[['pic:birthday-0','sinh nhật {K}'],['pic:birthday-1','thổi nến'],['pic:birthday-2','mở quà'],['pic:birthday-3','cả nhà vui']]},
   {c:[['🌋','núi lửa rung rung'],['🔥','núi lửa phun'],['🦕','khủng long chạy'],['🌴','trốn sau rừng cây']]},
-  {c:[['🧸','{K} chơi đồ chơi'],['🧩','bày ra đầy nhà'],['📦','cất vào thùng'],['✨','nhà gọn gàng']]},
+  {c:[['pic:toys-0','{K} chơi đồ chơi'],['pic:toys-1','bày ra đầy nhà'],['pic:toys-2','cất vào thùng'],['pic:toys-3','nhà gọn gàng']]},
   // 5 pictures
-  {c:[['🥚','đập trứng'],['🥣','trộn bột'],['🔥','nướng bánh'],['🎂','bánh chín thơm'],['😋','ăn bánh']]},
-  {c:[['⏰','thức dậy'],['🪥','đánh răng'],['🥣','ăn sáng'],['🎒','đeo cặp'],['🏫','tới trường']]},
+  {c:[['pic:cake-0','đập trứng'],['pic:cake-1','trộn bột'],['pic:cake-2','nướng bánh'],['pic:cake-3','bánh chín thơm'],['pic:cake-4','ăn bánh']]},
+  {c:[['pic:morning-0','thức dậy'],['pic:morning-1','đánh răng'],['pic:morning-2','ăn sáng'],['pic:morning-3','đeo cặp'],['pic:morning-4','tới trường']]},
   {c:[['seed','gieo hạt'],['🌱','nảy mầm'],['🪴','cây non'],['🌳','cây to'],['🍎','ra quả']]},
   {c:[['🥕','nhổ cà rốt'],['🚰','rửa sạch'],['🔪','mẹ cắt nhỏ'],['🍲','nấu canh'],['😋','cả nhà ăn ngon']]},
   {c:[['🧑‍🚀','Bíp mặc đồ bay'],['🚀','lên tàu'],['launch','tàu cất cánh'],['🌕','đáp xuống mặt trăng'],['🚩','cắm lá cờ']]},
