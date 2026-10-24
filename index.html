@@ -866,16 +866,19 @@ function talking(on,ms){clearTimeout(talkT);document.body.classList.toggle('talk
 let sayId=0;
 // say(t, then): `then` runs when this sentence ends by itself; a newer sentence cancels it. Without a Vietnamese voice we stay silent
 // (an English voice would teach wrong sounds) but still run `then` after a reading-length pause so the game keeps flowing.
-function say(t,then){const id=++sayId,est=Math.min(6000,600+String(t).length*75);const done=()=>{if(then&&id===sayId){const f=then;then=null;f()}};
+function say(t,then,_id){const id=_id||++sayId,est=Math.min(6000,600+String(t).length*75);const done=()=>{if(then&&id===sayId){const f=then;then=null;f()}};
   const quiet=()=>setTimeout(done,Math.min(4000,400+String(t).length*55));
   if(D.mute){quiet();return}
-  if(!viVoice){if(!voicesReady){setTimeout(()=>{if(id!==sayId)return;if(viVoice)say(t,then);else{noVoiceNotice();quiet()}},700);return}noVoiceNotice();quiet();return}
+  if(!viVoice){if(!voicesReady){setTimeout(()=>{if(id!==sayId)return;if(viVoice)say(t,then,id);else{noVoiceNotice();quiet()}},700);return}noVoiceNotice();quiet();return}
   lastSay=Date.now();
   try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='vi-VN';u.voice=viVoice;u.rate=D.rate||1;u.pitch=1;
     u.onend=()=>{talking(false);done()};u.onerror=()=>{talking(false);done()};talking(true,est);speechSynthesis.speak(u);
     if(then)setTimeout(done,est+3000) /* some browsers never send 'end' */}catch(e){quiet()}}
 // intro of a new twist, then always the instruction for this screen
 function sayThen(a,b,after){say(a,()=>say(b,after))}
+// awaitable: resolves when the sentence has finished (or another sentence replaced it), never sooner than min ms
+function sayW(t,min=0){return new Promise(res=>{const t0=Date.now();let ok=false;say(t,()=>{ok=true});const my=sayId;
+  const iv=setInterval(()=>{const el=Date.now()-t0;if(sayId!==my||((ok||el>12000)&&el>=min)){clearInterval(iv);res()}},60)})}
 function hush(){talking(false);try{speechSynthesis.cancel()}catch(e){}}
 function setSay(t){const s=$('#say');if(!s)return;s.innerHTML=t;const b=s.closest('.bubble');b.classList.remove('pop');void b.offsetWidth;b.classList.add('pop')}
 
@@ -1738,7 +1741,7 @@ function bandNote(i,vis=true){try{audio();const f=BAND[i][2],t=ac.currentTime+.0
   const n=document.createElement('span');n.className='note-fx';n.textContent=pickOne(['♪','♫','♬']);n.style.left=(35+Math.random()*30)+'%';pad.appendChild(n);setTimeout(()=>n.remove(),1200)}
 async function playSeq(){
   const g=gen;B.mode='listen';B.pos=0;$$('.bpad').forEach(p=>p.classList.add('dim'));
-  B.say='Nghe Bíp hát nhé!';setSay(B.say);say(B.say);await wait(1300);
+  B.say='Nghe Bíp hát nhé!';setSay(B.say);await sayW(B.say,1000);
   // ear mode: in the demo the dinos stay still, so the child remembers the tune by sound; after a slip the lights come back for that round
   const vis=!B.ear||B.help;
   if(!vis){B.say='Nghe thật kỹ nhé!';setSay(B.say)}
@@ -1755,7 +1758,7 @@ function bandPress(i){
     B.mode='wait';stat('band',true);B.round++;const d=$$('#bdots i')[B.round-1];d&&d.classList.add('on');
     later(()=>{bipReact('happy');sparkEl($('.band-row'),30);say(pickOne(PRAISE()))},350);
     B.help=false;
-    if(B.round>=B.rounds){award(3);if(B.miss<=1)D.lvl.band++;else if(B.miss>=4&&D.lvl.band>0)D.lvl.band--;save();later(async()=>{say('Cả ban nhạc cùng hát nào!');await wait(1300);confetti(110);await bandJingle(true);later(()=>showDone('band',3,'Ban nhạc tuyệt vời!'),400)},900);return}
+    if(B.round>=B.rounds){award(3);if(B.miss<=1)D.lvl.band++;else if(B.miss>=4&&D.lvl.band>0)D.lvl.band--;save();later(async()=>{await sayW('Cả ban nhạc cùng hát nào!',1000);confetti(110);await bandJingle(true);later(()=>showDone('band',3,'Ban nhạc tuyệt vời!'),400)},900);return}
     B.seq.push(rand(0,B.n-1));later(async()=>{await bandJingle(false);later(playSeq,500)},800);
   }else{
     B.mode='wait';B.miss++;B.help=true;stat('band',false);later(()=>{tone('no');bipReact('sad');say('Gần đúng rồi! Nghe lại nhé.')},350);later(playSeq,2200);
@@ -1965,7 +1968,7 @@ function abcTrace(l){
   function chips(){$$('.sci').forEach((c,i)=>{c.classList.toggle('ok',i<T.k);c.classList.toggle('cur',i===T.k)})}
   function startStrokeSay(){if(T.k<strokes.length)say(`Nét ${T.k+1}: ${strokes[T.k].name}`)}
   async function demo(){if(T.demo||T.done)return;const g=gen;T.demo=true;T.k=0;T.prog=0;T.ink=[];chips();
-    say(`Xem Bíp viết chữ ${lsay(l)} nhé!`);await wait(1200);
+    await sayW(`Xem Bíp viết chữ ${lsay(l)} nhé!`,1000);
     for(let k=0;k<R.length;k++){if(g!==gen)return;T.k=k;T.prog=0;chips();say(`Nét ${k+1}: ${strokes[k].name}`);
       const pts=R[k],dur=isDot(k)?400:clamp(pts.length*28,700,2600),t0=performance.now();
       await new Promise(res=>{const step=()=>{if(g!==gen)return res();const f=Math.min(1,(performance.now()-t0)/dur);T.prog=Math.round(f*(pts.length-1));T.pen=pts[T.prog];if(f<1)requestAnimationFrame(step);else res()};step()});
@@ -2170,9 +2173,9 @@ function marketRound(){
 }
 async function mkTell(){
   const g=gen;MK.phase='listen';$('#mkm').hidden=true;$('#mkb').hidden=true;$('#mkq').hidden=false;const c=$('#mkc');c.innerHTML='';c.classList.remove('fade');
-  say(`${KID()} ơi, ${mkWho()} muốn ăn...`);await wait(1900);
-  for(const [e,n,q] of MK.list){if(g!==gen)return;c.insertAdjacentHTML('beforeend',`<span class="mki">${q>1?`<span class="mkq">${e}${e}</span>`:e}<b>${q>1?'2 ':''}${n}</b></span>`);tone('pop');say(q>1?`hai ${n}`:n);await wait(q>1?1700:1400)}
-  if(g!==gen)return;say(MK.units>MK.list.length?`Nhớ chưa? Tất cả ${MK.units} món nhé!`:`Nhớ chưa? ${MK.list.length} món nhé!`);await wait(2000);if(g!==gen)return;
+  await sayW(`${KID()} ơi, ${mkWho()} muốn ăn...`,1200);
+  for(const [e,n,q] of MK.list){if(g!==gen)return;c.insertAdjacentHTML('beforeend',`<span class="mki">${q>1?`<span class="mkq">${e}${e}</span>`:e}<b>${q>1?'2 ':''}${n}</b></span>`);tone('pop');await sayW(q>1?`hai ${n}`:n,q>1?1500:1200);await wait(300)}
+  if(g!==gen)return;await sayW(MK.units>MK.list.length?`Nhớ chưa? Tất cả ${MK.units} món nhé!`:`Nhớ chưa? ${MK.list.length} món nhé!`,1500);if(g!==gen)return;
   c.classList.add('fade');await wait(600);if(g!==gen)return;
   $('#mkq').hidden=true;MK.phase='shop';
   const all=shuffle([...MK.list,...MK.extra]);
@@ -2350,7 +2353,7 @@ async function syCheck(){
   const g=gen;const wrong=SY.slots.map((ci,i)=>ci!==i);
   if(!wrong.some(Boolean)){stat('story',true);tone('ok');bipReact('happy');SY.lock=SY.lock.map(()=>true);syDraw();
     const words=SY_WORDS(SY.cards.length);
-    for(let i=0;i<SY.cards.length;i++){if(g!==gen)return;const el=$$('.sy-slot')[i];el.classList.add('tell');say(`${words[i]}, ${capOf(SY.cards[i])}.`);sparkEl(el,10);await wait(1800);el.classList.remove('tell')}
+    for(let i=0;i<SY.cards.length;i++){if(g!==gen)return;const el=$$('.sy-slot')[i];el.classList.add('tell');sparkEl(el,10);await sayW(`${words[i]}, ${capOf(SY.cards[i])}.`,1400);await wait(350);el.classList.remove('tell')}
     if(g!==gen)return;syOffer();
   }else{SY.miss++;SY.slips=(SY.slips||0)+1;SY.first=false;stat('story',false);tone('no');bipReact('sad');say('Chưa đúng thứ tự. Thử lại nhé!');
     $$('.sy-slot').forEach((el,i)=>{if(wrong[i])restartAnim(el,'nope')});
@@ -2390,14 +2393,14 @@ async function syTell(){
   const words=SY_WORDS(SY.cards.length);
   for(let i=0;i<SY.cards.length;i++){if(g!==gen)return;const el=$$('.sy-slot')[i];el.classList.add('tell');
     SY.say=`${words[i]}...`;setSay(`${words[i]}... <span class="muted">(${KID()} kể tranh số ${i+1})</span>`);
-    hush();say(`${words[i]}`);await wait(1300);if(g!==gen)return;
+    hush();await sayW(`${words[i]}`,900);if(g!==gen)return;
     if(i===0&&rec)try{rec.start();recT0=Date.now()}catch(e){rec=null}
     await tapOr($('#syGo'),12000);if(g!==gen)return;el.classList.remove('tell');sparkEl(el,8)}
   let url=null;
   if(rec){await new Promise(r=>{rec.onstop=r;stop();setTimeout(r,1500)});if(chunks.length){const blob=new Blob(chunks,{type:chunks[0].type||'audio/mp4'});url=URL.createObjectURL(blob);
       VDB.put({id:Date.now()+'-'+Math.random().toString(36).slice(2,6),who:S.cur,t:Date.now(),title:SY.cards.map(capOf).join(' → '),sec:(Date.now()-recT0)/1000,blob}).catch(()=>{})}}else stop();
   if(g!==gen)return;SY.told++;stat('story',true);bipReact('happy');tone('chime');confetti(60);
-  if(url){p.innerHTML=`<div class="sy-act"><div class="sy-mic play">🎧 Nghe ${KID()} kể nè!</div></div>`;say(`Hay quá! Cùng nghe lại ${KID()} kể nhé!`);await wait(2200);if(g!==gen)return;
+  if(url){p.innerHTML=`<div class="sy-act"><div class="sy-mic play">🎧 Nghe ${KID()} kể nè!</div></div>`;await sayW(`Hay quá! Cùng nghe lại ${KID()} kể nhé!`,1500);if(g!==gen)return;
     await new Promise(r=>{const a=new Audio(url);a.onended=a.onerror=r;a.play().catch(r);onCleanup(()=>{try{a.pause()}catch(e){}});
       const els=$$('.sy-slot');let k=0;const iv=setInterval(()=>{els.forEach(e=>e.classList.remove('tell'));if(els[k])els[k].classList.add('tell');k=(k+1)%els.length},1800);onCleanup(()=>clearInterval(iv));a.addEventListener('ended',()=>{clearInterval(iv);els.forEach(e=>e.classList.remove('tell'))})});
     if(g!==gen)return}
@@ -2415,8 +2418,8 @@ function nextRound(cards){
     <div class="sy-pool">${opts.map((c,k)=>`<button class="sy-card" data-k="${c===ans?1:0}" style="animation-delay:${(.3+k*.1).toFixed(1)}s">${storyArt(c[0])}<b>${capOf(c)}</b></button>`).join('')}</div></div>`);
   wireCommon(()=>SY.say);
   const intro=unlockToast('storynext','Mới! Đoán xem chuyện gì xảy ra tiếp theo!');
-  (async()=>{const g=gen;if(intro){say('Mới! Đoán xem chuyện gì xảy ra tiếp theo!');await wait(3200)}
-    const w=SY_WORDS(n);for(let i=0;i<n-1;i++){if(g!==gen)return;const el=$$('.sy-slot')[i];el.classList.add('tell');say(`${w[i]}, ${capOf(cards[i])}.`);await wait(1700);el.classList.remove('tell')}
+  (async()=>{const g=gen;if(intro){await sayW('Mới! Đoán xem chuyện gì xảy ra tiếp theo!',1500);await wait(250)}
+    const w=SY_WORDS(n);for(let i=0;i<n-1;i++){if(g!==gen)return;const el=$$('.sy-slot')[i];el.classList.add('tell');await sayW(`${w[i]}, ${capOf(cards[i])}.`,1400);await wait(350);el.classList.remove('tell')}
     if(g===gen)say(SY.say)})();
   $$('.sy-card').forEach(b=>b.onclick=()=>{if(SY.busy)return;
     if(b.dataset.k==='1'){SY.busy=true;stat('story',true);tone('ok');bipReact('happy');b.classList.add('right');
@@ -2466,7 +2469,7 @@ function numOptions(ans,max,dots){const s=new Set([ans]);while(s.size<3){const v
 function numWin(msg){if(NM.busy)return;NM.busy=true;stat('num',true);tone('ok');bipReact('happy');confetti(50);say(msg);
   const lv=D.lvl.num||0;D.lvl.num=NM.first?lv+.5:NM.slips>=2&&lv>0?Math.max(0,lv-1):lv;save();NM.round++;dotOn(NM.round);
   if(NM.round>=NM.rounds){const st=starsFor(NM.miss);award(st);later(()=>showDone('num',st,'Đếm giỏi quá!'),2600)}else later(numRound,2700)}
-function numMissTap(msg){NM.miss++;NM.slips++;NM.first=false;stat('num',false);tone('no');bipReact('sad');say(msg)}
+function numMissTap(msg){NM.miss++;NM.slips++;NM.first=false;stat('num',false);tone('no');bipReact('sad');NM.msgP=sayW(msg,800)}
 function scatter(n,set,cls=''){return Array.from({length:n},(_,i)=>`<button class="nm-it${cls}" data-i="${i}" style="--r:${rand(-12,12)}deg;--y:${rand(-10,10)}px;animation-delay:${(i*.06).toFixed(2)}s">${set.art()}<b class="nm-badge"></b></button>`).join('')}
 // count: tap each one (one number per object), then pick how many there are
 function numCount(news){
@@ -2477,8 +2480,8 @@ function numCount(news){
   const ask=()=>{if($('#nc').innerHTML)return;NM.say=`Có tất cả mấy ${set.name}? Chọn số ở dưới nhé.`;setSay(NM.say);say(NM.say);$('#nc').innerHTML=numOptions(n,NM.cf.max,NM.cf.dots);
     $$('.nm-pick').forEach(b=>b.onclick=()=>{if(+b.dataset.n===n){b.classList.add('right');numWin(`${pickOne(PRAISE())} Có ${NUMW[n]} ${set.name}!`)}
       else{b.disabled=true;b.classList.add('nope');numMissTap('Chưa đúng. Mình đếm lại cùng nhau nhé!');recount()}})};
-  const recount=async()=>{const g=gen;const its=$$('#nf .nm-it');its.forEach(x=>{x.classList.remove('on');x.querySelector('.nm-badge').textContent=''});
-    for(let i=0;i<its.length;i++){if(g!==gen)return;its[i].classList.add('on');its[i].querySelector('.nm-badge').textContent=i+1;tone('pop');say(NUMW[i+1]);await wait(750)}};
+  const recount=async()=>{const g=gen;const its=$$('#nf .nm-it');its.forEach(x=>{x.classList.remove('on');x.querySelector('.nm-badge').textContent=''});await NM.msgP;if(g!==gen)return;
+    for(let i=0;i<its.length;i++){if(g!==gen)return;its[i].classList.add('on');its[i].querySelector('.nm-badge').textContent=i+1;tone('pop');await sayW(NUMW[i+1],750)}};
   $$('#nf .nm-it').forEach(b=>b.onclick=()=>{if(b.classList.contains('on'))return;NM.counted++;b.classList.add('on');b.querySelector('.nm-badge').textContent=NM.counted;tone('pop');hush();say(NUMW[NM.counted]);
     if(NM.counted===n)later(ask,900)});
 }
@@ -2505,8 +2508,8 @@ function numMore(news){
   numFrame(`<div class="nm-two">${grp(a,0,wide&&fewer===0)}<span class="nm-vs">?</span>${grp(b,1,wide&&fewer===1)}</div>`,NM.say);numSay(news,NM.say+' Chạm vào bên đó nhé.');
   $$('.nm-grp').forEach(el=>el.onclick=async()=>{if(NM.busy)return;
     if(+el.dataset.g===ans){el.classList.add('right');numWin(`${pickOne(PRAISE())} Bên này có ${NUMW[[a,b][ans]]}, bên kia có ${NUMW[[a,b][1-ans]]}.`)}
-    else{numMissTap('Mình đếm thử từng bên nhé!');NM.busy=true;const g=gen;
-      for(const [gi,gr] of $$('.nm-grp').entries()){const its=[...gr.querySelectorAll('.nm-gi')];for(let i=0;i<its.length;i++){if(g!==gen)return;its[i].classList.add('on');its[i].querySelector('.nm-badge').textContent=i+1;tone('pop');say(NUMW[i+1]);await wait(650)}await wait(500)}
+    else{numMissTap('Mình đếm thử từng bên nhé!');NM.busy=true;const g=gen;await NM.msgP;
+      for(const [gi,gr] of $$('.nm-grp').entries()){const its=[...gr.querySelectorAll('.nm-gi')];for(let i=0;i<its.length;i++){if(g!==gen)return;its[i].classList.add('on');its[i].querySelector('.nm-badge').textContent=i+1;tone('pop');await sayW(NUMW[i+1],650)}await wait(500)}
       if(g===gen){NM.busy=false;say(NM.say)}}})
 }
 // missing number on a number track
