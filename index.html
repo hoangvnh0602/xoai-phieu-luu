@@ -687,6 +687,10 @@ body.sleep h1{color:#FFE28A}
 .chip{background:var(--sky2);border-radius:999px;padding:10px 18px;font-weight:800;font-size:18px}
 .chip.sel{background:var(--ink);color:#fff}
 table{border-collapse:collapse;width:100%;font-size:18px;font-variant-numeric:tabular-nums}
+.rp-tips{margin:0;padding-left:4px;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:17px}
+.rp-bar{display:inline-block;width:80px;height:10px;border-radius:9px;background:#E4F0F5;vertical-align:middle;overflow:hidden}.rp-bar i{display:block;height:100%;border-radius:9px}
+a.chip{text-decoration:none;color:inherit;display:inline-flex;align-items:center}
+.vrow{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #E4F0F5;flex-wrap:wrap}.vrow .vt{flex:1;min-width:180px}.vrow small{color:var(--soft)}
 .lvt td.lvd{font-size:15px;color:var(--soft)}.lvt .chip{min-width:44px}
 td,th{padding:8px 6px;border-bottom:1px solid #DDE8EE;text-align:left}
 td:not(:first-child),th:not(:first-child){text-align:right}
@@ -2277,9 +2281,23 @@ function syOffer(){const p=$('#syPool');if(!p)return;
   p.innerHTML=`<div class="sy-act"><button class="big-btn go pulse" id="syTell">🎤 ${KID()} kể lại</button><button class="big-btn alt" id="syNext">▶ Truyện khác</button></div>`;
   SY.say=`${KID()} kể lại truyện cho Bíp nghe nhé!`;setSay(SY.say);say(SY.say);
   $('#syTell').onclick=()=>{tone('tap');syTell()};$('#syNext').onclick=()=>{tone('tap');syAdvance()}}
+const VDB={p:null,open(){return this.p||(this.p=new Promise((ok,no)=>{const r=indexedDB.open('xpl-voice',1);r.onupgradeneeded=()=>r.result.createObjectStore('rec',{keyPath:'id'});r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)}))},
+  async tx(mode,fn){const db=await this.open();return new Promise((ok,no)=>{const t=db.transaction('rec',mode),st=t.objectStore('rec');const r=fn(st);t.oncomplete=()=>ok(r&&r.result);t.onerror=()=>no(t.error)})},
+  async all(){return ((await this.tx('readonly',s=>s.getAll()))||[]).filter(x=>x.who===S.cur).sort((a,b)=>b.t-a.t)},
+  async put(o){await this.tx('readwrite',s=>s.put(o));const mine=await this.all();for(const x of mine.slice(30))await this.del(x.id)},
+  del(id){return this.tx('readwrite',s=>s.delete(id))}};
+async function voiceLib(){const el=$('#vlib');if(!el)return;let list=[];try{list=await VDB.all()}catch(e){el.innerHTML='<span class="muted">Máy này không lưu được ghi âm.</span>';return}
+  if(!$('#vlib'))return;
+  if(!list.length){el.innerHTML=`<span class="muted">Chưa có bài kể nào. Trong trò Thứ tự tranh, sau khi xếp đúng, bấm “🎤 ${KID()} kể lại”: giọng bé sẽ được lưu ở đây để bố mẹ nghe lại.</span>`;return}
+  const urls=[];el.innerHTML=`<p class="muted" style="margin:0 0 4px">${list.length} bài kể gần nhất, lưu trên máy này (tối đa 30).</p>`+list.map((r,i)=>{const u=URL.createObjectURL(r.blob);urls.push(u);
+    return `<div class="vrow"><span class="vt"><b>${r.title}</b><br><small>${new Date(r.t).toLocaleString('vi-VN',{weekday:'short',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})} · ${Math.max(1,Math.round(r.sec||0))} giây</small></span>
+      <button class="chip" data-vp="${i}">▶ Nghe</button><a class="chip" href="${u}" download="xoai-ke-chuyen-${new Date(r.t).toISOString().slice(0,10)}.${/mp4|aac/.test(r.blob.type)?'m4a':'webm'}">⬇ Tải về</a><button class="chip" data-vd="${r.id}" aria-label="Xoá">🗑</button></div>`}).join('');
+  let cur=null;$$('[data-vp]').forEach(b=>b.onclick=()=>{if(cur){cur.pause()}hush();musicOff();cur=new Audio(urls[+b.dataset.vp]);cur.play().catch(()=>{})});
+  $$('[data-vd]').forEach(b=>b.onclick=async()=>{await VDB.del(b.dataset.vd);voiceLib()});
+  onCleanup(()=>{if(cur)cur.pause();urls.forEach(u=>URL.revokeObjectURL(u))})}
 const tapOr=(el,ms)=>new Promise(r=>{const t=setTimeout(r,ms);if(el)el.onclick=()=>{clearTimeout(t);tone('tap');r()}});
 async function syTell(){
-  const g=gen,p=$('#syPool');let rec=null,stream=null;const chunks=[];
+  const g=gen,p=$('#syPool');let rec=null,stream=null,recT0=Date.now();const chunks=[];
   // the child's own voice is recorded when the tablet allows the microphone, then played back; without it the guided telling still works
   try{stream=await navigator.mediaDevices.getUserMedia({audio:true});rec=new MediaRecorder(stream);rec.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)}}catch(e){rec=null}
   const stop=()=>{try{rec&&rec.state!=='inactive'&&rec.stop()}catch(e){}try{stream&&stream.getTracks().forEach(t=>t.stop())}catch(e){}};onCleanup(stop);
@@ -2290,10 +2308,11 @@ async function syTell(){
   for(let i=0;i<SY.cards.length;i++){if(g!==gen)return;const el=$$('.sy-slot')[i];el.classList.add('tell');
     SY.say=`${words[i]}...`;setSay(`${words[i]}... <span class="muted">(${KID()} kể tranh số ${i+1})</span>`);
     hush();say(`${words[i]}`);await wait(1300);if(g!==gen)return;
-    if(i===0&&rec)try{rec.start()}catch(e){rec=null}
+    if(i===0&&rec)try{rec.start();recT0=Date.now()}catch(e){rec=null}
     await tapOr($('#syGo'),12000);if(g!==gen)return;el.classList.remove('tell');sparkEl(el,8)}
   let url=null;
-  if(rec){await new Promise(r=>{rec.onstop=r;stop();setTimeout(r,1500)});if(chunks.length)url=URL.createObjectURL(new Blob(chunks,{type:chunks[0].type||'audio/mp4'}))}else stop();
+  if(rec){await new Promise(r=>{rec.onstop=r;stop();setTimeout(r,1500)});if(chunks.length){const blob=new Blob(chunks,{type:chunks[0].type||'audio/mp4'});url=URL.createObjectURL(blob);
+      VDB.put({id:Date.now()+'-'+Math.random().toString(36).slice(2,6),who:S.cur,t:Date.now(),title:SY.cards.map(capOf).join(' → '),sec:(Date.now()-recT0)/1000,blob}).catch(()=>{})}}else stop();
   if(g!==gen)return;SY.told++;stat('story',true);bipReact('happy');tone('chime');confetti(60);
   if(url){p.innerHTML=`<div class="sy-act"><div class="sy-mic play">🎧 Nghe ${KID()} kể nè!</div></div>`;say(`Hay quá! Cùng nghe lại ${KID()} kể nhé!`);await wait(2200);if(g!==gen)return;
     await new Promise(r=>{const a=new Audio(url);a.onended=a.onerror=r;a.play().catch(r);onCleanup(()=>{try{a.pause()}catch(e){}});
@@ -2425,8 +2444,30 @@ function shopAction(){const it=SH.sel,sd=shopData(),p=D.pet;if(!it)return;p.wear
 // ---------- daily history for the parent report ----------
 function logDay(){if(!D.day||!(D.used>0||Object.keys(D.stats||{}).length))return;
   let ok=0,no=0;Object.values(D.stats||{}).forEach(s=>{ok+=s.ok;no+=s.no});
-  D.hist=(D.hist||[]).filter(h=>h.day!==D.day);D.hist.push({day:D.day,min:Math.round(D.used/60),ok,no,tasks:D.daily&&D.daily.day===D.day?D.daily.tasks.filter(t=>t.done).length:0});
-  D.hist=D.hist.slice(-14)}
+  D.hist=(D.hist||[]).filter(h=>h.day!==D.day);D.hist.push({day:D.day,min:Math.round(D.used/60),ok,no,g:JSON.parse(JSON.stringify(D.stats||{})),tasks:D.daily&&D.daily.day===D.day?D.daily.tasks.filter(t=>t.done).length:0});
+  D.hist=D.hist.slice(-28)}
+// ---------- progress report for the parent (by skill, this week vs last week) ----------
+const SKILLS=[['🔤','Chữ cái','abc'],['🧩','Logic, lập trình','code','pattern'],['🧠','Trí nhớ','memory','hide','market','band'],['🎨','Màu sắc, phản xạ','catch'],['📖','Kể chuyện, thứ tự','story']];
+const dayKey=i=>{const d=new Date(Date.now()-i*864e5);return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()};
+function gameStats(from,to){const out={};const add=g=>Object.entries(g||{}).forEach(([k,v])=>{const o=out[k]||(out[k]={ok:0,no:0});o.ok+=v.ok||0;o.no+=v.no||0});
+  for(let i=from;i<=to;i++){if(i===0)add(D.stats);else{const h=(D.hist||[]).find(x=>x.day===dayKey(i));h&&add(h.g)}}return out}
+function reportHTML(){
+  const now=gameStats(0,6),prev=gameStats(7,13);
+  const sk=SKILLS.map(([ic,name,...gs])=>{const f=st=>gs.reduce((a,g)=>({ok:a.ok+((st[g]||{}).ok||0),no:a.no+((st[g]||{}).no||0)}),{ok:0,no:0});
+    const a=f(now),b=f(prev),n=a.ok+a.no,pct=n?Math.round(a.ok/n*100):null,pp=b.ok+b.no?Math.round(b.ok/(b.ok+b.no)*100):null;return {ic,name,gs,n,pct,pp}});
+  const played=sk.filter(x=>x.n>=8);const best=played.slice().sort((a,b)=>b.pct-a.pct)[0];const weak=played.slice().sort((a,b)=>a.pct-b.pct)[0];
+  const idle=sk.filter(x=>x.n===0).map(x=>x.name.toLowerCase());
+  const tips=[];
+  if(best&&best.pct>=80)tips.push(`🌟 ${KID()} đang làm rất tốt phần <b>${best.name.toLowerCase()}</b> (${best.pct}% đúng).`);
+  if(weak&&weak!==best&&weak.pct<70)tips.push(`💪 Phần <b>${weak.name.toLowerCase()}</b> còn khó (${weak.pct}% đúng). Bố mẹ có thể ngồi chơi cùng bé vài lượt, hoặc bấm − ở mục Độ khó.`);
+  if(idle.length)tips.push(`👀 Tuần này chưa chơi: ${idle.join(', ')}.`);
+  const ab=abcData();tips.push(`🔤 Đã tập viết ${ab.learned.length}/29 chữ cái${ab.learned.length?`: ${ab.learned.slice(-8).join(', ')}${ab.learned.length>8?'…':''}`:''}.`);
+  if(!tips.length)tips.push('Chơi thêm vài ngày để có đủ số liệu nhé.');
+  return `<ul class="rp-tips">${tips.map(t=>`<li>${t}</li>`).join('')}</ul>
+    <table class="lvt rp"><tr><th>Kỹ năng</th><th>7 ngày qua</th><th>So với tuần trước</th></tr>${sk.map(x=>`<tr><td>${x.ic} ${x.name}</td>
+      <td>${x.n?`<span class="rp-bar"><i style="width:${x.pct}%;background:${x.pct>=80?'#38B26A':x.pct>=60?'#FFC83D':'#FF8A3D'}"></i></span> ${x.pct}% <span class="muted">(${x.n} lượt)</span>`:'<span class="muted">chưa chơi</span>'}</td>
+      <td>${x.pct!=null&&x.pp!=null?(x.pct-x.pp>=5?`<b style="color:#2A8F53">▲ ${x.pct-x.pp}%</b>`:x.pp-x.pct>=5?`<b style="color:#C93A55">▼ ${x.pp-x.pct}%</b>`:'≈ như cũ'):'<span class="muted">—</span>'}</td></tr>`).join('')}</table>
+    <p class="muted" style="margin:0">Số liệu theo từng kỹ năng được ghi từ ngày 24/10/2026; sau 1–2 tuần phần so sánh mới đầy đủ.</p>`}
 function weekHTML(){
   const days=[];for(let i=6;i>=0;i--){const d=new Date(Date.now()-i*864e5),key=d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
     let h=(D.hist||[]).find(x=>x.day===key);
@@ -2582,6 +2623,8 @@ function showParent(){
   const rows=Object.entries(GAMES).map(([k,n])=>{const s=D.stats[k]||{ok:0,no:0};return `<tr><td>${n}</td><td>${s.ok}</td><td>${s.no}</td></tr>`}).join('');
   const L=D.lvl;
   render(`<div class="center" style="justify-content:flex-start"><div class="panel">
+    <h2>Tiến bộ của ${KID()}</h2>${reportHTML()}
+    <h2>🎙️ Thư viện giọng kể</h2><div id="vlib"><span class="muted">Đang tải…</span></div>
     <h2>7 ngày qua của ${KID()}</h2>${weekHTML()}
     <h2>Hôm nay của ${KID()}</h2>
     <p style="margin:0;font-size:20px">Đã chơi <b>${Math.round(D.used/60)} phút</b> / giới hạn ${D.limit+D.bonus} phút</p>
@@ -2610,6 +2653,7 @@ function showParent(){
     <button class="big-btn" id="back" style="align-self:flex-start">Xong</button></div></div>`);
   $$('[data-m]').forEach(b=>b.onclick=()=>{D.limit=+b.dataset.m;save();showParent()});
   if($('#clrErr'))$('#clrErr').onclick=()=>{D.errLog=[];save();showParent()};
+  voiceLib();
   $$('[data-lv]').forEach(b=>b.onclick=()=>{const k=b.dataset.lv;D.lvl[k]=clamp((D.lvl[k]||0)+(+b.dataset.d),0,LV_MAX[k]);save();showParent()});
   $('#plus').onclick=()=>{D.bonus+=10;save();showParent()};
   const sample=()=>say(`Chào ${KID()}! Mình là Bíp. Tìm quả trứng màu đỏ nào!`);
