@@ -147,6 +147,11 @@ svg .b-armL{transform-origin:100% 50%}svg .b-armR{transform-origin:0% 50%}
 
 /* Adventure map */
 .map-holder{flex:1;min-height:0;width:100%;display:grid;place-items:center}
+@media (orientation:portrait){.map-holder{overflow:hidden;flex:none;padding-block:10px;display:flex;align-items:center;justify-content:flex-start}.map-holder .map{flex:none}.map{border-radius:0;box-shadow:none}}
+.home-tasks{display:none}
+@media (orientation:portrait){.home-tasks{display:flex;flex-direction:column;gap:10px;width:100%;max-width:640px;flex:1;min-height:0;justify-content:center}
+  .home-tasks .ht-t{font:800 clamp(20px,3.2vw,28px) var(--display);text-align:center}
+  .home-tasks .mrow{background:var(--card);border-radius:22px;box-shadow:0 5px 0 rgba(29,54,70,.14);min-height:72px}}
 .map{position:relative;border-radius:30px;overflow:hidden;box-shadow:0 0 0 6px #fff,0 14px 0 6px rgba(29,54,70,.16);--mh:500px;animation:popIn .5s backwards}
 .map>svg.mapbg{position:absolute;inset:0;width:100%;height:100%}
 .map .waves path{animation:waves 5s linear infinite}
@@ -689,7 +694,16 @@ td:not(:first-child),th:not(:first-child){text-align:right}
 .muted{color:var(--soft);font-size:16px}
 input{user-select:text;-webkit-user-select:text;color:var(--ink);background:var(--card)}
 .txt{font:inherit;font-size:20px;padding:10px 16px;border-radius:16px;border:2px solid #CFDDE6;width:100%;max-width:320px;box-sizing:border-box;margin-top:6px}
-.pgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(clamp(130px,17vw,180px),1fr));gap:clamp(12px,2vw,22px);width:100%;max-width:900px;justify-content:center}
+.welcome{display:flex;align-items:flex-end;justify-content:center;gap:clamp(8px,3vw,40px);width:100%}
+.wc{flex:none;background:none;padding:0;border:0;filter:drop-shadow(0 8px 0 rgba(29,54,70,.15))}
+.wc-bip svg{width:clamp(96px,15vw,170px);height:auto;animation:bob 2.4s ease-in-out infinite}
+.wc-com img{width:clamp(110px,18vw,210px);height:auto;display:block;animation:bob 2.8s ease-in-out -.9s infinite}
+.wc.hop{animation:wcHop .6s cubic-bezier(.3,1.6,.5,1)}@keyframes wcHop{40%{transform:translateY(-22px) scale(1.06)}}
+.wc-mid{display:flex;flex-direction:column;align-items:center;gap:4px;padding-bottom:clamp(6px,2vh,24px);min-width:0}
+.wc-mid h1{margin:0;text-align:center}
+.wc-hi{background:#fff;border-radius:999px;padding:6px 18px;font:800 clamp(18px,2.6vw,26px) var(--display);color:var(--berry);box-shadow:0 4px 0 rgba(29,54,70,.12);animation:popIn .6s cubic-bezier(.3,1.6,.5,1)}
+@media (orientation:portrait){.welcome{flex-wrap:wrap}.wc-mid{order:3;width:100%}.wc-bip svg{width:26vw}.wc-com img{width:32vw}}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(clamp(130px,17vw,180px),230px));gap:clamp(12px,2vw,22px);width:100%;max-width:900px;justify-content:center}
 .pcard{background:var(--card);border-radius:30px;padding:clamp(14px,2.4vh,24px) 10px;display:flex;flex-direction:column;align-items:center;gap:6px;position:relative;box-shadow:0 8px 0 rgba(29,54,70,.18)}
 .pcard:active{transform:translateY(5px);box-shadow:0 3px 0 rgba(29,54,70,.18)}
 .pcard .pic{font-size:clamp(56px,9vw,84px);line-height:1}
@@ -1033,16 +1047,23 @@ function showStart(manage=false){
   screen='start';
   const cards=S.profiles.map(p=>`<button class="pcard" data-p="${p.id}"><span class="pic">${p.icon}</span><b>${p.name}</b>${p.pin?'<i class="pl" aria-label="Có mã">🔒</i>':''}${p.test?'<small>Người lớn</small>':''}${manage?'<i class="pe">✏️</i>':''}</button>`).join('');
   render(`<div class="top"><span></span>${manage?'<button class="chipbtn" id="done">✓ Xong</button>':'<button class="icon-btn lock" id="lock" aria-label="Quản lý hồ sơ">⚙️</button>'}</div>
-    <div class="center" style="max-width:1000px">${manage?'':bip('bip" style="width:clamp(90px,14vw,150px)')}
-    <h1>${manage?'Quản lý hồ sơ':'Ai đang chơi nào?'}</h1>
+    <div class="center" style="max-width:1100px">
+    ${manage?'':`<div class="welcome"><button class="wc wc-bip" id="wcBip" aria-label="Bíp">${bip('x','wave')}</button>
+      <div class="wc-mid"><div class="wc-hi">${hiWord()}</div><h1>Ai đang chơi nào?</h1></div>
+      <button class="wc wc-com" id="wcCom" aria-label="Bé Cốm"><img src="${COM_SRC.chao}" alt="" draggable="false"></button></div>`}
+    ${manage?'<h1>Quản lý hồ sơ</h1>':''}
     ${manage?'<p class="muted" style="margin:0">Chạm vào hồ sơ để sửa tên, biểu tượng, mã hoặc xoá.</p>':''}
     <div class="pgrid">${cards}${manage?'<button class="pcard add" id="add"><span class="pic">＋</span><b>Thêm hồ sơ</b></button>':''}</div></div>`);
   $$('[data-p]').forEach(b=>b.onclick=()=>{tone('tap');const p=S.profiles.find(x=>x.id===b.dataset.p);
     const go=()=>manage?editProfile(p):enterProfile(p.id);
     p.pin?askPin(p,go,()=>showStart(manage)):go()});
   if(manage){$('#done').onclick=()=>showStart();$('#add').onclick=()=>editProfile(null)}
-  else $('#lock').onclick=()=>{parentBack='start';showGate(()=>showStart(true))};
+  else{$('#lock').onclick=()=>{parentBack='start';showGate(()=>showStart(true))};
+    // tapping the characters is the first touch on a fresh launch, so it also unlocks sound and speech
+    $('#wcBip').onclick=()=>{tone('giggle');restartAnim($('#wcBip'),'hop');say(`${hiWord()} Chạm vào tên của mình để vào chơi nhé!`)};
+    $('#wcCom').onclick=()=>{tone('roar');restartAnim($('#wcCom'),'hop');say('Bé Cốm chào bạn!')}}
 }
+function hiWord(){const h=new Date().getHours();return h<11?'Chào buổi sáng!':h<14?'Chào buổi trưa!':h<18?'Chào buổi chiều!':'Chào buổi tối!'}
 function keypadHTML(keys){return `<div class="keypad">${keys.map(k=>k===''?'<span></span>':`<button data-k="${k}">${k}</button>`).join('')}</div>`}
 function askPin(p,ok,cancel){
   screen='gate';let typed='';
@@ -1166,7 +1187,10 @@ function showHome(){
     <div class="map-holder"><div class="map" id="map">${mapSVG()}${st}
       <div class="mapbip" id="mb">${bip('x','walk')}</div>${D.pet.hatched?`<button class="mappet" id="mp" aria-label="${D.pet.name}" style="left:34%;top:57%">${dino(D.pet)}</button>`:''}
       <div class="map-time" aria-label="Thời gian chơi còn lại">⏳<div class="timebar"><i style="width:${leftPct()}%"></i></div></div>
-    </div></div>`);
+    </div></div>
+    <div class="home-tasks" id="ht">${homeTasksHTML(dly)}</div>`);
+  $$('#ht [data-ht]').forEach(b=>b.onclick=()=>{tone('tap');const t=dly.tasks[+b.dataset.ht];const i=STATIONS.findIndex(s=>s.g===t.g);const st=$(`[data-st="${i}"]`);st&&st.click()});
+  if($('#htClaim'))$('#htClaim').onclick=()=>{tone('tap');missionSheet(false)};
   sizeMap();onResize(sizeMap);placeMB(D.lastSt,false);
   let moving=false;
   $$('.station').forEach(b=>b.onclick=()=>{if(moving)return;const i=+b.dataset.st;const s=STATIONS[i];tone('tap');
@@ -1189,7 +1213,10 @@ function wander(){const mp=$('#mp');if(!mp)return;let nxt;do{nxt=pickOne(SPOTS)}
   mp.style.transitionDuration=dur+'s';mp.style.left=nxt[0]+'%';mp.style.top=nxt[1]+'%';MP=nxt;mp.classList.add('walk');
   later(()=>{mp.classList.remove('walk');if(Math.random()<.35){mp.classList.add('hop');later(()=>mp.classList.remove('hop'),700)}},dur*1000);
   later(wander,dur*1000+rand(1500,4000))}
-function sizeMap(){const h=$('.map-holder'),m=$('#map');if(!h||!m)return;const w=Math.min(h.clientWidth,h.clientHeight*1.6);m.style.width=w+'px';m.style.height=(w/1.6)+'px';m.style.setProperty('--mh',(w/1.6)+'px')}
+function homeTasksHTML(d){const all=d.tasks.every(t=>t.done);
+  return `<div class="ht-t">📋 Nhiệm vụ hôm nay</div>${d.tasks.map((t,i)=>`<button class="mrow${t.done?' done':''}" data-ht="${i}"><span class="mic" style="background:${(STATIONS.find(s=>s.g===t.g)||{}).col||'#eee'}">${stArt(t.g)}</span><span class="mtx">${taskName(t)}</span><span class="mck">${t.done?'✅':'▶'}</span></button>`).join('')}
+    ${all&&!d.claimed?'<button class="big-btn go pulse" id="htClaim">🎁 Mở rương quà</button>':''}`}
+function sizeMap(){const h=$('.map-holder'),m=$('#map');if(!h||!m)return;const port=innerHeight>innerWidth;let w;if(port){w=h.clientWidth*1.16;h.style.height=(w/1.6+20)+'px';m.style.marginLeft=((h.clientWidth-w)/2)+'px'}else{h.style.height='';m.style.marginLeft='';w=Math.min(h.clientWidth,h.clientHeight*1.6)}m.style.width=w+'px';m.style.height=(w/1.6)+'px';m.style.setProperty('--mh',(w/1.6)+'px')}
 function placeMB(i,anim){const mb=$('#mb');if(!mb)return;const s=STATIONS[i];if(!anim){mb.style.transition='none'}
   const nx=s.x-7,ox=parseFloat(mb.style.left);if(anim&&!isNaN(ox)&&Math.abs(nx-ox)>1)mb.classList.toggle('flip',nx<ox);
   mb.style.left=nx+'%';mb.style.top=(s.y-3)+'%';
