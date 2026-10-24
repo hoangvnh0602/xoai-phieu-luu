@@ -687,6 +687,12 @@ body.sleep h1{color:#FFE28A}
 .chip{background:var(--sky2);border-radius:999px;padding:10px 18px;font-weight:800;font-size:18px}
 .chip.sel{background:var(--ink);color:#fff}
 table{border-collapse:collapse;width:100%;font-size:18px;font-variant-numeric:tabular-nums}
+.station.fire .st-ring{animation:fireGlow 1.6s ease-in-out infinite}
+@keyframes fireGlow{50%{filter:drop-shadow(0 0 calc(var(--mh)*.03) #FF8A3D) drop-shadow(0 0 calc(var(--mh)*.012) #FFC83D)}}
+.st-fire{position:absolute;bottom:-14%;left:50%;transform:translateX(-50%);background:linear-gradient(#FF8A3D,#F04438);color:#fff;font-weight:800;font-size:clamp(11px,calc(var(--mh)*.03),17px);padding:.1em .6em;border-radius:999px;white-space:nowrap;box-shadow:0 3px 0 rgba(29,54,70,.2);animation:pulse 1.2s ease-in-out infinite;z-index:3}
+.fx2{display:inline-block;margin-left:6px;background:linear-gradient(#FF8A3D,#F04438);color:#fff;border-radius:999px;padding:0 .5em;font-size:.8em;vertical-align:middle}
+.mrow.fire{box-shadow:0 0 0 3px #FF8A3D!important}.sheet button.fire{box-shadow:0 0 0 3px #FF8A3D}
+.fire-banner{background:linear-gradient(#FF8A3D,#F04438);color:#fff;font:800 clamp(18px,2.6vw,24px) var(--display);padding:8px 20px;border-radius:999px;box-shadow:0 5px 0 rgba(29,54,70,.2);animation:popIn .6s cubic-bezier(.3,1.6,.5,1) 1.4s backwards}
 .rp-tips{margin:0;padding-left:4px;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:17px}
 .rp-bar{display:inline-block;width:80px;height:10px;border-radius:9px;background:#E4F0F5;vertical-align:middle;overflow:hidden}.rp-bar i{display:block;height:100%;border-radius:9px}
 a.chip{text-decoration:none;color:inherit;display:inline-flex;align-items:center}
@@ -1200,8 +1206,8 @@ function showHome(){
   screen='home';
   if(D.lastSt==null||D.lastSt>=STATIONS.length)D.lastSt=0;const dly=ensureDaily(),todo=dly.tasks.filter(t=>!t.done).map(t=>t.g);
   const st=STATIONS.map((s,i)=>{const [b,alert]=stBadge(s.g);const nm=s.g==='pet'?(D.pet.hatched?'Nhà '+D.pet.name:'Trứng bí ẩn'):s.name;
-    return `<button class="station${todo.includes(s.g)?' mtask':''}${ST_IMG[s.g]?' pic':''}" data-st="${i}" style="left:${s.x}%;top:${s.y}%;--d:${(i*.09).toFixed(2)}s" aria-label="${nm}">
-      <span class="st-ring" style="background:${s.col};animation-delay:${(-i*.5).toFixed(1)}s">${stArt(s.g)}</span><span class="st-name">${nm}</span><span class="st-badge${alert?' alert':''}">${b}</span></button>`}).join('');
+    return `<button class="station${todo.map(stOf).includes(s.g)?' mtask':''}${ST_IMG[s.g]?' pic':''}${isFire(s.g)?' fire':''}" data-st="${i}" style="left:${s.x}%;top:${s.y}%;--d:${(i*.09).toFixed(2)}s" aria-label="${nm}">
+      <span class="st-ring" style="background:${s.col};animation-delay:${(-i*.5).toFixed(1)}s">${stArt(s.g)}</span><span class="st-name">${nm}</span>${isFire(s.g)?'<span class="st-fire">🔥 x2</span>':''}<span class="st-badge${alert?' alert':''}">${b}</span></button>`}).join('');
   render(`<div class="top"><div class="row"><button class="pill" id="who" aria-label="Đổi người chơi" ${isTest()?'style="background:#FFE08A"':''}>${curP().icon} ${curP().name} ⇄</button><div class="pill">⭐ <span id="starN">${D.stars}</span></div><button class="pill mis" id="mis" aria-label="Nhiệm vụ hôm nay"></button>${D.pet.hatched?'<button class="pill" id="shopP" aria-label="Cửa hàng">🛍️</button>':''}</div>
       <div class="row"><button class="icon-btn" id="mus" aria-label="Nhạc nền" style="width:48px;height:48px;font-size:22px">${D.music?'🎵':'🔇'}</button><button class="icon-btn lock" id="lock" aria-label="Dành cho bố mẹ">🔒</button></div></div>
     <div class="map-holder"><div class="map" id="map">${mapSVG()}${st}
@@ -1209,7 +1215,7 @@ function showHome(){
       <div class="map-time" aria-label="Thời gian chơi còn lại">⏳<div class="timebar"><i style="width:${leftPct()}%"></i></div></div>
     </div></div>
     <div class="home-tasks" id="ht">${homeTasksHTML(dly)}</div>`);
-  $$('#ht [data-ht]').forEach(b=>b.onclick=()=>{tone('tap');const t=dly.tasks[+b.dataset.ht];const i=STATIONS.findIndex(s=>s.g===t.g);const st=$(`[data-st="${i}"]`);st&&st.click()});
+  $$('#ht [data-ht]').forEach(b=>b.onclick=()=>{tone('tap');runTask(dly.tasks[+b.dataset.ht])});
   if($('#htClaim'))$('#htClaim').onclick=()=>{tone('tap');missionSheet(false)};
   sizeMap();onResize(sizeMap);placeMB(D.lastSt,false);
   let moving=false;
@@ -1234,7 +1240,7 @@ function wander(){const mp=$('#mp');if(!mp)return;let nxt;do{nxt=pickOne(SPOTS)}
   later(()=>{mp.classList.remove('walk');if(Math.random()<.35){mp.classList.add('hop');later(()=>mp.classList.remove('hop'),700)}},dur*1000);
   later(wander,dur*1000+rand(1500,4000))}
 function homeTasksHTML(d){const all=d.tasks.every(t=>t.done);
-  return `<div class="ht-t">📋 Nhiệm vụ hôm nay</div>${d.tasks.map((t,i)=>`<button class="mrow${t.done?' done':''}" data-ht="${i}"><span class="mic" style="background:${(STATIONS.find(s=>s.g===t.g)||{}).col||'#eee'}">${stArt(t.g)}</span><span class="mtx">${taskName(t)}</span><span class="mck">${t.done?'✅':'▶'}</span></button>`).join('')}
+  return `<div class="ht-t">📋 Nhiệm vụ hôm nay</div>${d.tasks.map((t,i)=>`<button class="mrow${t.done?' done':''}${d.fire===t.g&&!d.fireDone?' fire':''}" data-ht="${i}">${taskIcon(t)}<span class="mtx">${taskName(t)}${d.fire===t.g&&!d.fireDone?' <b class="fx2">🔥 x2 sao</b>':''}</span><span class="mck">${t.done?'✅':'▶'}</span></button>`).join('')}
     ${all&&!d.claimed?'<button class="big-btn go pulse" id="htClaim">🎁 Mở rương quà</button>':''}`}
 function sizeMap(){const h=$('.map-holder'),m=$('#map');if(!h||!m)return;const port=innerHeight>innerWidth;let w;if(port){w=h.clientWidth*1.16;h.style.height=(w/1.6+20)+'px';m.style.marginLeft=((h.clientWidth-w)/2)+'px'}else{h.style.height='';m.style.marginLeft='';w=Math.min(h.clientWidth,h.clientHeight*1.6)}m.style.width=w+'px';m.style.height=(w/1.6)+'px';m.style.setProperty('--mh',(w/1.6)+'px')}
 function placeMB(i,anim){const mb=$('#mb');if(!mb)return;const s=STATIONS[i];if(!anim){mb.style.transition='none'}
@@ -2005,7 +2011,7 @@ function brainSheet(){
     ['market',`Đi chợ cho ${D.pet.hatched?D.pet.name:'Bíp'}`,'<span class="se2">🧺</span>'],
     ['pattern','Quy luật tiếp theo',`<svg viewBox="0 0 130 60">${['#FF5C7A','#4C9BF5','#FF5C7A','#4C9BF5'].map((c,i)=>`<ellipse cx="${16+i*30}" cy="32" rx="11" ry="14" fill="${c}" stroke="#1D3646" stroke-width="3"/>`).join('')}<text x="118" y="42" font-family="Baloo 2,system-ui" font-weight="800" font-size="30" fill="#1D3646">?</text></svg>`],
     ['story','Chuyện gì xảy ra trước?','<span class="se2">🥚➜🐣</span>']];
-  m.insertAdjacentHTML('beforeend',`<div class="sheet-wrap" id="sw"><div class="sheet"><b class="sheet-t">🧠 Vườn Tư Duy</b>${items.map(([g,n,a])=>`<button data-b="${g}"><span>${a}</span>${n}</button>`).join('')}</div></div>`);
+  m.insertAdjacentHTML('beforeend',`<div class="sheet-wrap" id="sw"><div class="sheet"><b class="sheet-t">🧠 Vườn Tư Duy</b>${items.map(([g,n,a])=>`<button data-b="${g}"${isFire(g)?' class="fire"':''}><span>${a}</span>${n}${isFire(g)?'<b class="fx2">🔥 x2</b>':''}</button>`).join('')}</div></div>`);
   say('Chọn trò ở Vườn Tư Duy nào!');
   $('#sw').onclick=e=>{if(e.target.id==='sw'){tone('tap');$('#sw').remove()}};
   $$('[data-b]').forEach(b=>b.onclick=()=>{tone('tap');startGame(b.dataset.b)});
@@ -2358,29 +2364,43 @@ function whyRound(lv){
     else{SY.miss++;SY.slips++;SY.first=false;stat('story',false);tone('no');bipReact('sad');b.disabled=true;b.classList.add('used');say('Hmm, chưa đúng. Nghĩ lại nhé!')}})}
 
 // ================= Nhiệm vụ hôm nay + cửa hàng + lịch sử =================
-const TASK_NAME={brain:'Chơi ở Vườn Tư Duy',abc:'Học chữ ở Lâu Đài',code:'Đưa Bíp về tàu',memory:'Lật thẻ khủng long',catch:'Hứng trứng',band:'Chơi ban nhạc'};
+const TASK_NAME={brain:'Chơi ở Vườn Tư Duy',abc:'Học chữ ở Lâu Đài',code:'Đưa Bíp về tàu',memory:'Lật thẻ khủng long',catch:'Hứng trứng',band:'Chơi ban nhạc',hide:'Tìm bạn trốn (Vườn Tư Duy)',market:'Đi chợ giúp bạn (Vườn Tư Duy)',pattern:'Tìm quy luật (Vườn Tư Duy)',story:'Xếp tranh kể chuyện (Vườn Tư Duy)'};
+// Skill priorities for age 4–5, from early-childhood research (see the parent page): early number/pattern sense, letter–sound knowledge,
+// oral language and storytelling, and executive functions (working memory, flexible thinking, self-control) matter most right now.
+const PRIO={abc:3,story:3,pattern:3,market:2,code:2,memory:2,hide:2,band:2,catch:1};
+const SKILL_OF={abc:'lit',story:'lang',pattern:'math',market:'math',code:'space',memory:'mem',hide:'mem',band:'mem',catch:'react'};
+const PRIO_WHY={abc:'chữ cái và âm (dự báo khả năng đọc sau này)',story:'ngôn ngữ, kể chuyện, trình tự',pattern:'tư duy toán: quy luật, đếm số lượng',market:'trí nhớ lời nói, số lượng',code:'không gian, phương hướng, lập kế hoạch',memory:'trí nhớ làm việc (hình ảnh)',hide:'trí nhớ, quan sát kỹ',band:'trí nhớ âm thanh, nhịp điệu',catch:'màu sắc, phản xạ, kiềm chế'};
+const stOf=g=>BRAIN.includes(g)?'brain':g;
+function lastPlayed(g){const st=D.stats[g];if(st&&st.ok+st.no>0)return 0;for(let i=1;i<=28;i++){const h=(D.hist||[]).find(x=>x.day===dayKey(i));if(h&&h.g&&h.g[g]&&(h.g[g].ok+h.g[g].no)>0)return i}return 29}
+function accOf(g){const st=gameStats(0,13)[g];const n=st?st.ok+st.no:0;return n>=6?st.ok/n:null}
+// today's plan: the most needed skill becomes the fire challenge (double stars); a second task from a different skill; and caring for Bé Cốm
+function pickDaily(){const score=g=>{const d=Math.min(lastPlayed(g),10),a=accOf(g);return PRIO[g]*(1+d/2)*(a!=null&&a<.7?1.3:1)*(.85+Math.random()*.3)};
+  const order=Object.keys(PRIO).sort((a,b)=>score(b)-score(a));const fire=order.find(g=>g!==D.lastFire)||order[0];
+  const second=order.find(g=>g!==fire&&SKILL_OF[g]!==SKILL_OF[fire]&&stOf(g)!==stOf(fire))||order.find(g=>g!==fire);return {fire,tasks:[fire,second,'pet']}}
 function taskName(t){return t.g==='pet'?(D.pet.hatched?`Cho ${D.pet.name} ăn`:'Ấp trứng nở'):TASK_NAME[t.g]}
 function dayNum(){return Math.floor((Date.now()-new Date().getTimezoneOffset()*6e4)/864e5)}
 function ensureDaily(){
   if(D.daily&&D.daily.day===today())return D.daily;
-  const plays=['brain','code','memory','brain','catch','band'],prev=D.daily&&D.daily.tasks?D.daily.tasks.map(t=>t.g):[];
-  let play=plays[dayNum()%plays.length];if(prev.includes(play))play=plays[(dayNum()+1)%plays.length];
-  D.daily={day:today(),tasks:[{g:'abc'},{g:play},{g:'pet'}].map(t=>({...t,done:false})),claimed:false,announced:false};save();return D.daily}
+  const pk=pickDaily();D.lastFire=pk.fire;
+  D.daily={day:today(),fire:pk.fire,fireDone:false,tasks:pk.tasks.map(g=>({g,done:false})),claimed:false,announced:false};save();return D.daily}
+const isFire=g=>{const d=ensureDaily();return d.fire&&!d.fireDone&&(d.fire===g||stOf(d.fire)===g)};
+function taskIcon(t){return `<span class="mic" style="background:${(STATIONS.find(s=>s.g===stOf(t.g))||{}).col||'#eee'}">${stArt(stOf(t.g))}</span>`}
+function runTask(t){if(BRAIN.includes(t.g)){startGame(t.g);return}const i=STATIONS.findIndex(s=>s.g===t.g);const st=$(`[data-st="${i}"]`);st&&st.click()}
 function markTask(g){const d=ensureDaily();const t=d.tasks.find(x=>x.g===g&&!x.done);if(!t)return null;t.done=true;save();return t}
 const dailyDone=()=>ensureDaily().tasks.filter(t=>t.done).length;
 function missionSheet(auto){
   const m=$('#map');if(!m)return;const d=ensureDaily();const n=dailyDone(),all=n===d.tasks.length;
   m.insertAdjacentHTML('beforeend',`<div class="sheet-wrap" id="sw"><div class="sheet mission">
     <b class="sheet-t">📋 Nhiệm vụ hôm nay của ${KID()}</b>
-    ${d.tasks.map((t,i)=>`<button class="mrow${t.done?' done':''}" data-mt="${i}"><span class="mic" style="background:${(STATIONS.find(s=>s.g===t.g)||{}).col||'#eee'}">${stArt(t.g)}</span><span class="mtx">${taskName(t)}</span><span class="mck">${t.done?'✅':'▶'}</span></button>`).join('')}
+    ${d.tasks.map((t,i)=>`<button class="mrow${t.done?' done':''}${d.fire===t.g&&!d.fireDone?' fire':''}" data-mt="${i}">${taskIcon(t)}<span class="mtx">${taskName(t)}${d.fire===t.g&&!d.fireDone?' <b class="fx2">🔥 x2 sao</b>':''}</span><span class="mck">${t.done?'✅':'▶'}</span></button>`).join('')}
     ${all&&!d.claimed?'<button class="big-btn go" id="claim">🎁 Mở rương quà</button>':d.claimed?'<p class="muted" style="margin:0;width:100%;text-align:center">Hôm nay xong hết rồi! Mai có nhiệm vụ mới nhé.</p>':`<p class="muted" style="margin:0;width:100%;text-align:center">Xong cả 3 việc được mở rương quà 🎁</p>`}
   </div></div>`);
   const close=()=>{const s=$('#sw');s&&s.remove()};
   $('#sw').onclick=e=>{if(e.target.id==='sw'){tone('tap');close()}};
-  $$('[data-mt]').forEach(b=>b.onclick=()=>{const t=d.tasks[+b.dataset.mt];tone('tap');close();const i=STATIONS.findIndex(s=>s.g===t.g);const st=$(`[data-st="${i}"]`);st&&st.click()});
+  $$('[data-mt]').forEach(b=>b.onclick=()=>{const t=d.tasks[+b.dataset.mt];tone('tap');close();runTask(t)});
   if($('#claim'))$('#claim').onclick=()=>{d.claimed=true;award(5);save();close();const gift=pickGift();
     rewardScreen({title:'Xong 3 nhiệm vụ!',stars:5,gift,extra:gift?0:3,onClose:()=>{const sp=$('#starN');if(sp)sp.textContent=D.stars;updateMissionPill();if(D.pet.hatched&&$('#mp'))$('#mp').innerHTML=dino(D.pet)}})};
-  if(auto)say(`Hôm nay có ba nhiệm vụ: ${d.tasks.map(taskName).join(', ')}.`);
+  if(auto)say(`Hôm nay có ba nhiệm vụ: ${d.tasks.map(taskName).join(', ')}.${d.fire&&!d.fireDone?' Nhiệm vụ có ngọn lửa được gấp đôi sao!':''}`);
   else say(all?(d.claimed?'Xong hết rồi!':'Mở rương quà nào!'):`${KID()} đã làm ${n} trên ba nhiệm vụ.`);
 }
 function updateMissionPill(){const p=$('#mis');if(!p)return;const d=ensureDaily(),n=dailyDone();p.innerHTML=`📋 ${n}/3${n===3&&!d.claimed?' 🎁':''}`;p.classList.toggle('ready',n===3&&!d.claimed)}
@@ -2541,6 +2561,7 @@ function rewardScreen(opt){
 const MEDAL=[['#E8A86B','#B8733F','Đồng'],['#DDE6EE','#9FB0C0','Bạc'],['#FFD84D','#E0A800','Vàng']];
 function showDone(kind,n,title){
   screen='done';hush();
+  const dd=ensureDaily();let fireHit=false;if(dd.fire===kind&&!dd.fireDone){award(n);n*=2;dd.fireDone=true;fireHit=true;save()}
   const mt=markTask(kind)||(BRAIN.includes(kind)?markTask('brain'):null);
   const c0=stkCost(Math.min(D.stickers,STICKERS.length-1)),p0=Math.max(0,D.stkProg-n);const news=[];
   while(D.stickers<STICKERS.length&&D.stkProg>=stkCost(D.stickers)){D.stkProg-=stkCost(D.stickers);news.push(STICKERS[D.stickers]);D.stickers++}save();
@@ -2555,6 +2576,7 @@ function showDone(kind,n,title){
     <div class="win-row"><div class="pill big">⭐ +<b id="wN">0</b></div>
       ${allStickers&&!ns?'':`<div class="stk-bar"><i id="wBar" style="width:${fromPct}%"></i><span>${ns?'Sticker mới!':`Còn ${need} ⭐ nữa có sticker`}</span><em>${ns?ns[0]:'🎁'}</em></div>`}</div>
     ${ns?`<div class="prize win-prize" id="wPrize" hidden><span class="e">${ns[0]}</span><b>Sticker mới: ${ns[1]}</b></div>`:''}
+    ${fireHit?'<div class="fire-banner">🔥 Thử thách của ngày: gấp đôi sao!</div>':''}
     ${missionBanner(mt)}
     <div class="row done-btns" id="wBtns"><button class="big-btn go pulse" id="again2">▶ Chơi tiếp</button><button class="big-btn alt" id="home2">🏠 Về nhà</button></div></div>`);
   const slots=$$('.slot3');
@@ -2565,7 +2587,7 @@ function showDone(kind,n,title){
   const tBar=tCount+n*90+250;later(()=>{const b=$('#wBar');if(b)b.style.width=toPct+'%'},tBar);
   if(ns)later(()=>{const p=$('#wPrize');if(p){p.hidden=false;tone('chest');sparkEl(p,40);confetti(160)}},tBar+900);
   if(D.pet.hatched)later(()=>{const sv=$('.win-pet svg');sv&&sv.querySelector('.dino').classList.add('jump');tone('roar')},1400);
-  say((rate===3?`Ba ngôi sao! ${title}`:`${title} ${KID()} được ${n} ngôi sao!`)+(ns?` Có sticker mới, ${ns[1]}!`:'')+(mt?` Xong nhiệm vụ ${taskName(mt)}!`:''));
+  say((fireHit?'Thử thách lửa! Gấp đôi sao! ':'')+(rate===3?`Ba ngôi sao! ${title}`:`${title} ${KID()} được ${n} ngôi sao!`)+(ns?` Có sticker mới, ${ns[1]}!`:'')+(mt?` Xong nhiệm vụ ${taskName(mt)}!`:''));
   if(mt)later(()=>tone('chime'),tBar+400);
   $('#again2').onclick=()=>{tone('tap');startGame(kind)};$('#home2').onclick=()=>{tone('tap');showHome()};
 }
@@ -2624,6 +2646,8 @@ function showParent(){
   const L=D.lvl;
   render(`<div class="center" style="justify-content:flex-start"><div class="panel">
     <h2>Tiến bộ của ${KID()}</h2>${reportHTML()}
+    <div><b>Kỹ năng trọng tâm ở tuổi 4–5</b> <span class="muted">(nhiệm vụ ngày ưu tiên kỹ năng quan trọng và trò bé lâu chưa vào; hôm nay 🔥 là: ${TASK_NAME[ensureDaily().fire]||'—'})</span>
+      <table class="lvt">${Object.keys(PRIO).map(g=>`<tr><td>${'★'.repeat(PRIO[g])}<span class="muted">${'★'.repeat(3-PRIO[g])}</span></td><td>${GAMES[g]}</td><td class="lvd">${PRIO_WHY[g]}</td><td class="lvd">${(d=>d===0?'hôm nay':d>28?'chưa chơi':d+' ngày trước')(lastPlayed(g))}</td></tr>`).join('')}</table></div>
     <h2>🎙️ Thư viện giọng kể</h2><div id="vlib"><span class="muted">Đang tải…</span></div>
     <h2>7 ngày qua của ${KID()}</h2>${weekHTML()}
     <h2>Hôm nay của ${KID()}</h2>
