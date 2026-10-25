@@ -732,7 +732,7 @@ table{border-collapse:collapse;width:100%;font-size:18px;font-variant-numeric:ta
 .on>.nm-badge{opacity:1;transform:scale(1)}
 .nm-n{font:800 clamp(56px,9vw,96px)/1 var(--display);color:var(--ink)}
 .nm-dots{display:flex;flex-wrap:wrap;justify-content:center;gap:4px;max-width:90%;margin-top:4px}.nm-dots i{width:clamp(9px,1.3vw,14px);aspect-ratio:1;border-radius:50%;background:var(--berry)}
-.nm-pick{display:flex!important;flex-direction:column;align-items:center;justify-content:center}
+.nm-pick{background:#fff;display:flex!important;flex-direction:column;align-items:center;justify-content:center}
 .nm-give{flex:1;min-height:0;display:flex;gap:2%}.nm-tree{flex:1.4;display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:clamp(6px,1.4vw,16px);border-radius:30px;background:radial-gradient(ellipse at 50% 40%,#9EDB8C,#5BBF6A);padding:3%;box-shadow:0 10px 0 rgba(29,54,70,.12)}
 .nm-fr{font-size:clamp(46px,7.5vw,84px);line-height:1;animation:popIn .4s backwards;transition:transform .3s,opacity .3s}.nm-fr.taken{opacity:.15;transform:scale(.5)}
 .nm-side{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:8px;min-width:0}
@@ -744,6 +744,19 @@ table{border-collapse:collapse;width:100%;font-size:18px;font-variant-numeric:ta
 .nm-grp{flex:1;display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:clamp(4px,1vw,10px);border-radius:30px;background:#fff;box-shadow:0 8px 0 rgba(29,54,70,.12);padding:3%}
 .nm-grp .nm-gi{width:clamp(48px,8vw,90px)}.nm-grp.big{gap:clamp(18px,4vw,48px)}.nm-grp.big .nm-gi{width:clamp(60px,10vw,110px)}
 .nm-grp.right{box-shadow:0 0 0 6px #38B26A,0 8px 0 rgba(29,54,70,.12)}
+.op-wrap{flex:1;min-height:0;display:flex;flex-direction:column;gap:clamp(8px,1.6vh,14px)}
+.op-row{flex:1;min-height:0;display:flex;align-items:stretch;gap:2%}
+.op-grp{flex:1;display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:clamp(4px,1vw,10px);border-radius:30px;background:#fff;box-shadow:0 8px 0 rgba(29,54,70,.12);padding:2.5%;transition:transform .45s,opacity .45s}
+.op-grp .nm-gi{width:clamp(44px,7.5vw,88px)}.op-grp.wide .nm-gi{width:clamp(50px,8.5vw,96px)}
+.op-grp.md .nm-gi{width:clamp(58px,10vw,118px)}.op-grp.lg .nm-gi{width:clamp(72px,13vw,150px)}
+.op-grp.wait{opacity:0;transform:translateX(40%) scale(.8)}.op-grp.tell{box-shadow:0 0 0 6px #FFC83D,0 8px 0 rgba(29,54,70,.12)}
+.op-sign{align-self:center;font:800 clamp(40px,7vw,72px) var(--display);color:var(--berry)}
+.nm-gi.gone{opacity:.25;transform:scale(.75) rotate(-12deg);filter:grayscale(1)}.nm-gi.gone::after{content:'✕';position:absolute;inset:0;display:grid;place-items:center;font:800 clamp(30px,5vw,56px) var(--display);color:#E8455B}
+.nm-gi{transition:transform .4s,opacity .4s,filter .4s}
+.op-empty{border:4px dashed #9AB5C6;border-radius:50%;background:#F4FAFD}.op-empty.on{border-color:var(--berry);background:#FFF0F4}
+.op-eq{display:flex;align-items:center;justify-content:center;gap:clamp(10px,2vw,22px);font:800 clamp(40px,7vw,72px)/1 var(--display);color:var(--ink)}
+.op-eq span{opacity:0;transform:translateY(10px);transition:opacity .3s,transform .3s}.op-eq span.on{opacity:1;transform:none}
+.op-eq .op-s{color:var(--berry)}.op-eq .op-q{min-width:1.3em;text-align:center;border-radius:18px;background:#FFF0F4;border:4px dashed var(--berry);color:var(--berry);padding:0 .15em}.op-eq .op-q.ok{border-style:solid;border-color:#38B26A;background:#E9F8EE;color:#2E8B55}
 .nm-track{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;gap:clamp(6px,1.2vw,14px);flex-wrap:wrap}
 .nm-step{width:clamp(70px,12vw,130px);aspect-ratio:.8;border-radius:22px;background:#fff;box-shadow:0 6px 0 rgba(29,54,70,.12);display:flex;flex-direction:column;align-items:center;justify-content:center;animation:popIn .4s backwards}
 .nm-step .q{font:800 clamp(44px,7vw,80px) var(--display);color:var(--berry);animation:pulse 1s infinite}
@@ -2594,20 +2607,24 @@ function whyRound(lv){
 const NUMW=['không','một','hai','ba','bốn','năm','sáu','bảy','tám','chín','mười'];
 const NUM_FRUIT=[['🍎','quả táo'],['🍊','quả cam'],['🍓','quả dâu'],['🍐','quả lê'],['🍑','quả đào'],['🥭','quả xoài']];
 function numSet(){const r=rand(0,2);
-  if(r===0){const c=pickOne(COLORS)[1];return {name:'quả trứng',art:()=>egg(c)}}
-  if(r===1){const sp=pickOne(SPECIES),c=pickOne(DCOL)[1];return {name:'bạn khủng long',art:()=>dinoArt(sp[0],c)}}
-  const f=pickOne(NUM_FRUIT);return {name:f[1],art:()=>`<span class="nm-e">${f[0]}</span>`}}
+  if(r===0){const c=pickOne(COLORS)[1];return {kind:'egg',name:'quả trứng',art:()=>egg(c)}}
+  if(r===1){const sp=pickOne(SPECIES),c=pickOne(DCOL)[1];return {kind:'dino',name:'bạn khủng long',art:()=>dinoArt(sp[0],c)}}
+  const f=pickOne(NUM_FRUIT);return {kind:'fruit',name:f[1],art:()=>`<span class="nm-e">${f[0]}</span>`}}
 // level ladder: how far we count and which round types appear
-function numCfg(lv){return {max:lv<2?5:lv<4?6:lv<6?8:10,types:lv<2?['count','give']:lv<4?['count','give','more']:lv<6?['count','more','give','miss']:['count','less','give','miss','more'],dots:lv<4}}
+function numCfg(lv){return {max:lv<2?5:lv<4?6:lv<6?8:10,types:lv<2?['count','add','give']:lv<4?['count','add','give','sub','more']:lv<6?['add','sub','count','more','give','miss']:['add','sub','part','less','miss','give','more'],dots:lv<4}}
+// five rounds a session: always the operations the level has, the rest drawn from the other kinds; never opens with the hardest one
+function numPlan(lv){const t=numCfg(lv).types,must=t.filter(x=>['add','sub','part'].includes(x)),rest=shuffle(t.filter(x=>!must.includes(x)));
+  if(must.length<2)must.push('add');
+  let p=shuffle([...must,...rest].slice(0,5));while(p.length<5)p.push(pickOne(must));if(p[0]==='part'||p[0]==='sub'){const i=p.findIndex(x=>x!=='part'&&x!=='sub');if(i>0)[p[0],p[i]]=[p[i],p[0]]}return p}
 const numCard=(n,dots)=>`<span class="nm-n">${n}</span>${dots?`<span class="nm-dots">${'<i></i>'.repeat(n)}</span>`:''}`;
 let NM=null;
-function startNum(){NM={round:0,rounds:5,miss:0};numRound()}
+function startNum(){NM={round:0,rounds:5,miss:0,plan:numPlan(Math.floor(D.lvl.num||0))};numRound()}
 function numRound(){
-  screen='brain';const lv=Math.floor(D.lvl.num||0),cf=numCfg(lv),type=cf.types[NM.round%cf.types.length];
+  screen='brain';const lv=Math.floor(D.lvl.num||0),cf=numCfg(lv);let type=(NM.plan||[])[NM.round];if(!cf.types.includes(type))type=pickOne(cf.types);
   Object.assign(NM,{lv,cf,type,first:true,slips:0,busy:false});
-  const news={count:'Mới! Đếm cùng Bé Cốm.',give:'Mới! Hái quả cho Bé Cốm. Hái xong thì bấm nút Xong rồi.',more:'Mới! So sánh hai bên.',less:'Thử thách! Lần này tìm bên ít hơn.',miss:'Mới! Dãy số bị mất một số.'}[type];
+  const news={count:'Mới! Đếm cùng Bé Cốm.',give:'Mới! Hái quả cho Bé Cốm. Hái xong thì bấm nút Xong rồi.',more:'Mới! So sánh hai bên.',less:'Thử thách! Lần này tìm bên ít hơn.',miss:'Mới! Dãy số bị mất một số.',add:'Mới! Phép cộng: thêm vào thì nhiều hơn!',sub:'Mới! Phép trừ: bớt đi thì còn ít hơn!',part:'Thử thách! Cần thêm mấy nữa thì đủ?'}[type];
   const intro=unlockToast('num-'+type,news);
-  ({count:numCount,give:numGive,more:numMore,less:numMore,miss:numMiss})[type](intro?news:'');
+  ({count:numCount,give:numGive,more:numMore,less:numMore,miss:numMiss,add:numOp,sub:numOp,part:numOp})[type](intro?news:'');
 }
 const numSay=(news,t,then)=>news?sayThen(news,t,then):say(t,then);
 function numFrame(body,sayTxt){render(`${topBar(gdots(NM.rounds,NM.round))}${guide(sayTxt)}<div class="nm-wrap">${body}</div>`);wireCommon(()=>NM.say)}
@@ -2658,6 +2675,52 @@ function numMore(news){
     else{numMissTap('Mình đếm thử từng bên nhé!');NM.busy=true;const g=gen;await NM.msgP;
       for(const [gi,gr] of $$('.nm-grp').entries()){const its=[...gr.querySelectorAll('.nm-gi')];for(let i=0;i<its.length;i++){if(g!==gen)return;its[i].classList.add('on');its[i].querySelector('.nm-badge').textContent=i+1;tone('pop');await sayW(NUMW[i+1],650)}await wait(500)}
       if(g===gen){NM.busy=false;say(NM.say)}}})
+}
+// ---------- phép cộng / phép trừ with real objects: the story happens on screen (things arrive or go away), then the number sentence ----------
+const OPSTORY={
+  fruit:{has:(w,A,s)=>`${w} có ${A} ${s}.`,add:(w,B,s)=>`Bíp cho thêm ${B} ${s}.`,sub:(w,B,s)=>`${w} ăn mất ${B} ${s}.`,want:(w,T,s)=>`${w} muốn có ${T} ${s}.`},
+  dino:{has:(w,A,s)=>`Có ${A} ${s} đang chơi.`,add:(w,B,s)=>`Thêm ${B} bạn chạy tới.`,sub:(w,B,s)=>`${B} bạn về nhà ngủ.`,want:(w,T,s)=>`Cần ${T} bạn để chơi đá bóng.`},
+  egg:{has:(w,A,s)=>`Trong tổ có ${A} ${s}.`,add:(w,B,s)=>`Khủng long mẹ đẻ thêm ${B} quả.`,sub:(w,B,s)=>`${B} quả lăn ra ngoài tổ.`,want:(w,T,s)=>`Tổ có chỗ cho ${T} ${s}.`}};
+const opSize=n=>n<=3?' lg':n<=5?' md':'';
+const opItems=(n,set,cls='')=>Array.from({length:n},()=>`<span class="nm-gi${cls}">${set.art()}<b class="nm-badge"></b></span>`).join('');
+function opRange(lv){return lv<2?4:lv<4?5:lv<6?7:10}
+function numOp(news){
+  const lv=NM.lv,type=NM.type,set=numSet(),S=OPSTORY[set.kind],who=D.pet.hatched?D.pet.name:'Bé Cốm',top=opRange(lv),easy=lv<4;
+  let a,b,ans;
+  if(type==='add'){b=rand(1,lv<2?2:3);a=rand(lv<4?1:2,top-b);ans=a+b}
+  else if(type==='sub'){a=rand(lv<4?3:4,top);b=rand(1,Math.min(lv<4?2:4,a-1));ans=a-b}
+  else{const t=rand(4,Math.min(top,8));a=rand(1,t-1);b=t;ans=t-a}
+  const nm=set.name,W=NUMW,plus=easy?'thêm':'cộng',minus=easy?'bớt':'trừ';
+  const up=t=>t[0].toUpperCase()+t.slice(1);
+  const story=(type==='add'?[S.has(who,W[a],nm),S.add(who,W[b],nm)]:type==='sub'?[S.has(who,W[a],nm),S.sub(who,W[b],nm)]:[S.want(who,W[b],nm),`Đã có ${W[a]} rồi.`]).map(up);
+  const ask=type==='add'?`${W[a][0].toUpperCase()+W[a].slice(1)} ${plus} ${W[b]} bằng mấy?`:type==='sub'?`Còn lại mấy ${nm}? ${W[a][0].toUpperCase()+W[a].slice(1)} ${minus} ${W[b]} còn mấy?`:`Cần thêm mấy ${nm} nữa?`;
+  NM.say=ask;const eq=type==='add'?[a,'+',b,'=','?']:type==='sub'?[a,'−',b,'=','?']:[a,'+','?','=',b];
+  const body=type==='add'
+    ?`<div class="op-row"><div class="op-grp${opSize(Math.max(a,b))}" id="opA">${opItems(a,set)}</div><span class="op-sign">+</span><div class="op-grp wait${opSize(Math.max(a,b))}" id="opB">${opItems(b,set,' opb')}</div></div>`
+    :type==='sub'?`<div class="op-row"><div class="op-grp wide${opSize(a)}" id="opA">${opItems(a,set)}</div></div>`
+    :`<div class="op-row"><div class="op-grp wide${opSize(b)}" id="opA">${opItems(a,set)}${Array.from({length:b-a},()=>'<span class="nm-gi op-empty"><b class="nm-badge"></b></span>').join('')}</div></div>`;
+  numFrame(`<div class="op-wrap">${body}<div class="op-eq">${eq.map((x,i)=>`<span class="${x==='?'?'op-q':typeof x==='number'?'op-n':'op-s'}" data-i="${i}">${x}</span>`).join('')}</div><div class="choices" id="nc"></div></div>`,story.join(' '));
+  const g=gen,its=()=>$$('#opA .nm-gi:not(.op-empty)');
+  const showChoices=()=>{if(g!==gen||$('#nc').innerHTML)return;setSay(ask);say(ask);$('#nc').innerHTML=numOptions(ans,Math.max(NM.cf.max,ans+1),NM.cf.dots);
+    $$('.nm-pick').forEach(el=>el.onclick=()=>{if(NM.busy)return;const v=+el.dataset.n;
+      if(v===ans){el.classList.add('right');const q=$('.op-q');q.textContent=ans;q.classList.add('ok');sparkEl(q,16);
+        const sent=type==='add'?`${W[a]} cộng ${W[b]} bằng ${W[ans]}`:type==='sub'?`${W[a]} trừ ${W[b]} còn ${W[ans]}`:`${W[a]} thêm ${W[ans]} là ${W[b]}`;
+        numWin(`${pickOne(PRAISE())} ${easy&&type!=='part'?up(`${W[a]} ${type==='add'?'thêm':'bớt'} ${W[b]} là ${W[ans]}. `):''}${up(sent)}!`)}
+      else{el.disabled=true;el.classList.add('nope');help()}})};
+  // wrong answer: count it out together (count everything for +, what is left for −, the empty places for "how many more")
+  const help=async()=>{numMissTap(type==='add'?'Mình đếm tất cả cùng nhau nhé!':type==='sub'?'Mình đếm số còn lại nhé!':'Mình đếm chỗ trống nhé!');NM.busy=true;await NM.msgP;
+    const list=type==='add'?[...its(),...$$('#opB .nm-gi')]:type==='sub'?its().filter(x=>!x.classList.contains('gone')):$$('#opA .op-empty');
+    $$('.nm-gi').forEach(x=>{x.classList.remove('on');x.querySelector('.nm-badge').textContent=''});
+    for(let i=0;i<list.length;i++){if(g!==gen)return;list[i].classList.add('on');list[i].querySelector('.nm-badge').textContent=i+1;tone('pop');await sayW(W[i+1],700)}
+    if(g!==gen)return;NM.busy=false;say(ask)};
+  (async()=>{if(news){await sayW(news,800);if(g!==gen)return}
+    const A=$('#opA');A.classList.add('tell');await sayW(story[0],1200);A.classList.remove('tell');if(g!==gen)return;
+    if(type==='add'){const B=$('#opB');B.classList.remove('wait');tone('pop');B.classList.add('tell');await sayW(story[1],1200);B.classList.remove('tell')}
+    else if(type==='sub'){const out=its().slice(-b);await wait(200);out.forEach((x,i)=>setTimeout(()=>{x.classList.add('gone');tone('pop')},i*220));await sayW(story[1],1200)}
+    else{A.classList.add('tell');await sayW(story[1],900);A.classList.remove('tell')}
+    if(g!==gen)return;$$('.op-eq span').forEach((x,i)=>setTimeout(()=>x.classList.add('on'),i*120));await wait(700);showChoices()})();
+  // the speaker button repeats the whole little story
+  const rep=()=>{tone('tap');say(story.join(' ')+' '+ask)};$('#again')&&($('#again').onclick=rep);$('.bip')&&($('.bip').onclick=rep);
 }
 // missing number on a number track
 function numMiss(news){
@@ -3041,7 +3104,7 @@ const LV_MAX={rule:8,sound:8,num:10,code:30,memory:7,catch:12,band:10,hide:14,ma
 function lvDesc(k){const v=D.lvl[k]||0;
   if(k==='rule')return `Cấp ${Math.floor(v)+1}: ${v<2?'đổi luật 1 lần':v<4?'đổi luật 2 lần':v<6?'đổi luật 3 lần':'luật đổi theo hình nhỏ trên mỗi bạn'}`;
   if(k==='sound'){const t=soundCfg(Math.floor(v)).types;return `Cấp ${Math.floor(v)+1}: ${t.includes('pickL')?'nghe âm + nhìn chữ':'nghe âm, chọn tranh'}${t.includes('which')?', tìm chữ đầu':''}${t.includes('odd')?', tìm âm khác':''}`}
-  if(k==='num'){const c=numCfg(Math.floor(v));return `Cấp ${Math.floor(v)+1}: đếm tới ${c.max}${c.types.includes('more')?', nhiều hơn':''}${c.types.includes('less')?'/ít hơn':''}${c.types.includes('miss')?', số còn thiếu':''}`}
+  if(k==='num'){const c=numCfg(Math.floor(v));return `Cấp ${Math.floor(v)+1}: đếm tới ${c.max}, cộng${c.types.includes('sub')?'/trừ':''} trong phạm vi ${opRange(Math.floor(v))}${c.types.includes('part')?', cần thêm mấy':''}${c.types.includes('more')?', nhiều hơn':''}${c.types.includes('less')?'/ít hơn':''}${c.types.includes('miss')?', số còn thiếu':''}`}
   if(k==='code'){const d=CODE_LEVELS[v];return `Màn ${v+1}: ${v<2?'bấm từng bước':v<11?'xếp mũi tên rồi chạy':d?'nhặt sao rồi về tàu':'bàn cờ ngẫu nhiên có sao'}`}
   if(k==='memory')return v>=5?`Cấp ${v+1}: ${v>=6?16:12} thẻ khủng long giống nhau`:`Cấp ${v+1}: ${MEM_SIZES[Math.min(v,4)]} thẻ${v<2?', được xem trước':''}`;
   if(k==='catch'){const c=catchCfg(v);return `Cấp ${v+1}: trứng 1–${c.nmax} chấm${c.numeral?', chỉ hiện chữ số':''}${c.rock>.07?', đá':''}${c.gold?', trứng vàng':''}${c.sway?', lắc lư':''}${c.ptero?', thằn lằn bay':''}${c.rainbow?', cầu vồng':''}${c.every<4?', đổi số nhanh':''}`}
