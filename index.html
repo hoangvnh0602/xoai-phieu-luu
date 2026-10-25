@@ -196,7 +196,7 @@ svg .b-armL{transform-origin:100% 50%}svg .b-armR{transform-origin:0% 50%}
 .sheet-t{width:100%;text-align:center;font-family:var(--display);font-size:clamp(22px,3vw,30px)}
 .sheet button{background:var(--sky2);border-radius:24px;padding:12px;width:clamp(120px,18vw,170px);display:flex;flex-direction:column;align-items:center;gap:6px;font-family:var(--display);font-weight:800;font-size:clamp(16px,2vw,20px);box-shadow:0 6px 0 rgba(29,54,70,.15);transition:transform .15s}
 .sheet button:active{transform:scale(.93)}
-.sheet.brain6{display:grid;grid-template-columns:repeat(3,auto);max-width:min(92%,640px)}.sheet.brain6 .sheet-t{grid-column:1/-1}@media (min-width:1000px) and (orientation:landscape){.sheet.brain6{grid-template-columns:repeat(6,auto);max-width:96%}}
+.sheet.brain6{display:grid;grid-template-columns:repeat(3,auto);max-width:min(92%,640px)}.sheet.brain6 .sheet-t{grid-column:1/-1}@media (min-width:1000px) and (orientation:landscape){.sheet.brain6{grid-template-columns:repeat(6,minmax(0,170px));max-width:96%}.sheet.brain6 button{width:100%;min-width:0}}
 .sheet button span{height:clamp(70px,11vw,100px);display:grid;place-items:center}
 .sheet button svg{height:100%;width:auto;max-width:100%}
 
@@ -280,8 +280,9 @@ svg .b-armL{transform-origin:100% 50%}svg .b-armR{transform-origin:0% 50%}
 .ltile.wig{animation:wiggle .6s}
 
 /* Vườn Tư Duy */
-.se2{font-size:clamp(46px,7vw,64px);line-height:1}
+.se2{font-size:clamp(46px,7vw,64px);line-height:1;white-space:nowrap}.sheet.brain6 .se2.w3{font-size:clamp(28px,3.4vw,50px)}
 .meadow{flex:1;min-height:0;width:100%;max-width:1040px;position:relative;border-radius:30px;overflow:hidden;background:linear-gradient(#D8F1FF,#F0FAFF 58%,#9EDB8C 58.3%,#7FCB6E);box-shadow:0 10px 0 rgba(29,54,70,.14)}
+@media (orientation:portrait){.meadow{flex:0 1 auto;aspect-ratio:1.2;margin:auto 0}}
 .meadow .sunbeam{position:absolute;inset:0;background:radial-gradient(circle at 85% 10%,rgba(255,226,120,.55),transparent 40%);pointer-events:none}
 .lineup{position:absolute;left:3%;right:3%;bottom:10%;height:62%;display:grid;grid-template-columns:repeat(var(--n),1fr);gap:2%;align-items:end}
 .slot2{height:100%;display:flex;align-items:flex-end;justify-content:center;animation:popIn .5s backwards;border-radius:20px;position:relative}
@@ -1153,7 +1154,7 @@ const clean=s=>s.replace(/[<>&"'`$\\]/g,'').trim();
 function goFull(){try{const el=document.documentElement;const f=el.requestFullscreen||el.webkitRequestFullscreen;if(f){const r=f.call(el);r&&r.catch&&r.catch(()=>{})}}catch(e){}}
 function enterProfile(id){showHome._back=false;useProfile(id);goFull();musicOn();warmSkin(D.pet.color);warmSpecies();if(overLimit())showSleep();else{showHome();say(`Chào ${KID()}! Hôm nay mình chơi gì nào?`)}}
 function showStart(manage=false){
-  screen='start';
+  screen='start';if(!manage)setTimeout(()=>{if(screen==='start'&&!$('#gate'))say('Ai đang chơi nào? Chạm vào hình của mình nhé!')},500);
   const cards=S.profiles.map(p=>`<button class="pcard" data-p="${p.id}"><span class="pic">${p.icon}</span><b>${p.name}</b>${p.pin?'<i class="pl" aria-label="Có mã">🔒</i>':''}${p.test?'<small>Người lớn</small>':''}${manage?'<i class="pe">✏️</i>':''}</button>`).join('');
   render(`<div class="top"><span></span>${manage?'<button class="chipbtn" id="done">✓ Xong</button>':'<button class="icon-btn lock" id="lock" aria-label="Quản lý hồ sơ">⚙️</button>'}</div>
     <div class="center" style="max-width:1100px">
@@ -1566,7 +1567,9 @@ function spawnEgg(W,H,ER){const cf=K.cf;let x=.08+Math.random()*.84,y=-ER*1.4;
   if(K.ptero&&K.ptero.x>.06&&K.ptero.x<.94&&Math.random()<.6){x=K.ptero.x;y=H*.13}
   const r=Math.random();let kind='egg',color;
   if(r<cf.rock)kind='rock';else if(r<cf.rock+cf.gold)kind='gold';else if(r<cf.rock+cf.gold+cf.rainbow)kind='rainbow';
-  let dots=0;if(kind==='egg'){const others=K.nums.filter(n=>n!==K.target);dots=Math.random()<.55||!others.length?K.target:pickOne(others);color=pickOne(['#FFE08A','#FFB3C8','#A8DBFF','#B8EDB0','#D8C6FF','#FFC999'])}
+  let dots=0;if(kind==='egg'){const all=K.nums.filter(n=>n!==K.target),near=all.filter(n=>Math.abs(n-K.target)===1);
+    // from level 4 most wrong eggs are one dot off, so the child has to really count
+    const others=(D.lvl.catch||0)>=4&&near.length&&Math.random()<.7?near:all;dots=Math.random()<.55||!others.length?K.target:pickOne(others);color=pickOne(['#FFE08A','#FFB3C8','#A8DBFF','#B8EDB0','#D8C6FF','#FFC999'])}
   const sw=cf.sway&&kind!=='rock'&&Math.random()<.6?cf.sway:0;
   K.items.push({x,x0:x,y,vy:H*cf.speed*(.85+Math.random()*.3)*(kind==='gold'?1.15:1),vx:0,kind,rock:kind==='rock',color,dots,rot:0,spin:(Math.random()-.5)*2.4,
     sw:sw*.09,sf:1.4+Math.random()*1.2,ph:Math.random()*6.3})}
@@ -2114,7 +2117,7 @@ function brainSheet(){
   const items=[['num','Đếm cùng Bé Cốm','<span class="se2">🔢</span>'],['rule','Đổi luật!','<span class="se2">🔁</span>'],['hide','Ai trốn mất rồi?',`<svg viewBox="0 0 120 100">${nested(dinoArt('trex','#FF9F45'),10,14,80,70)}<text x="96" y="40" font-family="Baloo 2,system-ui" font-weight="800" font-size="40" fill="#FF5C7A">?</text></svg>`],
     ['market',`Đi chợ cho ${D.pet.hatched?D.pet.name:'Bíp'}`,'<span class="se2">🧺</span>'],
     ['pattern','Quy luật tiếp theo',`<svg viewBox="0 0 130 60">${['#FF5C7A','#4C9BF5','#FF5C7A','#4C9BF5'].map((c,i)=>`<ellipse cx="${16+i*30}" cy="32" rx="11" ry="14" fill="${c}" stroke="#1D3646" stroke-width="3"/>`).join('')}<text x="118" y="42" font-family="Baloo 2,system-ui" font-weight="800" font-size="30" fill="#1D3646">?</text></svg>`],
-    ['story','Chuyện gì xảy ra trước?','<span class="se2">🥚➜🐣</span>']];
+    ['story','Chuyện gì xảy ra trước?','<span class="se2 w3">🥚➜🐣</span>']];
   m.insertAdjacentHTML('beforeend',`<div class="sheet-wrap" id="sw"><div class="sheet brain6"><b class="sheet-t">🧠 Vườn Tư Duy</b>${items.map(([g,n,a])=>`<button data-b="${g}"${isFire(g)?' class="fire"':''}><span>${a}</span>${n}${isFire(g)?'<b class="fx2">🔥 x2</b>':''}</button>`).join('')}</div></div>`);
   say('Chọn trò ở Vườn Tư Duy nào!');
   $('#sw').onclick=e=>{if(e.target.id==='sw'){tone('tap');$('#sw').remove()}};
@@ -3118,7 +3121,7 @@ function lvDesc(k){const v=D.lvl[k]||0;
   if(k==='num'){const c=numCfg(Math.floor(v));return `Cấp ${Math.floor(v)+1}: đếm tới ${c.max}, cộng${c.types.includes('sub')?'/trừ':''} trong phạm vi ${opRange(Math.floor(v))}${c.types.includes('part')?', cần thêm mấy':''}${c.types.includes('more')?', nhiều hơn':''}${c.types.includes('less')?'/ít hơn':''}${c.types.includes('miss')?', số còn thiếu':''}`}
   if(k==='code'){const d=CODE_LEVELS[v];return `Màn ${v+1}: ${v<2?'bấm từng bước':v<11?'xếp mũi tên rồi chạy':d?'nhặt sao rồi về tàu':'bàn cờ ngẫu nhiên có sao'}`}
   if(k==='memory')return v>=5?`Cấp ${v+1}: ${v>=6?16:12} thẻ khủng long giống nhau`:`Cấp ${v+1}: ${MEM_SIZES[Math.min(v,4)]} thẻ${v<2?', được xem trước':''}`;
-  if(k==='catch'){const c=catchCfg(v);return `Cấp ${v+1}: trứng 1–${c.nmax} chấm${c.numeral?', chỉ hiện chữ số':''}${c.rock>.07?', đá':''}${c.gold?', trứng vàng':''}${c.sway?', lắc lư':''}${c.ptero?', thằn lằn bay':''}${c.rainbow?', cầu vồng':''}${c.every<4?', đổi số nhanh':''}`}
+  if(k==='catch'){const c=catchCfg(v);return `Cấp ${v+1}: trứng 1–${c.nmax} chấm${c.numeral?', chỉ hiện chữ số':''}${c.rock>.07?', đá':''}${c.gold?', trứng vàng':''}${c.sway?', lắc lư':''}${c.ptero?', thằn lằn bay':''}${c.rainbow?', cầu vồng':''}${c.every<4?', đổi số nhanh':''}${v>=4?', trứng sai chỉ lệch 1 chấm':''}`}
   if(k==='band')return `Cấp ${v+1}: ${v<2?3:v<5?4:5} bạn, bắt đầu ${v<2?2:v<4?3:4} nốt${v>=6?', chỉ nghe bằng tai':''}`;
   if(k==='hide')return `Cấp ${v+1}: ${Math.min(6,3+Math.floor(v/3))} bạn${v>=4?', có bạn lạ lẻn vào':''}${v>=8?', hai bạn cùng trốn':''}`;
   if(k==='market')return `Cấp ${v+1}: nhớ ${v<2?2:v<5?3:v<9?(v>=6?3:4):4} món${v>=6?', có món cần 2 cái':''}`;
