@@ -2312,7 +2312,81 @@ const WHY=[
   {e:'😴',see:'{K} buồn ngủ',q:'Vì sao {K} buồn ngủ?',a:['🌙','vì trời tối rồi'],no:[['☀️','vì trời vừa sáng'],['🎈','vì có bóng bay']]},
   {e:'🌻',see:'hoa nở thật đẹp',q:'Vì sao hoa nở đẹp?',a:['🚿','vì được tưới nước mỗi ngày'],no:[['📺','vì xem ti vi'],['🧦','vì đi tất']]},
   {e:'🏃',see:'mọi người chạy vào nhà',q:'Vì sao mọi người chạy vào nhà?',a:['⛈️','vì trời sắp mưa to'],no:[['🌈','vì có cầu vồng'],['🍦','vì có kem']]}];
+// ---------- generated sequences: one thing changing step by step. Object, colour, who and number of steps are random,
+// so there is always a new puzzle, and the order has to be worked out from what is visible in each picture ----------
+const stepIdx=(n,m)=>Array.from({length:n},(_,i)=>Math.round(i*(m-1)/(n-1)));
+const SVG=b=>`<svg viewBox="0 0 100 100">${b}</svg>`;
+const f1=x=>x.toFixed(1);
+function wedge(cx,cy,r,a0,a1){const p=a=>`${f1(cx+r*Math.cos(a*Math.PI/180))} ${f1(cy+r*Math.sin(a*Math.PI/180))}`;return `M${cx} ${cy} L${p(a0)} A${r} ${r} 0 0 1 ${p(a1)}Z`}
+const SEQ_GEN={
+  eat(n){const F=pickOne([
+      {n:'bánh kem',c:pickOne(['#FF9EC4','#A0673F','#FFE08A']),rim:'#fff',top:(x,y)=>`<circle cx="${x}" cy="${y}" r="4" fill="#E8455B"/>`},
+      {n:'bánh pizza',c:'#F7C65A',rim:'#D9963A',top:(x,y)=>`<circle cx="${x}" cy="${y}" r="4.5" fill="#D8432F"/>`},
+      {n:'dưa hấu',c:'#F25C66',rim:'#3FA34D',top:(x,y)=>`<ellipse cx="${x}" cy="${y}" rx="1.6" ry="2.6" fill="#2B2B2B"/>`}]);
+    const who=pickOne([KID(),'Bé Cốm','Bíp']),S=6;
+    const cap={6:`${F.n} còn nguyên`,5:`${who} ăn một miếng`,4:`${who} ăn hai miếng`,3:`còn một nửa`,2:'còn hai miếng',1:'còn một miếng',0:`${who} ăn hết sạch`};
+    return [0,1,2,3,4,5,6].map(k=>{const keep=S-k;let o='<ellipse cx="50" cy="54" rx="46" ry="44" fill="#EAF2F8" stroke="#1D3646" stroke-width="2.5"/>';
+      for(let j=0;j<keep;j++){const a0=-90+j*60,a1=a0+60,am=(a0+30)*Math.PI/180;
+        o+=`<path d="${wedge(50,54,38,a0,a1)}" fill="${F.c}" stroke="${F.rim}" stroke-width="3.5" stroke-linejoin="round"/>`+F.top(f1(50+24*Math.cos(am)),f1(54+24*Math.sin(am)))}
+      if(!keep)o+=[[38,50],[58,46],[50,64],[64,60],[42,62]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="2.2" fill="${F.rim==='#fff'?F.c:F.rim}"/>`).join('');
+      return [{h:SVG(o)},cap[keep]]})},
+  plant(n){const C=pickOne(COLORS.filter(c=>c[0]!=='xanh lá')),pot=Math.random()<.5;
+    const ground=pot?'<path d="M30 76 L70 76 L65 97 L35 97Z" fill="#D9774B" stroke="#1D3646" stroke-width="2.5"/><rect x="27" y="72" width="46" height="7" rx="2" fill="#C2653D" stroke="#1D3646" stroke-width="2.5"/>'
+      :'<path d="M4 84 Q50 70 96 84 L96 100 L4 100Z" fill="#9C6B43"/>';
+    const gy=pot?73:79,leaf=(x,y,s,d)=>`<path d="M${x} ${y} q${d*8*s} ${-8*s} ${d*16*s} ${-2*s} q${-d*8*s} ${8*s} ${-d*16*s} ${2*s}Z" fill="#4CAF50" stroke="#1D3646" stroke-width="2"/>`;
+    const stem=t=>`<path d="M50 ${gy} L50 ${t}" stroke="#3E8E41" stroke-width="4" stroke-linecap="round"/>`;
+    const st=[()=>`<ellipse cx="50" cy="${gy+1}" rx="6" ry="4.5" fill="#7A4A26" stroke="#1D3646" stroke-width="2"/>`,
+      ()=>stem(gy-12)+leaf(50,gy-11,.7,1)+leaf(50,gy-11,.7,-1),
+      ()=>stem(gy-30)+leaf(50,gy-14,1,1)+leaf(50,gy-14,1,-1)+leaf(50,gy-27,.8,1)+leaf(50,gy-27,.8,-1),
+      ()=>stem(26)+leaf(50,gy-14,1,1)+leaf(50,gy-14,1,-1)+leaf(50,gy-32,.9,1)+leaf(50,gy-32,.9,-1)+`<ellipse cx="50" cy="22" rx="6" ry="9" fill="#5DBB63" stroke="#1D3646" stroke-width="2"/><path d="M46 16 Q50 10 54 16" fill="${C[1]}"/>`,
+      ()=>stem(28)+leaf(50,gy-14,1,1)+leaf(50,gy-14,1,-1)+leaf(50,gy-32,.9,1)+leaf(50,gy-32,.9,-1)+[0,72,144,216,288].map(a=>`<ellipse cx="${f1(50+10*Math.cos(a*Math.PI/180))}" cy="${f1(22+10*Math.sin(a*Math.PI/180))}" rx="8" ry="8" fill="${C[1]}" stroke="#1D3646" stroke-width="2"/>`).join('')+'<circle cx="50" cy="22" r="6" fill="#FFD23F" stroke="#1D3646" stroke-width="2"/>'];
+    const cap=['gieo hạt','hạt nảy mầm','cây non lớn lên','cây có nụ hoa',`hoa ${C[0]} nở rồi`];
+    return [0,1,2,3,4].map(k=>[{h:SVG(ground+st[k]())},cap[k]])},
+  candle(n){const C=pickOne(COLORS);const H=[58,46,33,19,7];
+    const cap=[`thắp nến ${C[0]}`,'nến cháy sáng','nến ngắn dần','nến sắp hết','nến tắt rồi'];
+    return [0,1,2,3,4].map(k=>{const h=H[k],top=88-h;let o=`<ellipse cx="50" cy="90" rx="34" ry="7" fill="#C9D6E0" stroke="#1D3646" stroke-width="2.5"/>`;
+      o+=`<rect x="39" y="${top}" width="22" height="${h}" rx="3" fill="${C[1]}" stroke="#1D3646" stroke-width="2.5"/>`;
+      if(k>0)o+=`<path d="M41 ${top+1} q2 ${4+k*2} 4 0 M55 ${top+1} q2 ${3+k*2} 3 0" fill="${C[1]}" stroke="#1D3646" stroke-width="1.5"/>`;
+      o+=`<path d="M50 ${top} L50 ${top-5}" stroke="#1D3646" stroke-width="2"/>`;
+      o+=k<4?`<path d="M50 ${top-24} Q58 ${top-12} 50 ${top-5} Q42 ${top-12} 50 ${top-24}Z" fill="#FFB020" stroke="#E2611B" stroke-width="2"/><ellipse cx="50" cy="${top-10}" rx="2.5" ry="4" fill="#FFF3B0"/>`
+        :`<path d="M50 ${top-6} q-6 -6 0 -12 q6 -6 0 -12" fill="none" stroke="#9AA8B4" stroke-width="2.5" stroke-linecap="round"/>`;
+      return [{h:SVG(o)},cap[k]]})},
+  fill(n){const B=pickOne([['xô','#4C9BF5'],['xô','#FF8A3D'],['chậu','#8E5CF6']]),y0=40,y1=92,hw=y=>22+8*(y1-y)/(y1-y0),L=[0,.25,.5,.78,1];
+    const cap=['mở vòi nước',`nước chảy vào ${B[0]}`,'nước dâng lên',`${B[0]} gần đầy`,`đầy ${B[0]}, khóa vòi`];
+    return [0,1,2,3,4].map(k=>{const lv=L[k],wy=y1-lv*(y1-y0-4);let o='';
+      o+=`<path d="M6 10 L34 10 L34 18 L26 18 L26 24 L20 24 L20 18 L6 18Z" fill="#B8C4CE" stroke="#1D3646" stroke-width="2.2"/><rect x="${k<4?14:22}" y="4" width="10" height="5" rx="2" fill="#E8455B" stroke="#1D3646" stroke-width="1.8" transform="rotate(${k<4?-20:0} 19 6)"/>`;
+      if(lv>0)o+=`<path d="M${f1(50-hw(wy))} ${f1(wy)} L${f1(50+hw(wy))} ${f1(wy)} L72 ${y1} L28 ${y1}Z" fill="#6EC6FF"/>`;
+      if(k<4)o+=`<path d="M23 24 Q24 ${f1((24+wy)/2)} 30 ${f1(wy)}" fill="none" stroke="#6EC6FF" stroke-width="4" stroke-linecap="round"/>`;
+      o+=`<path d="M20 ${y0} L80 ${y0} L72 ${y1} L28 ${y1}Z" fill="${B[1]}" fill-opacity=".18" stroke="#1D3646" stroke-width="3" stroke-linejoin="round"/><path d="M20 ${y0} L80 ${y0}" stroke="${B[1]}" stroke-width="5" stroke-linecap="round"/>`;
+      return [{h:SVG(o)},cap[k]]})},
+  paint(n){const T=pickOne([
+      {n:'ngôi nhà',p:[['tường','#FFD27F','<rect x="22" y="44" width="56" height="44"/>'],['mái nhà','#E8455B','<path d="M14 46 L50 14 L86 46Z"/>'],['cửa','#A0673F','<rect x="42" y="62" width="16" height="26"/>'],['cửa sổ','#6EC6FF','<rect x="27" y="52" width="12" height="12"/><rect x="61" y="52" width="12" height="12"/>']]},
+      {n:'con cá',p:[['thân cá','#FF9F45','<ellipse cx="46" cy="52" rx="30" ry="20"/>'],['đuôi cá','#FFD23F','<path d="M74 52 L94 34 L94 70Z"/>'],['vây cá','#4C9BF5','<path d="M38 33 Q48 18 58 34Z"/><path d="M40 70 Q48 82 56 70Z"/>'],['vảy cá','#E8455B','<circle cx="44" cy="48" r="5"/><circle cx="56" cy="56" r="5"/><circle cx="58" cy="44" r="4"/>']]},
+      {n:'ô tô',p:[['thân xe','#E8455B','<path d="M10 60 L22 42 L72 42 L90 60 L90 74 L10 74Z"/>'],['cửa kính','#6EC6FF','<path d="M27 46 L45 46 L45 58 L20 58Z"/><path d="M50 46 L68 46 L80 58 L50 58Z"/>'],['bánh xe','#3B3F46','<circle cx="28" cy="76" r="9"/><circle cx="72" cy="76" r="9"/>'],['đèn xe','#FFD23F','<circle cx="84" cy="63" r="6"/>']]}]);
+    const order=shuffle(T.p.map((_,i)=>i));
+    return [0,1,2,3,4].map(k=>{const done=new Set(order.slice(0,k));
+      const o=T.p.map((p,i)=>p[2].replace(/\/>/g,` fill="${done.has(i)?p[1]:'#fff'}" stroke="#1D3646" stroke-width="2.6" stroke-linejoin="round"/>`)).join('')+(T.n==='con cá'?'<circle cx="30" cy="47" r="3.5" fill="#1D3646"/>':'');
+      return [{h:SVG(o+(k<4?`<g transform="translate(88 20) rotate(35)"><rect x="-4" y="-16" width="8" height="24" rx="2" fill="${k?T.p[order[k-1]][1]:'#8E5CF6'}" stroke="#1D3646" stroke-width="2"/><path d="M-4 8 L0 15 L4 8Z" fill="#1D3646"/></g>`:''))},
+        k===0?`tranh ${T.n} chưa tô màu`:k===4?`tô xong ${T.n} rồi`:`tô ${T.p[order[k-1]][0]}`]})},
+  walk(n){const Dst=pickOne([['🚀','tàu vũ trụ'],['🏠','nhà'],['🎡','khu vui chơi'],['🍦','xe kem']]),W=pickOne([['bip','Bíp'],['🦕','khủng long']]);
+    const P0=[14,82],P2=[76,24],P1=pickOne([[16,30],[80,78],[30,20],[70,86]]),at=t=>[0,1].map(d=>(1-t)*(1-t)*P0[d]+2*(1-t)*t*P1[d]+t*t*P2[d]);
+    const T=[0,.3,.55,.8,.9],cap=[`${W[1]} bắt đầu đi tới ${Dst[1]}`,`${W[1]} đi được một đoạn`,`${W[1]} đi được nửa đường`,`${W[1]} sắp tới ${Dst[1]}`,`${W[1]} tới ${Dst[1]} rồi`];
+    const path=`M${P0} Q${P1} ${P2}`,len=(()=>{let L=0,p=at(0);for(let i=1;i<=40;i++){const q=at(i/40);L+=Math.hypot(q[0]-p[0],q[1]-p[1]);p=q}return L})();
+    return [0,1,2,3,4].map(k=>{const [x,y]=at(T[k]);let o=`<path d="${path}" fill="none" stroke="#C9B48A" stroke-width="7" stroke-linecap="round" stroke-dasharray="1 9"/>`;
+      if(k)o+=`<path d="${path}" fill="none" stroke="#FFB020" stroke-width="5" stroke-linecap="round" stroke-dasharray="${f1(len*T[k])} 999"/>`;
+      o+=`<text x="${P2[0]+8}" y="${P2[1]+4}" font-size="30" text-anchor="middle">${Dst[0]}</text><circle cx="${P0[0]}" cy="${P0[1]}" r="3" fill="#C9B48A"/>`;
+      o+=W[0]==='bip'?`<image href="${BIP_IMG.walk}" x="${f1(x-15)}" y="${f1(y-30)}" width="30" height="35"/>`:`<text x="${f1(x)}" y="${f1(y+6)}" font-size="28" text-anchor="middle">${W[0]}</text>`;
+      if(k===4)o+=`<text x="${P2[0]-2}" y="${P2[1]-14}" font-size="14">✨</text>`;
+      return [{h:SVG(o)},cap[k]]})},
+  hatch(n){const C=pickOne(DCOL);warmSkin(C[1]);
+    const st=[()=>petEgg(0),()=>petEgg(4),()=>dino({color:C[1],xp:1,clean:5}),()=>dino({color:C[1],xp:30,clean:5}),()=>dino({color:C[1],xp:60,clean:5})];
+    const cap=['quả trứng khủng long','trứng nứt ra','khủng long con chào đời','khủng long lớn dần','khủng long to khỏe'];
+    return [0,1,2,3,4].map(k=>[{h:st[k]()},cap[k]])}};
+const GEN_KEYS=Object.keys(SEQ_GEN);
+// every generator returns all of its stages; a puzzle uses n of them, always the first and the last
+function genSeq(n,not=[]){const pool=GEN_KEYS.filter(x=>!not.includes(x)),k=pickOne(pool.length?pool:GEN_KEYS);const all=SEQ_GEN[k](),idx=stepIdx(n,all.length),c=idx.map(i=>all[i]);Object.assign(c,{gen:k,all,idx});return c}
 function storyArt(k){
+  if(typeof k==='object')return k.h;
   if(k.startsWith('pic:')){const id='s-'+k.slice(4);return `<img class="sy-img" src="${(window.__IMG&&window.__IMG[id])||'img/'+id+'.webp'}" alt="" draggable="false">`}
   const kid={color:(D.pet&&D.pet.color)||PINK,xp:20,clean:5};
   const m={egg0:()=>petEgg(0),egg4:()=>petEgg(4),baby:()=>dino({color:kid.color,xp:1,clean:5}),big:()=>dino({color:kid.color,xp:60,clean:5}),
@@ -2341,17 +2415,20 @@ function startStory(){SY={round:0,rounds:4,miss:0,used:[],told:0,whyUsed:[],tour
 // round types: put pictures in order, guess what happens next, and "why?" (cause and effect). The order rounds end with the child retelling the story.
 function storyRound(){
   screen='brain';const lv=D.lvl.story||0;SY.busy=false;
-  const type=lv<2?'order':['order','next','order','why'][SY.round%4];
+  const type=lv<2?'order':(lv<4?['order','next','order','why']:['order','next','why','next'])[SY.round%4];
   if(type==='why')return whyRound(lv);
   // story length grows with the level: 3 pictures, then 3–4, then 4–5
   const okLen=n=>lv<3?n===3:lv<7?n<=4:n>=4;
+  // about half the puzzles are generated (endless variety), the rest are the hand-made stories
+  if(Math.random()<(lv<2?.35:.5)){const n=lv<3?3:lv<7?rand(3,4):rand(4,5);const g=genSeq(n,SY.genUsed||(SY.genUsed=[]));SY.genUsed.push(g.gen);return storyPlay(type,g,lv)}
   const all=STORIES.map((s,i)=>i);
   const pool=all.filter(i=>okLen(STORIES[i].c.length)&&!SY.used.includes(i)&&!(D.syRecent||[]).includes(i));
   const pool2=all.filter(i=>okLen(STORIES[i].c.length)&&!SY.used.includes(i));
   const si=pickOne(pool.length?pool:pool2.length?pool2:all.filter(i=>STORIES[i].c.length===3));
   SY.used.push(si);D.syRecent=[si,...(D.syRecent||[]).filter(x=>x!==si)].slice(0,Math.floor(STORIES.length*.6));
-  const cards=STORIES[si].c;
-  if(type==='next')return nextRound(cards);
+  storyPlay(type,STORIES[si].c,lv)}
+function storyPlay(type,cards,lv){
+  if(type==='next')return nextRound(cards,lv);
   let order;do{order=shuffle(cards.map((c,i)=>i))}while(order.every((v,i)=>v===i));
   Object.assign(SY,{type,slips:0,cards,order,slots:Array(cards.length).fill(null),lock:Array(cards.length).fill(false),first:true,say:'Xếp tranh theo thứ tự nhé! Cái gì xảy ra trước?'});
   render(`${topBar(gdots(SY.rounds,SY.round))}${guide(SY.say)}
@@ -2432,26 +2509,37 @@ async function syTell(){
   say(`${pickOne(['Bé kể chuyện hay quá!','Kể rõ ràng ghê!','Bíp thích truyện này lắm!'])} Thưởng thêm một ngôi sao!`);musicOn();
   later(syAdvance,2600)}
 // ---------- "what happens next?" ----------
-function nextRound(cards){
-  const n=cards.length,ans=cards[n-1],mine=new Set(cards.map(x=>x[0]));
-  // wrong choices come only from unrelated stories, so there is exactly one sensible ending
-  const seen=new Set([ans[0]]),others=[];for(const st of shuffle(STORIES)){if(st.c.some(x=>mine.has(x[0])))continue;const c=st.c[st.c.length-1];if(seen.has(c[0]))continue;seen.add(c[0]);others.push(c)}
+// "what's missing?": usually the end of the story, later also the beginning or a picture in the middle
+function nextRound(cards,lv=0){
+  const n=cards.length,w=SY_WORDS(n);
+  const m=lv<4?n-1:pickOne(lv<6?[n-1,n-1,0]:[n-1,0,...Array.from({length:n-2},(_,i)=>i+1)]);
+  const ans=cards[m],cap=i=>capOf(cards[i]);
+  // wrong choices come from unrelated stories or other generated sequences, at the same point of their story, so there is exactly one sensible answer
+  let others=[];
+  if(cards.gen){const used=[cards.gen];for(let j=0;j<2;j++){const o=genSeq(n,used);used.push(o.gen);others.push(o[m])}
+    // harder: the same thing at an earlier stage, going backwards in time
+    if(lv>=5&&m===n-1){const back=cards.all.map((c,i)=>i).filter(i=>i<cards.idx[n-2]&&!cards.idx.includes(i));if(back.length)others[1]=cards.all[pickOne(back)]}}
+  else{const mine=new Set(cards.map(x=>x[0])),seen=new Set([ans[0]]);
+    for(const st of shuffle(STORIES)){if(st.c.some(x=>mine.has(x[0])))continue;const L=st.c.length,c=st.c[m===n-1?L-1:m===0?0:rand(1,L-2)];if(seen.has(c[0]))continue;seen.add(c[0]);others.push(c);if(others.length>=2)break}}
   const opts=shuffle([ans,others[0],others[1]]);
-  Object.assign(SY,{type:'next',slips:0,first:true,cards,ans,say:'Chuyện gì xảy ra tiếp theo?'});
+  const ask=m===n-1?'Chuyện gì xảy ra tiếp theo?':m===0?'Chuyện gì xảy ra đầu tiên?':'Tranh nào còn thiếu?';
+  Object.assign(SY,{type:'next',slips:0,first:true,cards,ans,say:ask});
   render(`${topBar(gdots(SY.rounds,SY.round))}${guide(SY.say)}
-    <div class="sy-wrap"><div class="sy-slots">${cards.map((c,i)=>`${i?'<span class="sy-arrow">➜</span>':''}<div class="sy-slot ${i<n-1?'full locked':'qslot'}" data-s="${i}">${i<n-1?`<span class="sy-in">${storyArt(c[0])}<b>${capOf(c)}</b></span>`:'<span class="sy-q">?</span>'}<em>${i+1}</em></div>`).join('')}</div>
+    <div class="sy-wrap"><div class="sy-slots">${cards.map((c,i)=>`${i?'<span class="sy-arrow">➜</span>':''}<div class="sy-slot ${i!==m?'full locked':'qslot'}" data-s="${i}">${i!==m?`<span class="sy-in">${storyArt(c[0])}<b>${capOf(c)}</b></span>`:'<span class="sy-q">?</span>'}<em>${i+1}</em></div>`).join('')}</div>
     <div class="sy-pool">${opts.map((c,k)=>`<button class="sy-card" data-k="${c===ans?1:0}" data-t="${capOf(c)}." style="animation-delay:${(.3+k*.1).toFixed(1)}s">${storyArt(c[0])}<b>${capOf(c)}</b></button>`).join('')}</div></div>`);
   wireCommon(()=>SY.say);
-  const intro=unlockToast('storynext','Mới! Đoán xem chuyện gì xảy ra tiếp theo!');
-  const w=SY_WORDS(n);
-  const tour=pre=>syTour([...(pre?[[null,pre]]:[]),...cards.slice(0,n-1).map((c,i)=>[$$('.sy-slot')[i],`${w[i]}, ${capOf(c)}.`]),
-    [null,'Rồi chuyện gì xảy ra tiếp theo? Có ba tranh.'],...$$('.sy-card:not(.used)').map(b=>[b,b.dataset.t])],'Chọn tranh đúng nhé!');
-  syEars(()=>tour());tour(intro?'Mới! Đoán xem chuyện gì xảy ra tiếp theo!':null);
+  const news=m===n-1?['storynext','Mới! Đoán xem chuyện gì xảy ra tiếp theo!']:['storygap','Mới! Tìm tranh còn thiếu trong truyện!'];
+  const intro=unlockToast(news[0],news[1]);
+  const lead=m===n-1?'Rồi chuyện gì xảy ra tiếp theo? Có ba tranh.':m===0?'Vậy chuyện gì xảy ra đầu tiên? Có ba tranh.':'Tranh nào còn thiếu ở giữa? Có ba tranh.';
+  const tour=pre=>syTour([...(pre?[[null,pre]]:[]),...cards.map((c,i)=>i===m?(m===n-1?null:[$$('.sy-slot')[i],`${w[i]}, là gì nhỉ?`]):[$$('.sy-slot')[i],`${w[i]}, ${capOf(c)}.`]).filter(Boolean),
+    [null,lead],...$$('.sy-card:not(.used)').map(b=>[b,b.dataset.t])],'Chọn tranh đúng nhé!');
+  syEars(()=>tour());tour(intro?news[1]:null);
   $$('.sy-card').forEach(b=>b.onclick=()=>{if(SY.busy)return;
     if(b.dataset.k==='1'){SY.busy=true;stat('story',true);tone('ok');bipReact('happy');b.classList.add('right');
-      const q=$('.qslot');q.classList.add('full','locked');q.innerHTML=`<span class="sy-in">${storyArt(ans[0])}<b>${capOf(ans)}</b></span><em>${n}</em>`;sparkEl(q,20);
-      say(`${pickOne(PRAISE())} ${SY_WORDS(n)[n-1]}, ${capOf(ans)}.`);later(syAdvance,2600)}
-    else{SY.miss++;SY.slips++;SY.first=false;stat('story',false);tone('no');bipReact('sad');b.disabled=true;b.classList.add('used');say(`Chưa hợp lý. Sau khi ${capOf(cards[n-2])} thì sao nhỉ?`)}})}
+      const q=$('.qslot');q.classList.add('full','locked');q.innerHTML=`<span class="sy-in">${storyArt(ans[0])}<b>${capOf(ans)}</b></span><em>${m+1}</em>`;sparkEl(q,20);
+      say(`${pickOne(PRAISE())} ${w[m]}, ${capOf(ans)}.`);later(syAdvance,2600)}
+    else{SY.miss++;SY.slips++;SY.first=false;stat('story',false);tone('no');bipReact('sad');b.disabled=true;b.classList.add('used');
+      say(m===n-1?`Chưa hợp lý. Sau khi ${cap(n-2)} thì sao nhỉ?`:m===0?`Chưa hợp lý. Trước khi ${cap(1)} thì sao nhỉ?`:`Chưa hợp lý. Sau khi ${cap(m-1)}, trước khi ${cap(m+1)} thì sao nhỉ?`)}})}
 // ---------- "why?" (cause and effect) ----------
 function whyRound(lv){
   const pool=WHY.map((w,i)=>i).filter(i=>!SY.whyUsed.includes(i)&&!(D.whyRecent||[]).includes(i));const wi=pickOne(pool.length?pool:WHY.map((w,i)=>i));
