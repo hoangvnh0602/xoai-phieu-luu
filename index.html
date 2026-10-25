@@ -2541,21 +2541,53 @@ function nextRound(cards,lv=0){
     else{SY.miss++;SY.slips++;SY.first=false;stat('story',false);tone('no');bipReact('sad');b.disabled=true;b.classList.add('used');
       say(m===n-1?`Chưa hợp lý. Sau khi ${cap(n-2)} thì sao nhỉ?`:m===0?`Chưa hợp lý. Trước khi ${cap(1)} thì sao nhỉ?`:`Chưa hợp lý. Sau khi ${cap(m-1)}, trước khi ${cap(m+1)} thì sao nhỉ?`)}})}
 // ---------- "why?" (cause and effect) ----------
+// ---------- generated cause and effect: each cause has several effects, so questions combine into many different puzzles.
+// "also" lists other causes that would also explain an effect: those are never offered as wrong answers ----------
+const CAUSES=[
+  {id:'nang',e:'☀️',why:'vì trời nắng nóng',if:'Trời nắng nóng',fx:[['🍦','que kem tan chảy'],['🧊','cục đá tan thành nước'],['👕','quần áo phơi mau khô',['gio']],['👒','{K} đội mũ khi ra ngoài']]},
+  {id:'mua',e:'🌧️',why:'vì trời mưa',if:'Trời đổ mưa',fx:[['☂️','mọi người bật ô',['nang']],['💧','sân có vũng nước'],['🧥','áo của {K} bị ướt',['chay']]]},
+  {id:'toi',e:'🌙',why:'vì trời tối rồi',if:'Trời tối rồi',fx:[['💡','bố bật đèn lên',['mua']],['⭐','thấy sao trên trời'],['🦉','cú mèo thức dậy']]},
+  {id:'lanh',e:'❄️',why:'vì trời lạnh',if:'Trời trở lạnh',fx:[['🧣','{K} quàng khăn ấm',['gio','mua']],['🥶','{K} run cầm cập',['gio']],['🍵','cả nhà uống nước ấm']]},
+  {id:'doi',e:'🍽️',why:'vì đói bụng',if:'{K} đói bụng',fx:[['🍚','{K} ăn hết bát cơm',['chay']],['🥪','mẹ làm bánh mì cho {K}']]},
+  {id:'ngu',e:'💤',why:'vì buồn ngủ',if:'{K} buồn ngủ',fx:[['🥱','{K} ngáp dài',['toi']],['🛏️','{K} lên giường nằm',['toi']]]},
+  {id:'nga',e:'🤕',why:'vì bị ngã',if:'{K} bị ngã',fx:[['🩹','dán băng cá nhân'],['🦵','đầu gối bị đau']]},
+  {id:'khan',e:'🚱',why:'vì không ai tưới nước',if:'Lâu ngày không tưới cây',fx:[['🥀','cây bị héo',['nang']]]},
+  {id:'tuoi',e:'🚿',why:'vì được tưới nước mỗi ngày',if:'{K} tưới cây mỗi ngày',fx:[['🌻','hoa nở thật đẹp',['mua','nang']],['🌱','cây xanh tốt',['mua','nang']]]},
+  {id:'gio',e:'🌬️',why:'vì có gió to',if:'Gió thổi thật mạnh',fx:[['🪁','diều bay thật cao'],['🍂','lá cây rơi xuống',['khan']],['🧢','mũ bay mất']]},
+  {id:'pin',e:'🪫',why:'vì hết pin',if:'Đồ chơi hết pin',fx:[['🚗','xe đồ chơi không chạy'],['🔦','đèn pin không sáng'],['🤖','Bíp nằm im',['ngu']]]},
+  {id:'sn',e:'🎂',why:'vì là sinh nhật {K}',if:'Hôm nay sinh nhật {K}',fx:[['🎁','{K} được nhận quà'],['🎈','nhà treo đầy bóng bay']]},
+  {id:'bun',e:'🟤',why:'vì nghịch bùn',if:'{K} nghịch bùn',fx:[['🛁','{K} phải đi tắm',['chay','mua']],['🩳','quần áo lấm lem',['mua']]]},
+  {id:'keo',e:'🍬',why:'vì ăn nhiều kẹo',if:'{K} ăn thật nhiều kẹo',fx:[['🦷','răng bị sâu',['rang']]]},
+  {id:'rang',e:'🪥',why:'vì không chịu đánh răng',if:'{K} không chịu đánh răng',fx:[['😬','miệng bị hôi',['keo']]]},
+  {id:'chay',e:'🏃',why:'vì chạy nhảy nhiều',if:'{K} chạy nhảy cả buổi',fx:[['🥤','{K} khát nước',['nang']],['💦','{K} đổ mồ hôi',['nang']]]}];
+const causesOf=(c,f)=>new Set([c.id,...(f[2]||[])]);
+// mode 'why': see an effect, choose the cause. mode 'next': see a cause, predict the effect.
+function genWhy(mode,avoid){
+  const all=[];CAUSES.forEach(c=>c.fx.forEach(f=>all.push([c,f])));
+  const fresh=all.filter(([c,f])=>!avoid.includes(c.id+f[1]));const [C,F]=pickOne(fresh.length?fresh:all),key=C.id+F[1];
+  if(mode==='why'){const ok=causesOf(C,F);const no=shuffle(CAUSES.filter(x=>!ok.has(x.id))).slice(0,2).map(x=>[x.e,x.why]);
+    return {key,mode,e:F[0],see:F[1],q:`Vì sao ${F[1]}?`,a:[C.e,C.why],no,join:`${F[1]}, ${C.why}`}}
+  const no=shuffle(all.filter(([c,f])=>c!==C&&!causesOf(c,f).has(C.id))).filter((x,i,a)=>a.findIndex(y=>y[0]===x[0])===i).slice(0,2).map(([c,f])=>[f[0],f[1]]);
+  return {key,mode,e:C.e,see:C.if,q:`${C.if}. Rồi chuyện gì sẽ xảy ra?`,a:[F[0],F[1]],no,join:`${C.if}, nên ${F[1]}`}}
 function whyRound(lv){
-  const pool=WHY.map((w,i)=>i).filter(i=>!SY.whyUsed.includes(i)&&!(D.whyRecent||[]).includes(i));const wi=pickOne(pool.length?pool:WHY.map((w,i)=>i));
-  SY.whyUsed.push(wi);D.whyRecent=[wi,...(D.whyRecent||[]).filter(x=>x!==wi)].slice(0,Math.floor(WHY.length*.6));
-  const W=WHY[wi],q=syTxt(W.q),opts=shuffle([[...W.a,1],...W.no.map(x=>[...x,0])]);
+  // most questions are combined from the cause and effect table; from level 4 half of those ask to predict what happens next
+  let W;
+  if(Math.random()<.6){const mode=lv>=4&&Math.random()<.5?'next':'why';W=genWhy(mode,D.whyGenRecent||[]);D.whyGenRecent=[W.key,...(D.whyGenRecent||[])].slice(0,24)}
+  else{const pool=WHY.map((w,i)=>i).filter(i=>!SY.whyUsed.includes(i)&&!(D.whyRecent||[]).includes(i));const wi=pickOne(pool.length?pool:WHY.map((w,i)=>i));
+    SY.whyUsed.push(wi);D.whyRecent=[wi,...(D.whyRecent||[]).filter(x=>x!==wi)].slice(0,Math.floor(WHY.length*.6));W={...WHY[wi],mode:'why'};W.join=`${W.see}, ${W.a[1]}`}
+  const q=syTxt(W.q),opts=shuffle([[...W.a,1],...W.no.map(x=>[...x,0])]);
   Object.assign(SY,{type:'why',slips:0,first:true,say:q});
   render(`${topBar(gdots(SY.rounds,SY.round))}${guide(q)}
-    <div class="sy-wrap"><div class="sy-slots why"><div class="sy-slot full locked wbig"><span class="sy-in"><span class="se">${W.e}</span><b>${syTxt(W.see)}</b></span></div><div class="why-q">Vì sao?</div></div>
+    <div class="sy-wrap"><div class="sy-slots why"><div class="sy-slot full locked wbig"><span class="sy-in"><span class="se">${W.e}</span><b>${syTxt(W.see)}</b></span></div><div class="why-q">${W.mode==='next'?'Rồi sao?':'Vì sao?'}</div></div>
     <div class="sy-pool">${opts.map((o,k)=>`<button class="sy-card" data-k="${o[2]}" data-t="${syTxt(o[1])}." style="animation-delay:${(.3+k*.1).toFixed(1)}s"><span class="se">${o[0]}</span><b>${syTxt(o[1])}</b></button>`).join('')}</div></div>`);
   wireCommon(()=>SY.say);
-  const intro=unlockToast('storywhy','Mới! Câu hỏi Vì sao? Nghĩ thật kỹ nhé!');
-  const tour=pre=>syTour([...(pre?[[null,pre]]:[]),[$('.wbig'),syTxt(W.see)+'.'],[null,q+' Có ba câu trả lời.'],...$$('.sy-card:not(.used)').map(b=>[b,b.dataset.t])],'Chọn câu đúng nhé!');
-  syEars(()=>tour());tour(intro?'Mới! Câu hỏi Vì sao? Nghĩ thật kỹ nhé!':null);
+  const news=W.mode==='next'?['storypredict','Mới! Đoán xem rồi chuyện gì sẽ xảy ra!']:['storywhy','Mới! Câu hỏi Vì sao? Nghĩ thật kỹ nhé!'];
+  const intro=unlockToast(news[0],news[1]);
+  const tour=pre=>syTour([...(pre?[[null,pre]]:[]),[$('.wbig'),syTxt(W.see)+'.'],[null,(W.mode==='next'?'Rồi chuyện gì sẽ xảy ra?':q)+' Có ba câu trả lời.'],...$$('.sy-card:not(.used)').map(b=>[b,b.dataset.t])],'Chọn câu đúng nhé!');
+  syEars(()=>tour());tour(intro?news[1]:null);
   $$('.sy-card').forEach(b=>b.onclick=()=>{if(SY.busy)return;
     if(b.dataset.k==='1'){SY.busy=true;stat('story',true);tone('ok');bipReact('happy');b.classList.add('right');sparkEl(b,20);
-      say(`${pickOne(PRAISE())} ${syTxt(W.see)}, ${syTxt(W.a[1])}.`);later(syAdvance,3000)}
+      say(`${pickOne(PRAISE())} ${syTxt(W.join)}.`);later(syAdvance,3000)}
     else{SY.miss++;SY.slips++;SY.first=false;stat('story',false);tone('no');bipReact('sad');b.disabled=true;b.classList.add('used');say('Hmm, chưa đúng. Nghĩ lại nhé!')}})}
 
 // ---------- 5. Đếm cùng Bé Cốm (số và đếm: đếm trong phạm vi 10, nhiều hơn / ít hơn, chữ số, thứ tự số) ----------
