@@ -891,8 +891,15 @@ function say(t,then,_id){const id=_id||++sayId,est=Math.min(6000,600+String(t).l
   if(!viVoice){if(!voicesReady){setTimeout(()=>{if(id!==sayId)return;if(viVoice)say(t,then,id);else{noVoiceNotice();quiet()}},700);return}noVoiceNotice();quiet();return}
   lastSay=Date.now();
   try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='vi-VN';u.voice=viVoice;u.rate=D.rate||1;u.pitch=1;
-    u.onend=()=>{talking(false);done()};u.onerror=()=>{talking(false);done()};talking(true,est);speechSynthesis.speak(u);
-    if(then)setTimeout(done,est+3000) /* some browsers never send 'end' */}catch(e){quiet()}}
+    u.onend=()=>{talking(false);done()};u.onerror=()=>{talking(false);done()};talking(true,est);
+    // keep a reference: Chrome on Android drops utterances that are garbage-collected and never sends 'end' for them
+    say.cur=u;speechSynthesis.speak(u);
+    if(then){
+      // do not rely on 'end' alone: once the engine has started talking, it going quiet also counts as the end of the sentence
+      const t0=Date.now();let seen=false;const iv=setInterval(()=>{if(id!==sayId||!then){clearInterval(iv);return}
+        const busy=speechSynthesis.speaking||speechSynthesis.pending;
+        if(busy&&Date.now()-t0>150)seen=true;else if(!busy&&seen){clearInterval(iv);talking(false);setTimeout(done,120)}},100);
+      setTimeout(()=>{clearInterval(iv);done()},est/(D.rate||1)+1500)}}catch(e){quiet()}}
 // intro of a new twist, then always the instruction for this screen
 function sayThen(a,b,after){say(a,()=>say(b,after))}
 // awaitable: resolves when the sentence has finished (or another sentence replaced it), never sooner than min ms
@@ -2732,7 +2739,7 @@ function numOp(news){
     if(type==='add'){const B=$('#opB');B.classList.remove('wait');tone('pop');B.classList.add('tell');await sayW(story[1],1200);B.classList.remove('tell')}
     else if(type==='sub'){const out=its().slice(-b);await wait(200);out.forEach((x,i)=>setTimeout(()=>{x.classList.add('gone');tone('pop')},i*220));await sayW(story[1],1200)}
     else{A.classList.add('tell');await sayW(story[1],900);A.classList.remove('tell')}
-    if(g!==gen)return;$$('.op-eq span').forEach((x,i)=>setTimeout(()=>x.classList.add('on'),i*120));await wait(700);showChoices()})();
+    if(g!==gen)return;$$('.op-eq span').forEach((x,i)=>setTimeout(()=>x.classList.add('on'),i*80));await wait(380);showChoices()})();
   // the speaker button repeats the whole little story
   const rep=()=>{tone('tap');say(story.join(' ')+' '+ask)};$('#again')&&($('#again').onclick=rep);$('.bip')&&($('.bip').onclick=rep);
 }
